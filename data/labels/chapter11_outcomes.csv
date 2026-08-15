@@ -1,0 +1,157 @@
+cik,company,event_date,outcome,survived,periodic_filings_after,deregistration_date,last_filing_date
+1415404,EchoStar CORP,2026-08-02,in_process,0,1,,2026-08-13
+1001233,"SANGAMO THERAPEUTICS, INC",2026-06-23,in_process,0,0,,2026-08-14
+827187,Sleep Number Corp,2026-06-12,deregistered,0,0,2026-08-03,2026-08-11
+1808220,"GoHealth, Inc.",2026-06-07,deregistered,0,0,2026-07-21,2026-07-23
+720154,"Inotiv, Inc.",2026-06-03,deregistered,0,0,2026-07-29,2026-07-29
+1519061,Trinseo PLC,2026-05-26,in_process,0,1,,2026-08-14
+1901799,Bitcoin Depot Inc.,2026-05-18,in_process,0,0,,2026-07-13
+1355096,"Old QVC Group, Inc.",2026-04-16,emerged,1,2,,2026-08-11
+1254699,"QVC Group, Inc.",2026-04-16,emerged,1,2,,2026-08-13
+1058623,CUMULUS MEDIA INC,2026-03-04,emerged,1,2,,2026-04-30
+1532286,"Nine Energy Service, Inc.",2026-02-01,emerged,1,3,,2026-08-14
+1705012,"Fat Brands, Inc",2026-01-26,in_process,0,0,,2026-06-18
+1758057,"Luminar Technologies, Inc./DE",2025-12-15,deregistered,0,1,2026-04-07,2026-05-15
+1159167,IROBOT CORP,2025-12-14,deregistered,0,0,2026-01-26,2026-01-26
+1456772,OFFICE PROPERTIES INCOME TRUST,2025-10-30,emerged,1,4,,2026-08-13
+1893311,LUXURBAN HOTELS INC.,2025-09-14,went_dark,0,0,,2025-09-18
+1220754,ModivCare Inc,2025-08-20,deregistered,0,2,2025-12-29,2025-12-29
+1455684,"TPI COMPOSITES, INC",2025-08-11,deregistered,0,2,2026-03-26,2026-03-26
+895419,"WOLFSPEED, INC.",2025-06-30,emerged,1,4,,2026-08-14
+1772695,Sunnova Energy International Inc.,2025-06-08,went_dark,0,0,,2025-06-17
+105319,"WW INTERNATIONAL, INC.",2025-05-06,emerged,1,5,,2026-08-14
+748790,"Global Clean Energy Holdings, Inc.",2025-04-18,deregistered,0,0,2025-08-12,2025-08-14
+1830210,"Benson Hill, Inc.",2025-03-25,went_dark,0,0,,2025-09-03
+1804591,Chrome Holding Co.,2025-03-24,deregistered,0,2,2025-12-04,2025-12-04
+1779020,"Danimer Scientific, Inc.",2025-03-18,went_dark,0,0,,2025-05-15
+1101680,DZS INC.,2025-03-14,went_dark,0,0,,2025-12-17
+1162461,CUTERA INC,2025-03-05,deregistered,0,0,2025-03-31,2025-07-16
+1731289,Nikola Corp,2025-02-19,deregistered,0,1,2025-10-10,2025-10-10
+1850838,"Omega Therapeutics, Inc.",2025-02-10,deregistered,0,0,2025-03-31,2025-03-31
+1835972,"iLearningEngines, Inc.",2024-12-23,went_dark,0,0,,2025-05-29
+1411688,"Container Store Group, Inc.",2024-12-22,deregistered,0,0,2025-02-04,2025-02-12
+1584754,ATECH (PARENT) RESOLUTION CORP.,2024-12-16,went_dark,0,0,,2025-06-06
+837852,"IDEANOMICS, INC.",2024-12-06,went_dark,0,0,,2025-08-12
+1537028,"Independence Contract Drilling, Inc.",2024-12-03,deregistered,0,0,2025-01-17,2025-01-22
+1813914,"CareMax, Inc.",2024-11-18,deregistered,0,0,2025-02-21,2025-02-21
+1498710,"Spirit Aviation Holdings, Inc.",2024-11-18,deregistered,0,6,2025-03-13,2026-06-22
+1580864,"Vroom, Inc.",2024-11-13,emerged,1,7,,2026-08-10
+1656634,"Gritstone bio, Inc.",2024-10-10,deregistered,0,0,2025-04-04,2025-04-08
+890447,Vertex Energy Inc.,2024-09-24,deregistered,0,0,2025-02-03,2025-02-03
+1723580,"BurgerFi International, Inc.",2024-09-17,went_dark,0,0,,2025-03-19
+1008654,TUPPERWARE BRANDS CORP,2024-09-17,went_dark,0,0,,2024-11-29
+1391127,"Edgio, Inc.",2024-09-09,deregistered,0,0,2024-10-25,2024-10-28
+768835,FORMER BL STORES INC,2024-09-09,went_dark,0,1,,2025-11-13
+1396033,"LL Flooring Holdings, Inc.",2024-08-11,deregistered,0,0,2025-05-13,2025-05-13
+867773,SUNPOWER CORP,2024-08-05,went_dark,0,0,,2024-09-20
+1223389,CONNS INC,2024-07-25,went_dark,0,0,,2025-02-14
+1459417,"2U, LLC",2024-07-24,deregistered,0,1,2024-09-25,2025-01-10
+1834045,"Vintage Wine Estates, Inc.",2024-07-24,deregistered,0,0,2024-08-19,2025-02-11
+1101396,"DELTA APPAREL, INC",2024-06-30,went_dark,0,0,,2025-01-08
+1720990,Fisker Inc./DE,2024-06-24,went_dark,0,0,,2024-08-15
+1651944,"DermTech, Inc.",2024-06-18,deregistered,0,0,2026-04-02,2026-04-02
+730255,CalAmp Corp.,2024-06-03,deregistered,0,0,2024-08-01,2024-08-01
+1634447,"ISUN, INC.",2024-06-03,went_dark,0,0,,2024-10-23
+1811109,"Applied UV, Inc.",2024-05-31,went_dark,0,0,,2024-06-28
+1353538,"Appgate, Inc.",2024-05-06,deregistered,0,0,2024-07-03,2024-07-03
+1483510,"EXP OldCo Winddown, Inc.",2024-04-22,deregistered,0,1,2024-04-24,2024-12-31
+1333835,Casa Systems Inc,2024-04-03,deregistered,0,0,2024-06-10,2024-06-10
+1811856,"View, Inc.",2024-04-02,deregistered,0,0,2024-05-24,2024-11-13
+1008848,"Acorda Therapeutics, Inc.",2024-04-01,deregistered,0,1,2024-08-13,2024-08-13
+1305253,"Eiger BioPharmaceuticals, Inc.",2024-04-01,deregistered,0,1,2024-10-01,2024-10-01
+1823882,Airspan Networks Holdings Inc.,2024-03-31,deregistered,0,1,2024-10-04,2024-10-04
+1711291,CURO Group Holdings Corp.,2024-03-25,deregistered,0,0,2024-03-29,2024-03-29
+1834585,JOANN Inc.,2024-03-18,deregistered,0,0,2024-05-01,2024-05-01
+1592057,"Enviva, LLC",2024-03-12,deregistered,0,1,2024-10-21,2025-02-05
+1277250,"Charge Enterprises, Inc.",2024-03-07,deregistered,0,0,2024-05-03,2024-05-06
+1078207,BOWFLEX INC.,2024-03-04,deregistered,0,1,2024-04-25,2024-08-21
+1347652,"CorEnergy Infrastructure Trust, Inc.",2024-02-25,deregistered,0,1,2024-05-14,2024-05-14
+1501134,Invitae Corp,2024-02-13,went_dark,0,0,,2025-01-10
+1551693,"PROJECT SAGE OLDCO, INC.",2024-02-12,deregistered,0,0,2024-06-25,2024-06-25
+1800682,"Cano Health, Inc.",2024-02-05,deregistered,0,2,2024-07-01,2024-07-12
+1401708,"NS Wind Down Co., Inc.",2024-02-05,deregistered,0,0,2024-06-26,2024-11-06
+1067837,"AUDACY, INC.",2024-01-05,deregistered,0,3,2024-10-01,2024-10-01
+1861449,"Bird Global, Inc.",2023-12-20,went_dark,0,0,,2024-01-10
+814549,EBIX INC,2023-12-17,deregistered,0,0,2024-08-30,2024-08-30
+1784567,"Harbor Custom Development, Inc.",2023-12-11,deregistered,0,1,2024-05-08,2024-05-08
+1826671,"Near Intelligence, Inc.",2023-12-11,deregistered,0,0,2024-03-28,2024-05-09
+1021096,"Troika Media Group, Inc.",2023-12-07,deregistered,0,1,2024-04-11,2024-04-11
+1813756,WeWork Inc.,2023-11-06,deregistered,0,0,2024-06-11,2024-07-03
+1821850,Sunlight Financial Holdings Inc.,2023-10-31,went_dark,0,0,,2023-12-08
+1776197,AKUMIN INC.,2023-10-22,deregistered,0,1,2024-02-07,2024-02-12
+84129,"NEW RITE AID, LLC",2023-10-15,deregistered,0,1,2025-03-03,2025-03-03
+1762322,"SHIFT TECHNOLOGIES, INC.",2023-10-09,deregistered,0,0,2024-11-27,2024-11-27
+1872356,"Molekule Group, Inc.",2023-10-03,deregistered,0,0,2024-03-27,2024-03-27
+1775625,"SmileDirectClub, Inc.",2023-09-29,went_dark,0,0,,2023-12-27
+1009759,"Capstone Energy Plus, Inc.",2023-09-28,emerged,1,14,,2026-08-13
+1770141,"UpHealth, Inc.",2023-09-19,emerged,1,3,,2026-05-15
+1446687,"SILVER STAR PROPERTIES REIT, INC",2023-09-13,in_process,0,1,,2026-06-08
+1108967,"Orbital Infrastructure Group, Inc.",2023-08-23,deregistered,0,0,2023-12-07,2023-12-12
+1365916,"AMYRIS, INC.",2023-08-09,deregistered,0,0,2024-05-07,2024-05-07
+1820630,Proterra Inc,2023-08-07,deregistered,0,2,2024-03-14,2024-03-14
+716006,Yellow Corp,2023-08-06,deregistered,0,1,2023-09-21,2024-02-14
+1807707,"AppHarvest, Inc.",2023-07-24,deregistered,0,0,2023-12-05,2024-02-14
+1136294,"NOS4-1, Inc.",2023-07-24,went_dark,0,1,,2024-01-12
+1467154,"NVN Liquidation, Inc.",2023-07-17,went_dark,0,0,,2024-05-01
+1597313,"ViewRay, Inc.",2023-07-16,went_dark,0,0,,2024-02-14
+1741231,"Tattooed Chef, Inc.",2023-07-02,went_dark,0,0,,2024-04-25
+870826,"Legacy IMBDS, Inc.",2023-06-28,deregistered,0,0,2024-04-01,2024-10-08
+1759546,Stark Novus Financial Inc.,2023-06-27,emerged,1,12,,2026-07-21
+1760173,"SURGALIGN HOLDINGS, INC.",2023-06-19,deregistered,0,0,2023-11-13,2024-02-14
+1794905,"Cyxtera Technologies, Inc.",2023-06-04,deregistered,0,0,2024-01-26,2024-02-14
+28823,"DIEBOLD NIXDORF, Inc",2023-06-01,emerged,1,13,,2026-07-31
+1839412,QualTek Services Inc.,2023-05-24,deregistered,0,1,2023-07-20,2023-07-20
+1300699,"Athenex, Inc.",2023-05-14,went_dark,0,0,,2023-10-18
+57725,LANNETT CO INC,2023-05-02,deregistered,0,1,2023-06-20,2023-06-23
+886158,"20230930-DK-Butterfly-1, Inc.",2023-04-23,deregistered,0,1,2023-09-29,2023-12-04
+1377630,"National CineMedia, Inc.",2023-04-11,emerged,1,15,,2026-08-12
+1835567,"Pear Therapeutics, Inc.",2023-04-07,went_dark,0,0,,2023-05-02
+1843388,"Virgin Orbit Holdings, Inc.",2023-04-04,deregistered,0,1,2023-08-02,2023-08-04
+1828672,"Boxed, Inc.",2023-04-02,went_dark,0,0,,2023-05-02
+1659352,"Codiak BioSciences, Inc.",2023-03-27,went_dark,0,0,,2024-02-14
+1652724,"Lucira Health, Inc.",2023-02-22,deregistered,0,0,2023-10-04,2023-10-04
+1418100,Avaya Holdings Corp.,2023-02-14,deregistered,0,3,2023-02-27,2024-02-15
+850261,"Sorrento Therapeutics, Inc.",2023-02-13,emerged,1,3,,2025-02-21
+742112,INVACARE HOLDINGS Corp,2023-01-31,deregistered,0,2,2023-05-17,2024-10-31
+1852117,Rockley Photonics Holdings Ltd,2023-01-23,deregistered,0,1,2023-05-15,2023-05-15
+1592058,Party City Holdco Inc.,2023-01-18,deregistered,0,4,2024-01-02,2024-09-26
+1595585,"Tricida, Inc.",2023-01-11,deregistered,0,0,2023-06-13,2023-06-16
+1596946,Quotient Ltd,2023-01-10,deregistered,0,1,2023-06-30,2023-06-30
+1839341,"Core Scientific, Inc./tx",2022-12-21,emerged,1,15,,2026-08-14
+1466301,"Clovis Oncology, Inc.",2022-12-13,deregistered,0,0,2023-07-11,2023-07-17
+1069996,FedNat Holding Co,2022-12-12,went_dark,0,0,,2023-02-16
+1832351,"Fast Radius, Inc.",2022-11-08,went_dark,0,1,,2023-02-10
+1579823,"NewAge, Inc.",2022-08-30,went_dark,0,0,,2022-09-15
+1593034,Endo International plc,2022-08-16,deregistered,0,6,2023-01-31,2025-02-14
+1830180,"Legacy EJY, Inc.",2022-06-30,deregistered,0,1,2022-12-15,2024-11-14
+887921,REVLON INC /DE/,2022-06-15,deregistered,0,3,2023-05-02,2023-05-03
+1084384,PARETEUM Corp,2022-05-15,deregistered,0,0,2023-01-18,2023-01-18
+1655075,"Armstrong Flooring, Inc.",2022-05-08,went_dark,0,0,,2022-10-06
+1587246,"Cypress Environmental Partners, L.P.",2022-05-08,deregistered,0,0,2022-05-19,2022-07-07
+1522690,"GWG Holdings, Inc.",2022-04-20,deregistered,0,0,2024-01-02,2024-01-17
+866609,ION GEOPHYSICAL CORP,2022-04-13,went_dark,0,0,,2023-11-14
+1525773,Intelsat S.A.,2021-12-20,deregistered,0,0,2022-01-24,2022-01-24
+352998,"Teligent, Inc.",2021-10-15,went_dark,0,0,,2022-02-14
+1648428,"Sequential Brands Group, Inc.",2021-08-31,deregistered,0,0,2022-03-09,2022-03-09
+1109189,"BASIC ENERGY SERVICES, INC.",2021-08-18,went_dark,0,0,,2023-05-23
+1594686,WASHINGTON PRIME GROUP INC.,2021-06-14,deregistered,0,1,2021-10-21,2022-02-11
+1583077,"Hospitality Investors Trust, Inc.",2021-05-19,deregistered,0,0,2021-07-01,2021-07-21
+1036848,Mega Matrix Corp.,2021-03-29,deregistered,0,15,2024-11-07,2024-11-07
+1725526,HighPoint Resources Corp,2021-03-14,deregistered,0,0,2021-04-19,2021-04-19
+883943,CHRISTOPHER & BANKS CORP,2021-01-13,deregistered,0,0,2021-03-30,2022-02-14
+922358,FERRELLGAS PARTNERS L P,2021-01-11,emerged,1,22,,2026-07-21
+886835,SUPERIOR ENERGY SERVICES INC,2020-12-07,deregistered,0,16,2021-02-03,2025-01-30
+1399935,FHC Holdings Corp,2020-12-03,deregistered,0,0,2022-01-26,2022-01-26
+1275229,"General Moly, Inc",2020-11-18,went_dark,0,0,,2021-04-01
+874499,GULFPORT ENERGY CORP,2020-11-13,emerged,1,23,,2026-08-12
+77281,PENNSYLVANIA REAL ESTATE INVESTMENT TRUST,2020-11-03,deregistered,0,13,2024-04-01,2024-04-03
+910612,CBL & ASSOCIATES PROPERTIES INC,2020-11-02,emerged,1,24,,2026-08-07
+1567892,Keenova Therapeutics plc,2020-10-12,emerged,1,24,,2026-08-11
+1486159,Chord Energy Corp,2020-09-30,emerged,1,24,,2026-08-14
+1661920,Lonestar Resources US Inc.,2020-09-30,deregistered,0,4,2021-10-08,2022-02-11
+1529463,"FTS International, Inc.",2020-09-22,emerged,1,5,,2022-04-08
+1281774,TOWN SPORTS INTERNATIONAL HOLDINGS INC,2020-09-14,deregistered,0,0,2022-01-31,2022-01-31
+904979,SHILOH INDUSTRIES INC,2020-08-31,deregistered,0,1,2020-11-09,2021-02-12
+1514732,"SAExploration Holdings, Inc.",2020-08-27,deregistered,0,1,2020-12-18,2021-11-30
+314808,Valaris Ltd,2020-08-19,deregistered,0,24,2021-02-02,2026-08-12
+1346980,"Chaparral Energy, Inc.",2020-08-17,deregistered,0,0,2020-10-14,2021-02-12

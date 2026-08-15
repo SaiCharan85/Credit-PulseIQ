@@ -1,0 +1,672 @@
+cik,company,sic,fts_date,item103_date,item103_accession,source_url,petition_date,date_basis,total_assets,periodic_filings_before,last_periodic,has_item103,has_chapter11_text,has_chapter7_text,verdict,reasons
+1415404,EchoStar CORP,4899,2026-08-03,2026-08-03,0001415404-26-000038,https://www.sec.gov/Archives/edgar/data/1415404/000141540426000038/sats-20260728x8k.htm,2026-08-02,petition_date_from_8k_text,41375692000.0,74,2026-05-11,True,True,False,confirmed,
+1813756,WeWork Inc.,6512,2023-11-07,2023-11-07,0001193125-23-271902,https://www.sec.gov/Archives/edgar/data/1813756/000119312523271902/d522028d8k.htm,2023-11-06,petition_date_from_8k_text,15063000000.0,13,2023-08-08,True,True,False,confirmed,
+1772695,Sunnova Energy International Inc.,4931,2025-06-09,2025-06-09,0001772695-25-000105,https://www.sec.gov/Archives/edgar/data/1772695/000177269525000105/nova-20250608.htm,2025-06-08,petition_date_from_8k_text,13353699000.0,23,2025-03-03,True,True,False,confirmed,
+1525773,Intelsat S.A.,4899,2021-12-20,2021-12-20,0001193125-21-362431,https://www.sec.gov/Archives/edgar/data/1525773/000119312521362431/d274948d8k.htm,2021-12-20,8k_filing_date_fallback,13253070000.0,8,2021-11-05,True,True,False,confirmed,
+1498710,"Spirit Aviation Holdings, Inc.",4512,2024-11-18,2024-11-18,0000950103-24-016405,https://www.sec.gov/Archives/edgar/data/1498710/000095010324016405/dp220813_8k.htm,2024-11-18,8k_filing_date_fallback,9559456000.0,53,2024-08-01,True,True,False,confirmed,
+1567892,Keenova Therapeutics plc,2834,2022-05-03,2022-05-03,0001193125-22-138759,https://www.sec.gov/Archives/edgar/data/1567892/000119312522138759/d232880d8k.htm,2022-05-03,8k_filing_date_fallback,8916300000.0,34,2022-03-15,True,True,True,confirmed,
+1254699,"QVC Group, Inc.",5961,2026-04-17,2026-04-17,0001104659-26-044600,https://www.sec.gov/Archives/edgar/data/1254699/000110465926044600/tm2611636d1_8k.htm,2026-04-16,petition_date_from_8k_text,8456000000.0,53,2026-04-15,True,True,False,confirmed,
+1166126,"Old COPPER Company, Inc.",5311,2021-02-01,2021-02-01,0001193125-21-023867,https://www.sec.gov/Archives/edgar/data/1166126/000119312521023867/d123081d8k.htm,2021-02-01,8k_filing_date_fallback,8134000000.0,76,2020-12-10,True,True,False,confirmed,
+84129,"NEW RITE AID, LLC",5912,2023-10-16,2023-10-16,0001104659-23-109413,https://www.sec.gov/Archives/edgar/data/84129/000110465923109413/tm2328535d1_8ka.htm,2023-10-15,petition_date_from_8k_text,7650418000.0,115,2023-07-11,True,True,True,confirmed,
+1355096,"Old QVC Group, Inc.",5961,2026-04-17,2026-04-17,0001104659-26-044521,https://www.sec.gov/Archives/edgar/data/1355096/000110465926044521/tm2611635d1_8k.htm,2026-04-16,petition_date_from_8k_text,7643000000.0,79,2026-04-15,True,True,False,confirmed,
+895419,"WOLFSPEED, INC.",3674,2025-07-01,2025-07-01,0001193125-25-153145,https://www.sec.gov/Archives/edgar/data/895419/000119312525153145/d755867d8k.htm,2025-06-30,petition_date_from_8k_text,7574200000.0,115,2025-05-09,True,True,False,confirmed,
+1593034,Endo International plc,2834,2022-08-17,2022-08-17,0001193125-22-222687,https://www.sec.gov/Archives/edgar/data/1593034/000119312522222687/d394120d8k.htm,2022-08-16,petition_date_from_8k_text,6362262000.0,34,2022-08-09,True,True,True,confirmed,
+1418100,Avaya Holdings Corp.,7372,2023-02-14,2023-02-14,0001193125-23-039349,https://www.sec.gov/Archives/edgar/data/1418100/000119312523039349/d811637d8k.htm,2023-02-14,petition_date_from_8k_text,5824000000.0,18,2022-05-10,True,True,False,confirmed,
+949039,"DIAMOND OFFSHORE DRILLING, INC.",1381,2021-04-14,2021-04-14,0001193125-21-115558,https://www.sec.gov/Archives/edgar/data/949039/000119312521115558/d135254d8k.htm,2021-04-14,8k_filing_date_fallback,4948453000.0,96,2021-02-10,True,True,False,confirmed,
+886158,"20230930-DK-Butterfly-1, Inc.",5700,2023-04-24,2023-04-24,0001193125-23-111754,https://www.sec.gov/Archives/edgar/data/886158/000119312523111754/d465247d8k.htm,2023-04-23,petition_date_from_8k_text,4401426000.0,108,2023-01-26,True,True,False,confirmed,
+910612,CBL & ASSOCIATES PROPERTIES INC,6798,2021-08-12,2021-08-12,0001564590-21-043767,https://www.sec.gov/Archives/edgar/data/910612/000156459021043767/cbl-8k_20210811.htm,2021-08-12,8k_filing_date_fallback,4280187000.0,101,2021-05-17,True,True,True,confirmed,
+1594686,WASHINGTON PRIME GROUP INC.,6798,2021-06-14,2021-06-14,0001437749-21-014660,https://www.sec.gov/Archives/edgar/data/1594686/000143774921014660/wpg20210611_8k.htm,2021-06-14,8k_filing_date_fallback,4028916000.0,29,2021-05-10,True,True,False,confirmed,
+1456772,OFFICE PROPERTIES INCOME TRUST,6500,2025-10-31,2025-10-31,0001104659-25-104631,https://www.sec.gov/Archives/edgar/data/1456772/000110465925104631/tm2529875d1_8k.htm,2025-10-30,petition_date_from_8k_text,3560949000.0,65,2025-07-30,True,True,False,confirmed,
+1522690,"GWG Holdings, Inc.",6311,2022-04-20,2022-04-20,0001213900-22-020675,https://www.sec.gov/Archives/edgar/data/1522690/000121390022020675/ea158650-8k_gwgholdings.htm,2022-04-20,8k_filing_date_fallback,3490196000.0,39,2021-11-19,True,True,False,confirmed,
+768835,FORMER BL STORES INC,5331,2024-09-10,2024-09-10,0000768835-24-000062,https://www.sec.gov/Archives/edgar/data/768835/000076883524000062/big-20240905.htm,2024-09-09,petition_date_from_8k_text,3178342000.0,122,2024-06-13,True,True,False,confirmed,
+28823,"DIEBOLD NIXDORF, Inc",3578,2023-06-01,2023-06-01,0001193125-23-158463,https://www.sec.gov/Archives/edgar/data/28823/000119312523158463/d404278d8k.htm,2023-06-01,8k_filing_date_fallback,3090700000.0,110,2023-05-30,True,True,False,confirmed,
+1592057,"Enviva, LLC",2400,2021-10-15,2024-03-13,0001104659-24-033709,https://www.sec.gov/Archives/edgar/data/1592057/000110465924033709/tm248430d1_8k.htm,2024-03-12,petition_date_from_8k_text,2893581000.0,35,2023-11-09,True,True,False,confirmed,
+1592058,Party City Holdco Inc.,5900,2023-01-18,2023-01-18,0001193125-23-009847,https://www.sec.gov/Archives/edgar/data/1592058/000119312523009847/d643228d8k.htm,2023-01-18,8k_filing_date_fallback,2869248000.0,31,2022-11-08,True,True,False,confirmed,
+1067837,"AUDACY, INC.",4832,2024-01-08,2024-01-08,0001193125-24-003834,https://www.sec.gov/Archives/edgar/data/1067837/000119312524003834/d676036d8k.htm,2024-01-05,petition_date_from_8k_text,2788943000.0,99,2023-11-09,True,True,True,confirmed,
+1794905,"Cyxtera Technologies, Inc.",7370,2023-06-05,2023-06-05,0001193125-23-160378,https://www.sec.gov/Archives/edgar/data/1794905/000119312523160378/d497336d8k.htm,2023-06-04,petition_date_from_8k_text,2769600000.0,11,2023-05-05,True,True,False,confirmed,
+1223389,CONNS INC,5731,2024-07-25,2024-07-25,0001193125-24-184837,https://www.sec.gov/Archives/edgar/data/1223389/000119312524184837/d855036d8k.htm,2024-07-25,8k_filing_date_fallback,2444042000.0,82,2024-04-18,True,True,False,confirmed,
+887921,REVLON INC /DE/,2844,2022-06-16,2022-06-16,0001140361-22-023182,https://www.sec.gov/Archives/edgar/data/887921/000114036122023182/brhc10038750_8k.htm,2022-06-15,petition_date_from_8k_text,2374800000.0,104,2022-05-04,True,True,True,confirmed,
+1498301,"Mahwah Bergen Retail Group, Inc.",5600,2021-03-03,2021-03-03,0001104659-21-031505,https://www.sec.gov/Archives/edgar/data/1498301/000110465921031505/tm218212d1_8k.htm,2021-03-03,8k_filing_date_fallback,2334100000.0,39,2020-12-11,True,True,False,confirmed,
+1519061,Trinseo PLC,2821,2026-05-26,2026-05-26,0001104659-26-066376,https://www.sec.gov/Archives/edgar/data/1519061/000110465926066376/tm2615591d1_8k.htm,2026-05-26,petition_date_from_8k_text,2309300000.0,48,2026-04-30,True,True,False,confirmed,
+1834585,JOANN Inc.,5940,2024-03-18,2024-03-18,0001193125-24-069648,https://www.sec.gov/Archives/edgar/data/1834585/000119312524069648/d775196d8k.htm,2024-03-18,petition_date_from_8k_text,2257700000.0,12,2023-12-05,True,True,True,confirmed,
+716006,Yellow Corp,4213,2023-08-07,2023-08-07,0001193125-23-204370,https://www.sec.gov/Archives/edgar/data/716006/000119312523204370/d483482d8k.htm,2023-08-06,petition_date_from_8k_text,2152200000.0,117,2023-05-03,True,True,False,confirmed,
+1720990,Fisker Inc./DE,3711,2024-06-24,2024-06-24,0001193125-24-167032,https://www.sec.gov/Archives/edgar/data/1720990/000119312524167032/d798771d8k.htm,2024-06-24,8k_filing_date_fallback,1831687000.0,22,2024-04-23,True,True,False,confirmed,
+1711291,CURO Group Holdings Corp.,6199,2024-03-25,2024-03-25,0001104659-24-038503,https://www.sec.gov/Archives/edgar/data/1711291/000110465924038503/tm249524d1_8k.htm,2024-03-25,petition_date_from_8k_text,1776952000.0,24,2023-11-02,True,True,False,confirmed,
+77281,PENNSYLVANIA REAL ESTATE INVESTMENT TRUST,6798,2023-12-11,2023-12-11,0001193125-23-292055,https://www.sec.gov/Archives/edgar/data/77281/000119312523292055/d644338d8k.htm,2023-12-11,8k_filing_date_fallback,1717955000.0,118,2023-11-14,True,True,False,confirmed,
+1583077,"Hospitality Investors Trust, Inc.",6798,2021-05-19,2021-05-19,0001104659-21-069107,https://www.sec.gov/Archives/edgar/data/1583077/000110465921069107/tm2116811d1_8k.htm,2021-05-19,petition_date_from_8k_text,1701867000.0,30,2021-05-14,True,True,False,confirmed,
+1220754,ModivCare Inc,4700,2021-08-24,2025-08-21,0001437749-25-027478,https://www.sec.gov/Archives/edgar/data/1220754/000143774925027478/modv20250818_8k.htm,2025-08-20,petition_date_from_8k_text,1677163000.0,87,2025-05-09,True,True,True,confirmed,
+922358,FERRELLGAS PARTNERS L P,5900,2021-01-11,2021-01-11,0001104659-21-002790,https://www.sec.gov/Archives/edgar/data/922358/000110465921002790/tm212268d1_8k.htm,2021-01-11,8k_filing_date_fallback,1652844000.0,106,2020-12-15,True,True,False,confirmed,
+1776197,AKUMIN INC.,8071,2023-10-23,2023-10-23,0001193125-23-260391,https://www.sec.gov/Archives/edgar/data/1776197/000119312523260391/d559087d8k.htm,2023-10-22,petition_date_from_8k_text,1635742000.0,7,2023-08-09,True,True,False,confirmed,
+748790,"Global Clean Energy Holdings, Inc.",2860,2025-04-18,2025-04-18,0001213900-25-033420,https://www.sec.gov/Archives/edgar/data/748790/000121390025033420/ea0238127-8k_global.htm,2025-04-18,8k_filing_date_fallback,1598001000.0,53,2024-11-14,True,True,False,confirmed,
+886835,SUPERIOR ENERGY SERVICES INC,1389,2021-01-20,2021-01-20,0001193125-21-012439,https://www.sec.gov/Archives/edgar/data/886835/000119312521012439/d112869d8k.htm,2021-01-20,8k_filing_date_fallback,1574246000.0,89,2020-11-06,True,True,False,confirmed,
+814549,EBIX INC,7373,2023-12-19,2023-12-19,0001193125-23-298190,https://www.sec.gov/Archives/edgar/data/814549/000119312523298190/d629924d8k.htm,2023-12-17,petition_date_from_8k_text,1561991000.0,115,2023-11-14,True,True,True,confirmed,
+1669812,"LSC Communications, Inc.",2750,2021-03-10,2021-03-10,0001193125-21-075200,https://www.sec.gov/Archives/edgar/data/1669812/000119312521075200/d149017d8k.htm,2021-03-10,8k_filing_date_fallback,1473000000.0,17,2020-10-29,True,True,False,confirmed,
+1483510,"EXP OldCo Winddown, Inc.",5600,2024-04-22,2024-04-22,0001193125-24-103828,https://www.sec.gov/Archives/edgar/data/1483510/000119312524103828/d827429d8k.htm,2024-04-22,petition_date_from_8k_text,1467758000.0,55,2023-12-07,True,True,False,confirmed,
+867773,SUNPOWER CORP,3674,2024-02-15,2024-08-06,0000867773-24-000086,https://www.sec.gov/Archives/edgar/data/867773/000086777324000086/spwr-20240802.htm,2024-08-05,petition_date_from_8k_text,1447332000.0,72,2023-12-18,True,True,False,confirmed,
+1459417,"2U, LLC",7372,2024-07-25,2024-07-25,0001193125-24-184277,https://www.sec.gov/Archives/edgar/data/1459417/000119312524184277/d875063d8k.htm,2024-07-24,petition_date_from_8k_text,1432937000.0,41,2024-05-02,True,True,False,confirmed,
+1839341,"Core Scientific, Inc./tx",6199,2022-12-21,2022-12-21,0001193125-22-310173,https://www.sec.gov/Archives/edgar/data/1839341/000119312522310173/d366482d8k.htm,2022-12-21,8k_filing_date_fallback,1404001000.0,7,2022-11-22,True,True,False,confirmed,
+1800682,"Cano Health, Inc.",8011,2024-02-05,2024-02-05,0001193125-24-023512,https://www.sec.gov/Archives/edgar/data/1800682/000119312524023512/d733561d8k.htm,2024-02-05,8k_filing_date_fallback,1211931000.0,14,2023-11-13,True,True,True,confirmed,
+1705012,"Fat Brands, Inc",5812,2026-01-27,2026-01-27,0001493152-26-003696,https://www.sec.gov/Archives/edgar/data/1705012/000149315226003696/form8-k.htm,2026-01-26,petition_date_from_8k_text,1210626000.0,33,2025-11-12,True,True,False,confirmed,
+1069996,FedNat Holding Co,6331,2022-12-12,2022-12-12,0001069996-22-000102,https://www.sec.gov/Archives/edgar/data/1069996/000106999622000102/fnhc-20221211.htm,2022-12-12,8k_filing_date_fallback,1201961000.0,84,2022-05-18,True,True,False,confirmed,
+1580864,"Vroom, Inc.",5500,2024-11-13,2024-11-13,0001193125-24-256669,https://www.sec.gov/Archives/edgar/data/1580864/000119312524256669/d902566d8k.htm,2024-11-13,8k_filing_date_fallback,1123734000.0,18,2024-11-12,True,True,False,confirmed,
+1058623,CUMULUS MEDIA INC,4832,2026-03-05,2026-03-05,0001104659-26-023855,https://www.sec.gov/Archives/edgar/data/1058623/000110465926023855/tm267873d1_8k.htm,2026-03-04,petition_date_from_8k_text,1078217000.0,109,2025-10-30,True,True,False,confirmed,
+1731289,Nikola Corp,3711,2025-02-19,2025-02-19,0001731289-25-000004,https://www.sec.gov/Archives/edgar/data/1731289/000173128925000004/nkla-20250218.htm,2025-02-19,8k_filing_date_fallback,1036043000.0,26,2024-10-31,True,True,False,confirmed,
+1411688,"Container Store Group, Inc.",5700,2024-12-23,2024-12-23,0001104659-24-131067,https://www.sec.gov/Archives/edgar/data/1411688/000110465924131067/tm2431779d1_8k.htm,2024-12-22,petition_date_from_8k_text,969204000.0,44,2024-10-30,True,True,True,confirmed,
+1808220,"GoHealth, Inc.",6411,2026-06-08,2026-06-08,0001628280-26-041369,https://www.sec.gov/Archives/edgar/data/1808220/000162828026041369/goco-20260605.htm,2026-06-07,petition_date_from_8k_text,917917000.0,24,2026-05-18,True,True,False,confirmed,
+1820630,Proterra Inc,3711,2023-08-08,2023-08-08,0001628280-23-027865,https://www.sec.gov/Archives/edgar/data/1820630/000162828023027865/ptra-20230807.htm,2023-08-07,petition_date_from_8k_text,830715000.0,11,2023-05-10,True,True,False,confirmed,
+1725526,HighPoint Resources Corp,1311,2021-03-15,2021-03-15,0001193125-21-080407,https://www.sec.gov/Archives/edgar/data/1725526/000119312521080407/d156524d8k.htm,2021-03-14,petition_date_from_8k_text,826637000.0,12,2021-02-24,True,True,False,confirmed,
+1377630,"National CineMedia, Inc.",7310,2023-04-12,2023-04-12,0001377630-23-000056,https://www.sec.gov/Archives/edgar/data/1377630/000137763023000056/ncmllc-20230411.htm,2023-04-11,petition_date_from_8k_text,775400000.0,64,2022-11-07,True,True,False,confirmed,
+890447,Vertex Energy Inc.,2911,2024-09-26,2024-09-26,0001999371-24-012469,https://www.sec.gov/Archives/edgar/data/890447/000199937124012469/vntr_8k-091924.htm,2024-09-24,petition_date_from_8k_text,772368000.0,73,2024-08-08,True,True,False,confirmed,
+742112,INVACARE HOLDINGS Corp,3842,2022-07-26,2023-02-01,0000742112-23-000008,https://www.sec.gov/Archives/edgar/data/742112/000074211223000008/ivc-20230127.htm,2023-01-31,petition_date_from_8k_text,757606000.0,111,2022-11-07,True,True,False,confirmed,
+720154,"Inotiv, Inc.",8731,2026-06-03,2026-06-03,0001104659-26-069950,https://www.sec.gov/Archives/edgar/data/720154/000110465926069950/tm2616729d1_8k.htm,2026-06-03,petition_date_from_8k_text,702418000.0,114,2026-05-11,True,True,False,confirmed,
+105319,"WW INTERNATIONAL, INC.",7200,2025-05-07,2025-05-07,0001193125-25-114307,https://www.sec.gov/Archives/edgar/data/105319/000119312525114307/d934787d8k.htm,2025-05-06,petition_date_from_8k_text,696873000.0,99,2025-05-06,True,True,False,confirmed,
+1839412,QualTek Services Inc.,1623,2023-05-31,2023-05-31,0001104659-23-066357,https://www.sec.gov/Archives/edgar/data/1839412/000110465923066357/tm2317209d1_8k.htm,2023-05-24,petition_date_from_8k_text,688927000.0,8,2023-04-28,True,True,False,confirmed,
+1365916,"AMYRIS, INC.",2860,2023-08-10,2023-08-10,0001365916-23-000094,https://www.sec.gov/Archives/edgar/data/1365916/000136591623000094/amrs-20230804.htm,2023-08-09,petition_date_from_8k_text,679679000.0,51,2023-05-10,True,True,False,confirmed,
+1008654,TUPPERWARE BRANDS CORP,3089,2024-09-18,2024-09-18,0001008654-24-000068,https://www.sec.gov/Archives/edgar/data/1008654/000100865424000068/tup-20240917.htm,2024-09-17,petition_date_from_8k_text,679500000.0,111,2024-03-29,True,True,False,confirmed,
+1779020,"Danimer Scientific, Inc.",2821,2025-03-18,2025-03-18,0000950170-25-041367,https://www.sec.gov/Archives/edgar/data/1779020/000095017025041367/dnmr-20250318.htm,2025-03-18,petition_date_from_8k_text,643770000.0,18,2024-11-19,True,True,False,confirmed,
+827187,Sleep Number Corp,2510,2026-06-12,2026-06-12,0000950103-26-008891,https://www.sec.gov/Archives/edgar/data/827187/000095010326008891/dp248362_8k.htm,2026-06-12,petition_date_from_8k_text,641008000.0,109,2026-05-12,True,True,False,confirmed,
+850261,"Sorrento Therapeutics, Inc.",2836,2023-02-13,2023-02-13,0001104659-23-018890,https://www.sec.gov/Archives/edgar/data/850261/000110465923018890/tm236509d1_8k.htm,2023-02-13,8k_filing_date_fallback,615614000.0,59,2022-11-08,True,True,False,confirmed,
+1807707,"AppHarvest, Inc.",0100,2023-07-24,2023-07-24,0001807707-23-000104,https://www.sec.gov/Archives/edgar/data/1807707/000180770723000104/apph-20230719.htm,2023-07-24,8k_filing_date_fallback,609804000.0,13,2023-05-10,True,True,False,confirmed,
+1455684,"TPI COMPOSITES, INC",3510,2025-08-15,2025-08-15,0001171843-25-005450,https://www.sec.gov/Archives/edgar/data/1455684/000117184325005450/f8k_081525.htm,2025-08-11,petition_date_from_8k_text,591709000.0,37,2025-08-11,True,True,False,confirmed,
+1648428,"Sequential Brands Group, Inc.",2300,2021-09-01,2021-09-01,0001104659-21-111773,https://www.sec.gov/Archives/edgar/data/1648428/000110465921111773/tm2126672d1_8k.htm,2021-08-31,petition_date_from_8k_text,565909000.0,21,2021-04-15,True,True,False,confirmed,
+1501134,Invitae Corp,8071,2024-02-14,2024-02-14,0001501134-24-000016,https://www.sec.gov/Archives/edgar/data/1501134/000150113424000016/nvta-20240213.htm,2024-02-13,petition_date_from_8k_text,535115000.0,36,2023-11-08,True,True,False,confirmed,
+1396033,"LL Flooring Holdings, Inc.",5211,2024-08-12,2024-08-12,0001193125-24-198385,https://www.sec.gov/Archives/edgar/data/1396033/000119312524198385/d794510d8k.htm,2024-08-11,petition_date_from_8k_text,523094000.0,66,2024-05-08,True,True,True,confirmed,
+1655075,"Armstrong Flooring, Inc.",3089,2022-05-12,2022-05-12,0001193125-22-148844,https://www.sec.gov/Archives/edgar/data/1655075/000119312522148844/d361921d8k.htm,2022-05-08,petition_date_from_8k_text,517000000.0,24,2022-03-09,True,True,True,confirmed,
+1775625,"SmileDirectClub, Inc.",3843,2023-10-02,2023-10-02,0001775625-23-000109,https://www.sec.gov/Archives/edgar/data/1775625/000177562523000109/sdc-20230925.htm,2023-09-29,petition_date_from_8k_text,498712000.0,16,2023-08-08,True,True,False,confirmed,
+1347652,"CorEnergy Infrastructure Trust, Inc.",6798,2024-02-26,2024-02-26,0001347652-24-000017,https://www.sec.gov/Archives/edgar/data/1347652/000134765224000017/corr-20240225.htm,2024-02-25,petition_date_from_8k_text,482922873.0,67,2023-11-07,True,True,False,confirmed,
+1159167,IROBOT CORP,3630,2025-12-15,2025-12-15,0001193125-25-318337,https://www.sec.gov/Archives/edgar/data/1159167/000119312525318337/d97115d8k.htm,2025-12-14,petition_date_from_8k_text,481573000.0,80,2025-11-06,True,True,False,confirmed,
+1834045,"Vintage Wine Estates, Inc.",2080,2024-07-24,2024-07-24,0000950170-24-085857,https://www.sec.gov/Archives/edgar/data/1834045/000095017024085857/vwe-20240719.htm,2024-07-24,petition_date_from_8k_text,478633000.0,12,2024-05-15,True,True,False,confirmed,
+1446687,"SILVER STAR PROPERTIES REIT, INC",6500,2023-09-14,2023-09-14,0001446687-23-000050,https://www.sec.gov/Archives/edgar/data/1446687/000144668723000050/a8-kspebk.htm,2023-09-13,petition_date_from_8k_text,465032000.0,55,2023-08-11,True,True,False,confirmed,
+870826,"Legacy IMBDS, Inc.",5961,2023-06-29,2023-06-29,0001104659-23-076399,https://www.sec.gov/Archives/edgar/data/870826/000110465923076399/tm2320234d1_8k.htm,2023-06-28,petition_date_from_8k_text,459601000.0,107,2022-12-13,True,True,False,confirmed,
+1813914,"CareMax, Inc.",8050,2024-11-18,2024-11-18,0000950170-24-127766,https://www.sec.gov/Archives/edgar/data/1813914/000095017024127766/cmax-20241115.htm,2024-11-18,8k_filing_date_fallback,454043000.0,17,2024-08-09,True,True,True,confirmed,
+1391127,"Edgio, Inc.",7389,2024-09-09,2024-09-09,0001193125-24-215572,https://www.sec.gov/Archives/edgar/data/1391127/000119312524215572/d795614d8k.htm,2024-09-09,petition_date_from_8k_text,453273000.0,66,2023-11-16,True,True,False,confirmed,
+57725,LANNETT CO INC,2834,2023-05-03,2023-05-03,0001104659-23-055287,https://www.sec.gov/Archives/edgar/data/57725/000110465923055287/tm2314233d3_8k.htm,2023-05-02,petition_date_from_8k_text,438359000.0,79,2023-02-02,True,True,False,confirmed,
+1821850,Sunlight Financial Holdings Inc.,6199,2023-10-31,2023-10-31,0001104659-23-112707,https://www.sec.gov/Archives/edgar/data/1821850/000110465923112707/tm2329469d1_8k.htm,2023-10-31,8k_filing_date_fallback,434779000.0,11,2023-08-09,True,True,False,confirmed,
+1579823,"NewAge, Inc.",2082,2022-08-30,2022-08-30,0001493152-22-024420,https://www.sec.gov/Archives/edgar/data/1579823/000149315222024420/form8-k.htm,2022-08-30,petition_date_from_8k_text,405650000.0,31,2021-11-09,True,True,False,confirmed,
+1101396,"DELTA APPAREL, INC",5130,2024-07-01,2024-07-01,0001437749-24-021637,https://www.sec.gov/Archives/edgar/data/1101396/000143774924021637/dla20240619_8k.htm,2024-06-30,petition_date_from_8k_text,365899000.0,94,2024-05-09,True,True,True,confirmed,
+1537028,"Independence Contract Drilling, Inc.",1381,2024-12-03,2024-12-03,0001537028-24-000057,https://www.sec.gov/Archives/edgar/data/1537028/000153702824000057/icdi-20241127x8k.htm,2024-12-03,8k_filing_date_fallback,356854000.0,42,2024-11-19,True,True,False,confirmed,
+1466301,"Clovis Oncology, Inc.",2834,2022-12-13,2022-12-13,0001193125-22-303179,https://www.sec.gov/Archives/edgar/data/1466301/000119312522303179/d386858d8k.htm,2022-12-13,8k_filing_date_fallback,346775000.0,44,2022-11-09,True,True,True,confirmed,
+878726,TUESDAY MORNING CORP/DE,5331,2023-02-16,2023-02-16,0001104659-23-022784,https://www.sec.gov/Archives/edgar/data/878726/000110465923022784/tm237022d2_8k.htm,2023-02-14,petition_date_from_8k_text,340835000.0,100,2022-11-22,True,True,True,confirmed,
+1532286,"Nine Energy Service, Inc.",1389,2026-02-02,2026-02-02,0001213900-26-010501,https://www.sec.gov/Archives/edgar/data/1532286/000121390026010501/ea0274803-8k_nineenergy.htm,2026-02-01,petition_date_from_8k_text,340701000.0,32,2025-10-30,True,True,False,confirmed,
+1109189,"BASIC ENERGY SERVICES, INC.",1389,2021-08-18,2021-08-18,0001104659-21-107217,https://www.sec.gov/Archives/edgar/data/1109189/000110465921107217/tm2125297d1_8k.htm,2021-08-18,8k_filing_date_fallback,331099000.0,62,2021-05-17,True,True,False,confirmed,
+1770141,"UpHealth, Inc.",8000,2023-09-19,2023-09-19,0001193125-23-237292,https://www.sec.gov/Archives/edgar/data/1770141/000119312523237292/d496861d8k.htm,2023-09-19,petition_date_from_8k_text,295078000.0,17,2023-08-10,True,True,False,confirmed,
+1811856,"View, Inc.",3211,2024-04-03,2024-04-03,0001193125-24-085064,https://www.sec.gov/Archives/edgar/data/1811856/000119312524085064/d86667d8k.htm,2024-04-02,petition_date_from_8k_text,291438000.0,13,2023-11-14,True,True,False,confirmed,
+730255,CalAmp Corp.,3663,2022-07-15,2024-06-03,0000950170-24-067683,https://www.sec.gov/Archives/edgar/data/730255/000095017024067683/camp-20240522.htm,2024-06-03,petition_date_from_8k_text,281241000.0,109,2024-01-09,True,True,False,confirmed,
+1804591,Chrome Holding Co.,2834,2025-03-24,2025-03-24,0001193125-25-060817,https://www.sec.gov/Archives/edgar/data/1804591/000119312525060817/d933650d8k.htm,2025-03-24,8k_filing_date_fallback,277422000.0,18,2025-02-06,True,True,False,confirmed,
+1401708,"NS Wind Down Co., Inc.",2836,2024-02-05,2024-02-05,0001401708-24-000012,https://www.sec.gov/Archives/edgar/data/1401708/000140170824000012/nstg-20240204.htm,2024-02-05,8k_filing_date_fallback,274713000.0,42,2023-11-06,True,True,False,confirmed,
+1759546,Stark Novus Financial Inc.,3711,2023-06-27,2023-06-27,0001104659-23-074944,https://www.sec.gov/Archives/edgar/data/1759546/000110465923074944/tm2319664d1_8k.htm,2023-06-27,8k_filing_date_fallback,272410000.0,17,2023-05-04,True,True,False,confirmed,
+1108967,"Orbital Infrastructure Group, Inc.",5065,2023-08-24,2023-08-24,0001437749-23-024627,https://www.sec.gov/Archives/edgar/data/1108967/000143774923024627/oeg20230824_8k.htm,2023-08-23,petition_date_from_8k_text,268213000.0,61,2023-05-15,True,True,False,confirmed,
+1333835,Casa Systems Inc,3663,2024-04-03,2024-04-03,0001193125-24-085992,https://www.sec.gov/Archives/edgar/data/1333835/000119312524085992/d818677d8k.htm,2024-04-03,petition_date_from_8k_text,262516000.0,24,2023-11-08,True,True,False,confirmed,
+1723580,"BurgerFi International, Inc.",5812,2024-09-17,2024-09-17,0001723580-24-000055,https://www.sec.gov/Archives/edgar/data/1723580/000172358024000055/bfi-20240911.htm,2024-09-17,8k_filing_date_fallback,252608000.0,25,2024-05-16,True,True,False,confirmed,
+1843388,"Virgin Orbit Holdings, Inc.",3812,2023-04-04,2023-04-04,0001628280-23-010459,https://www.sec.gov/Archives/edgar/data/1843388/000162828023010459/vorb-20230330.htm,2023-04-04,petition_date_from_8k_text,242978000.0,7,2022-11-08,True,True,False,confirmed,
+1162461,CUTERA INC,3845,2025-03-05,2025-03-05,0001193125-25-046217,https://www.sec.gov/Archives/edgar/data/1162461/000119312525046217/d878024d8k.htm,2025-03-05,petition_date_from_8k_text,234418000.0,83,2024-11-12,True,True,True,confirmed,
+1597313,"ViewRay, Inc.",3845,2023-07-17,2023-07-17,0001628280-23-024952,https://www.sec.gov/Archives/edgar/data/1597313/000162828023024952/vray-20230715.htm,2023-07-16,petition_date_from_8k_text,233159000.0,36,2023-05-11,True,True,False,confirmed,
+1784567,"Harbor Custom Development, Inc.",1531,2023-12-15,2023-12-15,0001493152-23-045017,https://www.sec.gov/Archives/edgar/data/1784567/000149315223045017/form8-k.htm,2023-12-11,petition_date_from_8k_text,223981000.0,13,2023-11-14,True,True,False,confirmed,
+1861449,"Bird Global, Inc.",3751,2023-12-26,2023-12-26,0001861449-23-000220,https://www.sec.gov/Archives/edgar/data/1861449/000186144923000220/brds-20231220.htm,2023-12-20,petition_date_from_8k_text,222437000.0,9,2023-11-14,True,True,True,confirmed,
+1893311,LUXURBAN HOTELS INC.,6500,2025-09-18,2025-09-18,0001829126-25-007474,https://www.sec.gov/Archives/edgar/data/1893311/000182912625007474/luxurban_8k.htm,2025-09-14,petition_date_from_8k_text,206614089.0,10,2024-11-19,True,True,False,confirmed,
+1300699,"Athenex, Inc.",2834,2023-05-22,2023-05-22,0001193125-23-150484,https://www.sec.gov/Archives/edgar/data/1300699/000119312523150484/d470846d8k.htm,2023-05-14,petition_date_from_8k_text,204055000.0,23,2023-03-20,True,True,False,confirmed,
+1758057,"Luminar Technologies, Inc./DE",3714,2025-12-15,2025-12-15,0001140361-25-045494,https://www.sec.gov/Archives/edgar/data/1758057/000114036125045494/ef20061234_8k.htm,2025-12-15,8k_filing_date_fallback,203516000.0,28,2025-11-13,True,True,False,confirmed,
+866609,ION GEOPHYSICAL CORP,1382,2021-04-22,2022-04-13,0001437749-22-008791,https://www.sec.gov/Archives/edgar/data/866609/000143774922008791/io20220411_8k.htm,2022-04-13,8k_filing_date_fallback,190908000.0,102,2021-11-03,True,True,False,confirmed,
+1741231,"Tattooed Chef, Inc.",2090,2023-07-06,2023-07-06,0001628280-23-024475,https://www.sec.gov/Archives/edgar/data/1741231/000162828023024475/ttcf-20230629.htm,2023-07-02,petition_date_from_8k_text,190301000.0,20,2023-05-15,True,True,False,confirmed,
+1652724,"Lucira Health, Inc.",2835,2023-02-22,2023-02-22,0001193125-23-044968,https://www.sec.gov/Archives/edgar/data/1652724/000119312523044968/d642141d8k.htm,2023-02-22,8k_filing_date_fallback,189185000.0,8,2022-11-14,True,True,False,confirmed,
+1277250,"Charge Enterprises, Inc.",4822,2024-03-12,2024-03-12,0001437749-24-007478,https://www.sec.gov/Archives/edgar/data/1277250/000143774924007478/crge20240311c_8k.htm,2024-03-07,petition_date_from_8k_text,187517000.0,8,2023-11-08,True,True,False,confirmed,
+1101680,DZS INC.,3661,2025-03-14,2025-03-14,0001101680-25-000021,https://www.sec.gov/Archives/edgar/data/1101680/000110168025000021/dzsi-20250314.htm,2025-03-14,8k_filing_date_fallback,178503000.0,94,2024-11-12,True,True,True,confirmed,
+883943,CHRISTOPHER & BANKS CORP,5621,2021-01-14,2021-01-14,0000897101-21-000029,https://www.sec.gov/Archives/edgar/data/883943/000089710121000029/cbkc210033_8k.htm,2021-01-13,petition_date_from_8k_text,172836000.0,93,2020-12-14,True,True,False,confirmed,
+1826671,"Near Intelligence, Inc.",7374,2023-12-11,2023-12-11,0001213900-23-094534,https://www.sec.gov/Archives/edgar/data/1826671/000121390023094534/ea189803-8k_nearintell.htm,2023-12-11,8k_filing_date_fallback,161690090.0,11,2023-08-14,True,True,True,confirmed,
+1835972,"iLearningEngines, Inc.",7372,2024-12-23,2024-12-23,0001213900-24-111529,https://www.sec.gov/Archives/edgar/data/1835972/000121390024111529/ea0225698-8k_ilearning.htm,2024-12-23,8k_filing_date_fallback,156686000.0,14,2024-08-13,True,True,False,confirmed,
+1850838,"Omega Therapeutics, Inc.",2836,2025-02-14,2025-02-14,0001193125-25-027349,https://www.sec.gov/Archives/edgar/data/1850838/000119312525027349/d896578d8k.htm,2025-02-10,petition_date_from_8k_text,152727000.0,14,2024-11-14,True,True,False,confirmed,
+1021096,"Troika Media Group, Inc.",4841,2023-12-07,2023-12-07,0001628280-23-040998,https://www.sec.gov/Archives/edgar/data/1021096/000162828023040998/trka-20231207.htm,2023-12-07,8k_filing_date_fallback,146183354.0,41,2023-10-20,True,True,True,confirmed,
+1656634,"Gritstone bio, Inc.",2836,2024-10-10,2024-10-10,0001193125-24-235637,https://www.sec.gov/Archives/edgar/data/1656634/000119312524235637/d119736d8k.htm,2024-10-10,petition_date_from_8k_text,142542000.0,24,2024-08-13,True,True,False,confirmed,
+1078207,BOWFLEX INC.,3949,2024-03-05,2024-03-05,0001628280-24-008736,https://www.sec.gov/Archives/edgar/data/1078207/000162828024008736/bfx-20240304.htm,2024-03-04,petition_date_from_8k_text,140117000.0,98,2024-02-21,True,True,True,confirmed,
+1551693,"PROJECT SAGE OLDCO, INC.",3842,2024-02-13,2024-02-13,0001213900-24-012888,https://www.sec.gov/Archives/edgar/data/1551693/000121390024012888/ea193549-8k_sientrainc.htm,2024-02-12,petition_date_from_8k_text,139933000.0,37,2023-11-13,True,True,False,confirmed,
+1830210,"Benson Hill, Inc.",2000,2025-03-25,2025-03-25,0001830210-25-000016,https://www.sec.gov/Archives/edgar/data/1830210/000183021025000016/bhil-20250319.htm,2025-03-25,8k_filing_date_fallback,137542000.0,16,2024-11-12,True,True,False,confirmed,
+1659352,"Codiak BioSciences, Inc.",2836,2023-03-27,2023-03-27,0001193125-23-079964,https://www.sec.gov/Archives/edgar/data/1659352/000119312523079964/d467120d8k.htm,2023-03-27,8k_filing_date_fallback,134396000.0,9,2022-11-03,True,True,False,confirmed,
+1901799,Bitcoin Depot Inc.,6199,2026-05-18,2026-05-18,0001193125-26-227832,https://www.sec.gov/Archives/edgar/data/1901799/000119312526227832/d130621d8k.htm,2026-05-18,8k_filing_date_fallback,130575000.0,16,2026-03-18,True,True,False,confirmed,
+1596946,Quotient Ltd,2835,2023-01-10,2023-01-10,0001193125-23-005670,https://www.sec.gov/Archives/edgar/data/1596946/000119312523005670/d165499d8k.htm,2023-01-10,petition_date_from_8k_text,127905000.0,35,2022-11-14,True,True,False,confirmed,
+1872356,"Molekule Group, Inc.",3564,2023-10-03,2023-10-03,0001104659-23-106353,https://www.sec.gov/Archives/edgar/data/1872356/000110465923106353/tm2327546d1_8k.htm,2023-10-03,8k_filing_date_fallback,125440012.0,8,2023-08-14,True,True,False,confirmed,
+1353538,"Appgate, Inc.",7372,2024-05-06,2024-05-06,0001628280-24-020689,https://www.sec.gov/Archives/edgar/data/1353538/000162828024020689/apgt-20240430.htm,2024-05-06,petition_date_from_8k_text,123519000.0,62,2023-11-14,True,True,True,confirmed,
+1036848,Mega Matrix Corp.,7812,2021-03-30,2021-03-30,0001654954-21-003441,https://www.sec.gov/Archives/edgar/data/1036848/000165495421003441/ACY8KReorg.htm,2021-03-29,petition_date_from_8k_text,121020700.0,60,2020-11-12,True,True,False,confirmed,
+1828672,"Boxed, Inc.",5961,2023-04-03,2023-04-03,0001140361-23-015648,https://www.sec.gov/Archives/edgar/data/1828672/000114036123015648/brhc10050838_8k.htm,2023-04-02,petition_date_from_8k_text,118778000.0,8,2022-11-09,True,True,False,confirmed,
+837852,"IDEANOMICS, INC.",3711,2024-12-06,2024-12-06,0001628280-24-050149,https://www.sec.gov/Archives/edgar/data/837852/000162828024050149/idex-20241204.htm,2024-12-06,8k_filing_date_fallback,116884000.0,68,2024-06-18,True,True,True,confirmed,
+1136294,"NOS4-1, Inc.",1600,2023-07-24,2023-07-24,0001104659-23-083246,https://www.sec.gov/Archives/edgar/data/1136294/000110465923083246/tm2321858d1_8k.htm,2023-07-24,8k_filing_date_fallback,114461000.0,63,2023-05-17,True,True,True,confirmed,
+1830180,"Legacy EJY, Inc.",7389,2022-06-30,2022-06-30,0001193125-22-185628,https://www.sec.gov/Archives/edgar/data/1830180/000119312522185628/d316004d8k.htm,2022-06-30,petition_date_from_8k_text,111611000.0,6,2022-05-16,True,True,False,confirmed,
+1762322,"SHIFT TECHNOLOGIES, INC.",5500,2023-10-10,2023-10-10,0001213900-23-081257,https://www.sec.gov/Archives/edgar/data/1762322/000121390023081257/ea186500-8k_shifttech.htm,2023-10-09,petition_date_from_8k_text,110089000.0,18,2023-08-11,True,True,False,confirmed,
+1008848,"Acorda Therapeutics, Inc.",2836,2024-04-02,2024-04-02,0000950170-24-039674,https://www.sec.gov/Archives/edgar/data/1008848/000095017024039674/acor-20240331.htm,2024-04-01,petition_date_from_8k_text,108525000.0,73,2024-04-01,True,True,True,confirmed,
+1009759,"Capstone Energy Plus, Inc.",3510,2023-09-28,2023-09-28,0001558370-23-016108,https://www.sec.gov/Archives/edgar/data/1009759/000155837023016108/cgrn-20230926x8k.htm,2023-09-28,petition_date_from_8k_text,104866000.0,91,2023-02-14,True,True,False,confirmed,
+1651944,"DermTech, Inc.",8071,2024-06-18,2024-06-18,0001651944-24-000060,https://www.sec.gov/Archives/edgar/data/1651944/000165194424000060/dmtk-20240612.htm,2024-06-18,8k_filing_date_fallback,102970000.0,28,2024-05-15,True,True,False,confirmed,
+1587246,"Cypress Environmental Partners, L.P.",7389,2022-05-11,2022-05-11,0001387131-22-005994,https://www.sec.gov/Archives/edgar/data/1587246/000138713122005994/celp-8k_050622.htm,2022-05-08,petition_date_from_8k_text,96978000.0,33,2022-04-15,True,True,False,confirmed,
+1835567,"Pear Therapeutics, Inc.",8000,2023-04-07,2023-04-07,0001835567-23-000020,https://www.sec.gov/Archives/edgar/data/1835567/000183556723000020/pear-20230405.htm,2023-04-07,petition_date_from_8k_text,95129000.0,8,2023-03-31,True,True,False,confirmed,
+1595585,"Tricida, Inc.",2834,2023-01-12,2023-01-12,0001595585-23-000007,https://www.sec.gov/Archives/edgar/data/1595585/000159558523000007/tcda-20230109.htm,2023-01-11,petition_date_from_8k_text,93879000.0,18,2022-11-14,True,True,False,confirmed,
+1852117,Rockley Photonics Holdings Ltd,3674,2023-01-24,2023-01-24,0001852117-23-000003,https://www.sec.gov/Archives/edgar/data/1852117/000185211723000003/rkly-20230123.htm,2023-01-23,petition_date_from_8k_text,90880000.0,6,2022-11-10,True,True,False,confirmed,
+352998,"Teligent, Inc.",2834,2021-10-15,2021-10-15,0001104659-21-126768,https://www.sec.gov/Archives/edgar/data/352998/000110465921126768/tm2129875d1_8k.htm,2021-10-15,8k_filing_date_fallback,90419000.0,96,2021-08-16,True,True,False,confirmed,
+1739426,RVL Pharmaceuticals plc,2834,2023-10-13,2023-10-13,0001104659-23-109105,https://www.sec.gov/Archives/edgar/data/1739426/000110465923109105/tm2328340d1_8k.htm,2023-10-12,petition_date_from_8k_text,85404000.0,20,2023-08-14,True,True,False,confirmed,
+1467154,"NVN Liquidation, Inc.",2834,2023-07-17,2023-07-17,0001467154-23-000081,https://www.sec.gov/Archives/edgar/data/1467154/000146715423000081/novn-20230714.htm,2023-07-17,8k_filing_date_fallback,79793000.0,27,2023-05-15,True,True,True,confirmed,
+1832351,"Fast Radius, Inc.",3440,2022-11-08,2022-11-08,0000950170-22-022842,https://www.sec.gov/Archives/edgar/data/1832351/000095017022022842/fsrd-20221104.htm,2022-11-08,8k_filing_date_fallback,69329000.0,6,2022-08-11,True,True,False,confirmed,
+1760173,"SURGALIGN HOLDINGS, INC.",3842,2023-06-20,2023-06-20,0001193125-23-169695,https://www.sec.gov/Archives/edgar/data/1760173/000119312523169695/d713202d8k.htm,2023-06-19,petition_date_from_8k_text,67712000.0,17,2023-05-11,True,True,False,confirmed,
+1634447,"ISUN, INC.",3674,2024-06-07,2024-06-07,0001493152-24-023164,https://www.sec.gov/Archives/edgar/data/1634447/000149315224023164/form8-k.htm,2024-06-03,petition_date_from_8k_text,66701000.0,32,2024-04-16,True,True,False,confirmed,
+1001233,"SANGAMO THERAPEUTICS, INC",2836,2026-06-23,2026-06-23,0001193125-26-278582,https://www.sec.gov/Archives/edgar/data/1001233/000119312526278582/d161847d8k.htm,2026-06-23,petition_date_from_8k_text,59965000.0,104,2026-05-14,True,True,True,confirmed,
+1823882,Airspan Networks Holdings Inc.,3663,2024-04-01,2024-04-01,0001829126-24-002060,https://www.sec.gov/Archives/edgar/data/1823882/000182912624002060/airspannetworks_8k.htm,2024-03-31,petition_date_from_8k_text,58965000.0,13,2023-11-08,True,True,False,confirmed,
+1811109,"Applied UV, Inc.",3640,2024-05-31,2024-05-31,0001213900-24-048456,https://www.sec.gov/Archives/edgar/data/1811109/000121390024048456/ea0207186-8k_applieduv.htm,2024-05-31,8k_filing_date_fallback,58386231.0,14,2024-04-16,True,True,False,confirmed,
+1584754,ATECH (PARENT) RESOLUTION CORP.,3661,2024-12-16,2024-12-16,0001213900-24-109364,https://www.sec.gov/Archives/edgar/data/1584754/000121390024109364/ea0224859-8k_akoustis.htm,2024-12-16,petition_date_from_8k_text,57371000.0,42,2024-11-14,True,True,True,confirmed,
+1305253,"Eiger BioPharmaceuticals, Inc.",2836,2024-04-01,2024-04-01,0001193125-24-083403,https://www.sec.gov/Archives/edgar/data/1305253/000119312524083403/d818699d8k.htm,2024-04-01,8k_filing_date_fallback,55654000.0,40,2023-11-09,True,True,False,confirmed,
+1023994,OLENOX INDUSTRIES INC.,5030,2026-05-04,2026-05-04,0001213900-26-051696,https://www.sec.gov/Archives/edgar/data/1023994/000121390026051696/ea0289100-8k_olenox.htm,2026-05-04,8k_filing_date_fallback,54105678.0,71,2025-11-14,True,True,False,confirmed,
+1084384,PARETEUM Corp,7373,2022-05-19,2022-05-19,0001193125-22-155078,https://www.sec.gov/Archives/edgar/data/1084384/000119312522155078/d253103d8k.htm,2022-05-15,petition_date_from_8k_text,52043000.0,54,2021-08-27,True,True,False,confirmed,
+1817944,"Clarus Therapeutics Holdings, Inc.",2836,2022-09-06,2022-09-06,0001213900-22-054293,https://www.sec.gov/Archives/edgar/data/1817944/000121390022054293/ea165390-8k_clarusthera.htm,2022-09-06,8k_filing_date_fallback,48940000.0,7,2022-08-19,True,True,False,rejected,"total assets below 50,000,000"
+1841800,"Nogin, Inc.",7389,2023-12-11,2023-12-11,0001213900-23-094753,https://www.sec.gov/Archives/edgar/data/1841800/000121390023094753/ea189862-8k_nogininc.htm,2023-12-05,petition_date_from_8k_text,47263000.0,10,2023-11-22,True,True,False,rejected,"total assets below 50,000,000"
+846475,ZYNEX INC,3845,2025-12-16,2025-12-16,0001104659-25-121390,https://www.sec.gov/Archives/edgar/data/846475/000110465925121390/zyxi-20251215x8k.htm,2025-12-15,petition_date_from_8k_text,45322000.0,71,2025-11-17,True,True,False,rejected,"total assets below 50,000,000"
+1794621,"Quanergy Systems, Inc.",3714,2022-12-13,2022-12-13,0001193125-22-303285,https://www.sec.gov/Archives/edgar/data/1794621/000119312522303285/d425268d8k.htm,2022-12-13,8k_filing_date_fallback,40375000.0,11,2022-11-14,True,True,True,rejected,"total assets below 50,000,000"
+1536577,Medley LLC,6282,2021-03-08,2021-03-08,0001437749-21-005208,https://www.sec.gov/Archives/edgar/data/1536577/000143774921005208/mdlx20210307_8k.htm,2021-03-07,petition_date_from_8k_text,36538000.0,18,2020-11-16,True,True,False,rejected,"total assets below 50,000,000"
+1445499,IPI Legacy Liquidation Co,2834,2023-12-20,2023-12-20,0001193125-23-299243,https://www.sec.gov/Archives/edgar/data/1445499/000119312523299243/d676211d8k.htm,2023-12-19,petition_date_from_8k_text,35073000.0,11,2023-11-14,True,True,True,rejected,"total assets below 50,000,000"
+1777946,"IronNet, Inc.",7372,2023-10-12,2023-10-12,0001193125-23-255052,https://www.sec.gov/Archives/edgar/data/1777946/000119312523255052/d549915d8k.htm,2023-10-12,petition_date_from_8k_text,33659000.0,14,2023-05-16,True,True,True,rejected,"total assets below 50,000,000"
+1497504,PLx Pharma Winddown Corp.,2834,2023-04-13,2023-04-13,0001193805-23-000557,https://www.sec.gov/Archives/edgar/data/1497504/000119380523000557/e618499_8k-plx.htm,2023-04-13,8k_filing_date_fallback,33224000.0,35,2022-11-10,True,True,False,rejected,"total assets below 50,000,000"
+1817511,SOCIETY PASS INCORPORATED.,7389,2026-05-14,2026-05-14,0001493152-26-023162,https://www.sec.gov/Archives/edgar/data/1817511/000149315226023162/form8-k.htm,2026-05-12,petition_date_from_8k_text,32934375.0,17,2025-11-14,True,True,False,rejected,"total assets below 50,000,000"
+719274,"GRESHAM WORLDWIDE, INC.",3825,2024-08-16,2024-08-16,0000950170-24-098113,https://www.sec.gov/Archives/edgar/data/719274/000095017024098113/giga-20240812.htm,2024-08-16,8k_filing_date_fallback,31810000.0,102,2024-05-17,True,True,False,rejected,"total assets below 50,000,000"
+1704760,"American Virtual Cloud Technologies, Inc.",7373,2023-01-11,2023-01-11,0001213900-23-002136,https://www.sec.gov/Archives/edgar/data/1704760/000121390023002136/ea171523-8k_americanvct.htm,2023-01-11,8k_filing_date_fallback,31122000.0,22,2022-11-14,True,True,False,rejected,"total assets below 50,000,000"
+811240,"BIOLASE, INC",3843,2024-10-01,2024-10-01,0000950170-24-110801,https://www.sec.gov/Archives/edgar/data/811240/000095017024110801/biol-20240930.htm,2024-10-01,8k_filing_date_fallback,30641000.0,109,2024-08-08,True,True,False,rejected,"total assets below 50,000,000"
+1015155,CHARLES & COLVARD LTD,3910,2026-03-04,2026-03-04,0001104659-26-023038,https://www.sec.gov/Archives/edgar/data/1015155/000110465926023038/tm267752d2_8k.htm,2026-03-02,petition_date_from_8k_text,29105427.0,105,2025-08-04,True,True,False,rejected,"total assets below 50,000,000"
+1842356,Wag! Group Co.,7200,2025-07-21,2025-07-21,0001842356-25-000090,https://www.sec.gov/Archives/edgar/data/1842356/000184235625000090/pet-20250720.htm,2025-07-21,8k_filing_date_fallback,28840000.0,15,2025-05-12,True,True,True,rejected,"total assets below 50,000,000"
+727207,"Accelerate Diagnostics, Inc",3826,2025-05-08,2025-05-08,0001104659-25-046104,https://www.sec.gov/Archives/edgar/data/727207/000110465925046104/tm2514448d1_8k.htm,2025-05-08,petition_date_from_8k_text,28556000.0,68,2025-03-21,True,True,False,rejected,"total assets below 50,000,000"
+1717556,"Vinco Ventures, Inc.",3944,2021-04-21,2021-04-21,0001493152-21-009322,https://www.sec.gov/Archives/edgar/data/1717556/000149315221009322/form8-k.htm,2021-04-21,8k_filing_date_fallback,28028207.0,13,2021-04-15,True,True,False,rejected,"total assets below 50,000,000"
+1183765,"Molecular Templates, Inc.",2834,2025-04-24,2025-04-24,0001641172-25-006026,https://www.sec.gov/Archives/edgar/data/1183765/000164117225006026/form8-k.htm,2025-04-20,petition_date_from_8k_text,26697000.0,79,2024-08-14,True,True,False,rejected,"total assets below 50,000,000"
+1587221,Zosano Pharma Corp,2834,2022-06-02,2022-06-02,0001193125-22-165821,https://www.sec.gov/Archives/edgar/data/1587221/000119312522165821/d298742d8k.htm,2022-06-01,petition_date_from_8k_text,26445000.0,30,2022-05-13,True,True,False,rejected,"total assets below 50,000,000"
+1169245,PhaseBio Pharmaceuticals Inc,2834,2022-10-24,2022-10-24,0001169245-22-000103,https://www.sec.gov/Archives/edgar/data/1169245/000116924522000103/phas-20221023.htm,2022-10-24,8k_filing_date_fallback,22166000.0,16,2022-08-12,True,True,False,rejected,"total assets below 50,000,000"
+1113148,"INFINITY PHARMACEUTICALS, INC.",2834,2023-09-29,2023-09-29,0001113148-23-000018,https://www.sec.gov/Archives/edgar/data/1113148/000111314823000018/infi-20230928.htm,2023-09-29,8k_filing_date_fallback,21232000.0,92,2023-08-10,True,True,False,rejected,"total assets below 50,000,000"
+1780097,"Baudax Bio, Inc.",2834,2024-02-28,2024-02-28,0001193125-24-049000,https://www.sec.gov/Archives/edgar/data/1780097/000119312524049000/d800225d8k.htm,2024-02-28,8k_filing_date_fallback,20583000.0,17,2023-11-20,True,True,False,rejected,"total assets below 50,000,000"
+874710,ALLIED HEALTHCARE PRODUCTS INC,3842,2023-05-12,2023-05-12,0001104659-23-059512,https://www.sec.gov/Archives/edgar/data/874710/000110465923059512/tm2315621d1_8k.htm,2023-05-08,petition_date_from_8k_text,19670586.0,105,2022-10-07,True,True,False,rejected,"total assets below 50,000,000"
+1698113,"ID Auto, Inc.",7311,2023-12-26,2023-12-26,0001213900-23-098373,https://www.sec.gov/Archives/edgar/data/1698113/000121390023098373/ea190552-8k_partsid.htm,2023-12-26,petition_date_from_8k_text,18697244.0,24,2023-12-08,True,True,False,rejected,"total assets below 50,000,000"
+1350073,"Iconic Brands, Inc.",2080,2023-06-29,2023-06-29,0001477932-23-004886,https://www.sec.gov/Archives/edgar/data/1350073/000147793223004886/icnb_8k.htm,2023-06-29,8k_filing_date_fallback,18358748.0,39,2023-03-31,True,True,False,rejected,"total assets below 50,000,000"
+1076682,"POLARITYTE, INC.",2836,2023-06-07,2023-06-07,0001493152-23-020348,https://www.sec.gov/Archives/edgar/data/1076682/000149315223020348/form8-k.htm,2023-06-07,8k_filing_date_fallback,18049000.0,77,2023-05-12,True,True,False,rejected,"total assets below 50,000,000"
+1624658,"Allena Pharmaceuticals, Inc.",2836,2022-09-02,2022-09-02,0001193125-22-237990,https://www.sec.gov/Archives/edgar/data/1624658/000119312522237990/d322264d8k.htm,2022-09-02,petition_date_from_8k_text,17811000.0,20,2022-08-15,True,True,False,rejected,"total assets below 50,000,000"
+1713832,"HC LIQUIDATING, INC.",7510,2023-03-02,2023-03-02,0001437749-23-005227,https://www.sec.gov/Archives/edgar/data/1713832/000143774923005227/hyre20230301_8k.htm,2023-03-02,8k_filing_date_fallback,17555324.0,18,2022-11-14,True,True,True,rejected,"total assets below 50,000,000"
+1886799,Bright Green Corp,2833,2025-02-27,2025-01-28,0001493152-25-003865,https://www.sec.gov/Archives/edgar/data/1886799/000149315225003865/form8-k.htm,2025-01-28,8k_filing_date_fallback,15964970.0,11,2024-11-19,True,True,False,rejected,"total assets below 50,000,000"
+1559998,"Gaucho Group Holdings, Inc.",6552,2024-11-12,2024-11-12,0001493152-24-044836,https://www.sec.gov/Archives/edgar/data/1559998/000149315224044836/form8-k.htm,2024-11-12,8k_filing_date_fallback,15939412.0,41,2024-08-14,True,True,False,rejected,"total assets below 50,000,000"
+1580063,"BIORA THERAPEUTICS, INC.",2834,2024-12-30,2024-12-30,0001213900-24-113256,https://www.sec.gov/Archives/edgar/data/1580063/000121390024113256/ea0226262-8k_biora.htm,2024-12-27,petition_date_from_8k_text,14505000.0,18,2024-11-14,True,True,True,rejected,"total assets below 50,000,000"
+933738,ENGLOBAL CORP,8711,2025-03-06,2025-03-06,0001654954-25-002332,https://www.sec.gov/Archives/edgar/data/933738/000165495425002332/eng_8k.htm,2025-03-06,8k_filing_date_fallback,13230000.0,91,2024-11-12,True,True,False,rejected,"total assets below 50,000,000"
+1389002,MARIN SOFTWARE INC,7374,2025-07-03,2025-07-03,0000950170-25-093994,https://www.sec.gov/Archives/edgar/data/1389002/000095017025093994/mrin-20250630.htm,2025-07-01,petition_date_from_8k_text,12180000.0,47,2024-11-12,True,True,True,rejected,"total assets below 50,000,000"
+1539029,"Clearside Biomedical, Inc.",2834,2025-11-25,2025-11-25,0001193125-25-297177,https://www.sec.gov/Archives/edgar/data/1539029/000119312525297177/d41251d8k.htm,2025-11-25,8k_filing_date_fallback,11641000.0,38,2025-11-14,True,True,False,rejected,"total assets below 50,000,000"
+1169987,"HTG MOLECULAR DIAGNOSTICS, INC",3826,2023-06-05,2023-06-05,0000950170-23-026337,https://www.sec.gov/Archives/edgar/data/1169987/000095017023026337/htgm-20230601.htm,2023-06-05,petition_date_from_8k_text,10865628.0,33,2023-05-11,True,True,False,rejected,"total assets below 50,000,000"
+895665,"Clearday, Inc.",8050,2024-04-05,2024-04-05,0001493152-24-013381,https://www.sec.gov/Archives/edgar/data/895665/000149315224013381/form8-k.htm,2024-04-03,petition_date_from_8k_text,10205039.0,111,2024-01-16,True,True,False,rejected,"total assets below 50,000,000"
+1292519,INVIVO THERAPEUTICS HOLDINGS CORP.,3841,2024-02-01,2024-02-01,0001104659-24-009146,https://www.sec.gov/Archives/edgar/data/1292519/000110465924009146/tm244807d1_8k.htm,2024-02-01,8k_filing_date_fallback,9584000.0,62,2023-11-08,True,True,False,rejected,"total assets below 50,000,000"
+887247,DMK PHARMACEUTICALS Corp,2834,2024-02-05,2024-02-05,0001839882-24-003361,https://www.sec.gov/Archives/edgar/data/887247/000183988224003361/dmk-8k_020524.htm,2024-02-02,petition_date_from_8k_text,8957411.0,99,2023-11-14,True,True,False,rejected,"total assets below 50,000,000"
+1736865,"Golden Developing Solutions, Inc.",5900,2023-07-05,2023-07-05,0001683168-23-004650,https://www.sec.gov/Archives/edgar/data/1736865/000168316823004650/golden_8k.htm,2023-07-05,8k_filing_date_fallback,7798584.0,16,2023-05-23,True,True,False,rejected,"total assets below 50,000,000"
+1368148,"ATHERSYS, INC / NEW",2834,2024-01-08,2024-01-08,0001437749-24-000820,https://www.sec.gov/Archives/edgar/data/1368148/000143774924000820/athx20240107_8k.htm,2024-01-05,petition_date_from_8k_text,7428000.0,66,2023-11-16,True,True,True,rejected,"total assets below 50,000,000"
+1906133,iCoreConnect Inc.,7372,2025-06-03,2025-06-03,0001477932-25-004389,https://www.sec.gov/Archives/edgar/data/1906133/000147793225004389/icct_8k.htm,2025-06-02,petition_date_from_8k_text,5691041.0,12,2025-05-30,True,True,False,rejected,"total assets below 50,000,000"
+1293310,"HUMANIGEN, INC",2834,2024-01-08,2024-01-08,0001214659-24-000421,https://www.sec.gov/Archives/edgar/data/1293310/000121465924000421/o152468k.htm,2024-01-03,petition_date_from_8k_text,5116000.0,44,2023-05-15,True,True,True,rejected,"total assets below 50,000,000"
+1675634,"ShiftPixy, Inc.",7361,2024-10-29,2024-10-29,0001477932-24-006731,https://www.sec.gov/Archives/edgar/data/1675634/000147793224006731/pixy_8k.htm,2024-10-29,8k_filing_date_fallback,4090000.0,29,2024-07-02,True,True,False,rejected,"total assets below 50,000,000"
+1504167,"TREX WIND-DOWN, INC.",2834,2023-11-17,2023-11-17,0001437749-23-032492,https://www.sec.gov/Archives/edgar/data/1504167/000143774923032492/tmbr20231117_8k.htm,2023-11-17,8k_filing_date_fallback,3326213.0,51,2023-08-21,True,True,True,rejected,"total assets below 50,000,000"
+1121702,"YIELD10 BIOSCIENCE, INC.",0100,2024-12-06,2024-12-06,0001121702-24-000093,https://www.sec.gov/Archives/edgar/data/1121702/000112170224000093/yten-20241206.htm,2024-12-06,8k_filing_date_fallback,2968000.0,72,2024-08-14,True,True,False,rejected,"total assets below 50,000,000"
+1017491,"SEELOS THERAPEUTICS, INC.",2834,2024-11-22,2024-11-22,0001099910-24-000383,https://www.sec.gov/Archives/edgar/data/1017491/000109991024000383/seel_8k.htm,2024-11-22,8k_filing_date_fallback,2381000.0,94,2024-08-14,True,True,False,rejected,"total assets below 50,000,000"
+1347242,LIPELLA PHARMACEUTICALS INC.,2834,2026-03-31,2026-03-31,0001753926-26-000577,https://www.sec.gov/Archives/edgar/data/1347242/000175392626000577/g085465_8k.htm,2026-03-31,8k_filing_date_fallback,2349810.0,12,2025-11-14,True,True,False,rejected,"total assets below 50,000,000"
+1537561,"Arch Therapeutics, Inc.",3841,2025-05-23,2025-05-23,0001641172-25-012288,https://www.sec.gov/Archives/edgar/data/1537561/000164117225012288/form8-k.htm,2025-05-23,8k_filing_date_fallback,1397644.0,50,2024-08-19,True,True,False,rejected,"total assets below 50,000,000"
+1494448,"EMERGENT CAPITAL, INC.",6311,2021-01-04,2021-01-04,0001104659-21-000304,https://www.sec.gov/Archives/edgar/data/1494448/000110465921000304/tm2039694d1_8k.htm,,,,39,2020-10-15,True,True,False,needs_review,"parsed petition 2020-10-26 is 70d from disclosure 2021-01-04; 8-K may concern a prior case, or the date is mis-parsed"
+1064728,PEABODY ENERGY CORP,1221,2021-01-04,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1830315,BANK 2020-BNK29,6189,2021-01-05,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1833522,GS Mortgage Securities Trust 2020-GSA2,6189,2021-01-07,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1157817,"SITO MOBILE, LTD.",7389,2021-01-08,2021-01-08,0001213900-21-001252,https://www.sec.gov/Archives/edgar/data/1157817/000121390021001252/ea133017-8k_sitomobile.htm,,,,45,2020-02-11,True,True,False,needs_review,"parsed petition 2020-10-08 is 92d from disclosure 2021-01-08; 8-K may concern a prior case, or the date is mis-parsed"
+1725255,AdaptHealth Corp.,8082,2021-01-08,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1561880,"Legacy Education Alliance, Inc.",8200,2021-01-15,2021-01-15,0001213900-21-002525,https://www.sec.gov/Archives/edgar/data/1561880/000121390021002525/ea133389-8k_legacyedu.htm,,,,31,2020-11-16,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+895126,EXPAND ENERGY Corp,1311,2021-01-19,2021-01-19,0000895126-21-000016,https://www.sec.gov/Archives/edgar/data/895126/000089512621000016/chk-20210116.htm,,,,96,2020-11-09,True,True,False,needs_review,"parsed petition 2020-06-28 is 205d from disclosure 2021-01-19; 8-K may concern a prior case, or the date is mis-parsed"
+1163302,UNITED STATES STEEL CORP,3312,2021-01-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1582919,Flitways Technology Inc.,7389,2021-01-21,2021-01-21,0001683168-21-000209,,,,,19,2019-05-01,True,False,False,rejected,stopped reporting 631 days before the event
+1516332,"Blue Water Global Group, Inc.",5812,2021-01-21,2021-01-21,0001683168-21-000210,,,,,16,2015-08-14,True,False,False,rejected,stopped reporting 1987 days before the event
+1593470,"Tiger Reef, Inc.",4991,2021-01-21,2021-01-21,0001683168-21-000211,,,,,13,2017-08-23,True,False,False,rejected,stopped reporting 1247 days before the event
+1459482,"Chineseinvestors.com, Inc.",8200,2021-01-22,2021-01-22,0001683168-21-000219,https://www.sec.gov/Archives/edgar/data/1459482/000168316821000219/chineseinvestors_8k.htm,,,,38,2020-04-14,True,True,True,needs_review,"parsed petition 2020-06-18 is 218d from disclosure 2021-01-22; 8-K may concern a prior case, or the date is mis-parsed"
+1835747,Mercedes-Benz Auto Lease Trust 2021-A,6189,2021-01-22,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1520118,"MedWellAI, Inc.",6199,2021-01-28,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1559484,"Resource REIT, Inc.",6798,2021-01-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1816861,Morgan Stanley Capital I Trust 2020-HR8,6189,2021-01-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1443611,SinglePoint Inc.,5960,2021-02-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1832874,BANK 2020-BNK30,6189,2021-02-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1404079,Samson Oil & Gas LTD,1381,2021-02-02,2021-02-02,0001562762-21-000016,https://www.sec.gov/Archives/edgar/data/1404079/000156276221000016/c079-20210202x8k.htm,,,,36,2020-05-20,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1827054,Wells Fargo Commercial Mortgage Trust 2020-C58,6189,2021-02-02,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1665918,US Foods Holding Corp.,5140,2021-02-04,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1840121,BANK 2021-BNK31,6189,2021-02-11,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1840644,BENCHMARK 2021-B23 MORTGAGE TRUST,6189,2021-02-18,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1077428,TEXAS CAPITAL BANCSHARES INC/TX,6022,2021-02-22,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1827183,Benchmark 2020-B21 Mortgage Trust,6189,2021-02-22,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1833563,Benchmark 2020-B22 Mortgage Trust,6189,2021-02-22,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1069680,"Hannover House, Inc.",7812,2021-02-26,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1609711,GoDaddy Inc.,7373,2021-02-26,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+31235,EASTMAN KODAK CO,3861,2021-03-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+711665,"Gadsden Properties, Inc.",6500,2021-03-03,2021-03-03,0001213900-21-013217,,,,,93,2019-11-06,True,False,False,rejected,stopped reporting 483 days before the event
+1478242,IQVIA HOLDINGS INC.,8731,2021-03-03,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1845709,John Deere Owner Trust 2021,6189,2021-03-04,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+314808,Valaris Ltd,1381,2021-03-05,2021-03-05,0001104659-21-032788,https://www.sec.gov/Archives/edgar/data/314808/000110465921032788/tm218790d1_8k.htm,,,,101,2021-03-02,True,True,False,needs_review,"parsed petition 2020-08-19 is 198d from disclosure 2021-03-05; 8-K may concern a prior case, or the date is mis-parsed"
+1326089,Sundance Energy Inc.,1311,2021-03-10,2021-03-10,0001104659-21-034047,,,,,4,2020-11-09,True,False,False,rejected,only 4 periodic filings before the event
+1843823,BBCMS Mortgage Trust 2021-C9,6189,2021-03-10,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+931584,UNIVERSAL STAINLESS & ALLOY PRODUCTS INC,3312,2021-03-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1605331,AI Era Corp.,6794,2021-03-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1627606,DAVIDsTEA Inc.,5400,2021-03-24,2021-03-24,0001477932-21-001635,https://www.sec.gov/Archives/edgar/data/1627606/000147793221001635/dtea_8k.htm,,,,23,2020-12-15,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1844998,Benchmark 2021-B24 Mortgage Trust,6189,2021-03-24,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1848411,BANK 2021-BNK32,6189,2021-03-24,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1455926,IRONCLAD ENCRYPTION Corp,7372,2021-03-29,2021-03-29,0001052918-21-000083,,,,,42,2020-02-19,True,False,False,rejected,stopped reporting 404 days before the event
+1832873,CSAIL 2021-C20 Commercial Mortgage Trust,6189,2021-03-30,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1692144,Life Partners Position Holder Trust,6311,2021-04-01,2021-04-01,0001654954-21-003664,https://www.sec.gov/Archives/edgar/data/1692144/000165495421003664/none-20211231.htm,,,,14,2021-03-11,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+731802,ATMOS ENERGY CORP,4924,2021-04-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1693853,VINE ENERGY INC.,1311,2021-04-09,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+931336,DEAN FOODS CO,2020,2021-04-14,2021-04-14,0000950103-21-005576,https://www.sec.gov/Archives/edgar/data/931336/000095010321005576/dp149331_8k.htm,,,,90,2020-03-20,True,True,False,needs_review,"parsed petition 2019-11-12 is 519d from disclosure 2021-04-14; 8-K may concern a prior case, or the date is mis-parsed"
+1465470,NaturalShrimp Inc,0900,2021-04-15,2024-09-13,0001493152-24-036227,https://www.sec.gov/Archives/edgar/data/1465470/000149315224036227/form8-k.htm,,,,60,2024-08-14,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+739421,CITIZENS FINANCIAL SERVICES INC,6022,2021-04-16,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1510247,"LGBTQ Loyalty Holdings, Inc.",7374,2021-04-16,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1031623,GULF ISLAND FABRICATION INC,3440,2021-04-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1157647,"Western New England Bancorp, Inc.",6035,2021-04-20,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1735707,Garrett Motion Inc.,3714,2021-04-27,2021-04-27,0001193125-21-134457,https://www.sec.gov/Archives/edgar/data/1735707/000119312521134457/d11321d8k.htm,2021-04-27,8k_filing_date_fallback,,10,2021-02-16,True,True,False,rejected,"total assets below 50,000,000"
+812128,SANDERSON FARMS INC,2015,2021-04-28,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+874499,GULFPORT ENERGY CORP,1311,2021-04-29,2021-04-29,0001213900-21-023524,https://www.sec.gov/Archives/edgar/data/874499/000121390021023524/ea140017-8k_gulfport.htm,,,,80,2021-03-05,True,True,False,needs_review,"parsed petition 2020-11-13 is 167d from disclosure 2021-04-29; 8-K may concern a prior case, or the date is mis-parsed"
+1851115,Benchmark 2021-B25 Mortgage Trust,6189,2021-04-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1851817,WELLS FARGO COMMERCIAL MORTGAGE TRUST 2021-C59,6189,2021-05-05,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1856967,Morgan Stanley Capital I Trust 2021-L5,6189,2021-05-11,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+887396,EMPIRE PETROLEUM CORP,1311,2021-05-17,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1858865,BANK 2021-BNK33,6189,2021-05-20,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1858289,Benchmark 2021-B26 Mortgage Trust,6189,2021-05-27,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+736772,CNB FINANCIAL CORP/PA,6022,2021-06-03,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1320414,SELECT MEDICAL HOLDINGS CORP,8060,2021-06-04,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1574910,"RENAVOTIO, INC.",8742,2021-06-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1657853,"HERTZ GLOBAL HOLDINGS, INC",7510,2021-06-16,2021-06-16,0001104659-21-081986,https://www.sec.gov/Archives/edgar/data/1657853/000110465921081986/tm2119738d1_8k.htm,,,,20,2021-05-07,True,True,False,needs_review,"parsed petition 2020-05-22 is 390d from disclosure 2021-06-16; 8-K may concern a prior case, or the date is mis-parsed"
+1814974,"BBX Capital, Inc.",5400,2021-06-17,2021-06-17,0001814974-21-000040,,,,,3,2021-05-10,True,False,False,rejected,only 3 periodic filings before the event
+1443646,Booz Allen Hamilton Holding Corp,8742,2021-06-17,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1864833,Mercedes-Benz Auto Lease Trust 2021-B,6189,2021-06-24,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1863688,BANK 2021-BNK34,6189,2021-06-24,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1862080,BENCHMARK 2021-B27 MORTGAGE TRUST,6189,2021-06-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+6176,AMPCO PITTSBURGH CORP,3561,2021-07-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1802215,Benchmark 2020-B17 Mortgage Trust,6189,2021-07-06,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1630805,"Babcock & Wilcox Enterprises, Inc.",3433,2021-07-07,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1866493,Morgan Stanley Capital I Trust 2021-L6,6189,2021-07-13,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1867550,John Deere Owner Trust 2021-B,6189,2021-07-15,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1864196,BBCMS Mortgage Trust 2021-C10,6189,2021-07-15,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+924396,Crisp Momentum Inc.,6199,2021-07-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+41719,Magnera Corp,2621,2021-07-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1399935,FHC Holdings Corp,5600,2021-07-26,2021-07-26,0001104659-21-095882,https://www.sec.gov/Archives/edgar/data/1399935/000110465921095882/tm2123245-1_8k.htm,,,,37,2020-09-15,True,True,False,needs_review,"parsed petition 2020-12-03 is 235d from disclosure 2021-07-26; 8-K may concern a prior case, or the date is mis-parsed"
+1867467,WELLS FARGO COMMERCIAL MORTGAGE TRUST 2021-C60,6189,2021-07-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1404935,"THC Therapeutics, Inc.",3523,2021-08-04,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+709283,QUANTUM CORP /DE/,3572,2021-08-05,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1872347,BANK 2021-BNK35,6189,2021-08-11,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+49196,HUNTINGTON BANCSHARES INC /MD/,6021,2021-08-16,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1871630,Benchmark 2021-B28 Mortgage Trust,6189,2021-08-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+798359,CENTERSPACE,6798,2021-09-02,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1426506,SMG Industries Inc.,4700,2021-09-13,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1379006,"NANOVIRICIDES, INC.",2834,2021-09-15,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1878122,Mercedes-Benz Auto Receivables Trust 2021-1,6189,2021-09-17,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+914122,"Perma-Pipe International Holdings, Inc.",3564,2021-09-21,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1881326,BBCMS Mortgage Trust 2021-C11,6189,2021-09-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1880187,Benchmark 2021-B29 Mortgage Trust,6189,2021-09-30,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+751365,VIRCO MFG CORPORATION,2531,2021-10-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1880921,BANK 2021-BNK36,6189,2021-10-07,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1883246,Morgan Stanley Capital I Trust 2021-L7,6189,2021-10-13,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1382231,Fortem Resources Inc.,1381,2021-10-18,2021-10-18,0001085037-21-000089,,,,,50,2020-07-21,True,False,False,rejected,stopped reporting 454 days before the event
+1315255,"GTT Communications, Inc.",4813,2021-11-01,2021-11-01,0001628280-21-020899,,,,,61,2020-05-08,True,False,False,rejected,stopped reporting 542 days before the event
+1885855,Benchmark 2021-B30 Mortgage Trust,6189,2021-11-16,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1890702,3650R 2021-PF1 Commercial Mortgage Trust,6189,2021-11-18,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1889297,BANK 2021-BNK37,6189,2021-11-22,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1172358,"DORCHESTER MINERALS, L.P.",1311,2021-11-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1891818,BBCMS Mortgage Trust 2021-C12,6189,2021-11-30,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1437925,Meridian Holdings Inc./NV,7372,2021-12-03,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1300734,"SHINECO, INC.",0100,2021-12-06,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+746514,NEW ENGLAND REALTY ASSOCIATES LIMITED PARTNERSHIP,6513,2021-12-06,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1891774,Wells Fargo Commercial Mortgage Trust 2021-C61,6189,2021-12-06,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+884614,UGI CORP /PA/,4932,2021-12-09,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1490054,"VERDE BIO HOLDINGS, INC.",1311,2021-12-17,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1895567,BANK 2021-BNK38,6189,2021-12-22,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1894714,BENCHMARK 2021-B31 MORTGAGE TRUST,6189,2021-12-22,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1895116,GS Mortgage Securities Trust 2021-GSA3,6189,2021-12-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1376804,"VNUE, Inc.",7822,2022-01-06,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1799011,Lucid Diagnostics Inc.,3841,2022-01-20,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1031203,GROUP 1 AUTOMOTIVE INC,5500,2022-02-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1375618,"Amazing Energy Oil & Gas, Co.",1311,2022-02-09,2022-02-09,0001199835-22-000085,,,,,48,2020-03-23,True,False,False,rejected,stopped reporting 688 days before the event
+1866175,Crescent Energy Co,1311,2022-02-10,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1902565,BANK 2022-BNK39,6189,2022-02-10,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1900454,Benchmark 2022-B32 Mortgage Trust,6189,2022-02-16,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1901814,BBCMS Mortgage Trust 2022-C14,6189,2022-02-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1624326,PAVmed Inc.,3841,2022-02-24,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1903688,BMO 2022-C1 Mortgage Trust,6189,2022-02-28,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1539894,"Atlas Financial Holdings, Inc.",6331,2022-03-01,2022-03-01,0001539894-22-000005,https://www.sec.gov/Archives/edgar/data/1539894/000153989422000005/afh-20220225.htm,,,,40,2021-11-08,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1045742,LIVE VENTURES Inc,5900,2022-03-03,2022-03-03,0000950170-22-002733,https://www.sec.gov/Archives/edgar/data/1045742/000095017022002733/live-20220228.htm,,,,69,2022-02-10,True,True,False,needs_review,"parsed petition 2019-12-13 is 811d from disclosure 2022-03-03; 8-K may concern a prior case, or the date is mis-parsed"
+889348,CPI AEROSTRUCTURES INC,3728,2022-03-09,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1873722,Bubblr Inc.,7370,2022-03-10,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1907569,BANK 2022-BNK40,6189,2022-03-10,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1911818,John Deere Owner Trust 2022,6189,2022-03-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1907059,Benchmark 2022-B33 Mortgage Trust,6189,2022-03-15,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1473579,NANOMIX Corp,2834,2022-03-24,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1050446,Strategy Inc,6199,2022-03-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+75488,PACIFIC GAS & ELECTRIC Co,4931,2022-04-04,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1912724,Morgan Stanley Capital I Trust 2022-L8,6189,2022-04-07,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1379785,"Barings BDC, Inc.",0000,2022-04-13,2022-03-03,0001140361-22-007671,https://www.sec.gov/Archives/edgar/data/1379785/000114036122007671/ny20002465x4_8k.htm,,,,61,2022-02-23,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1913593,BBCMS Mortgage Trust 2022-C15,6189,2022-04-13,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1912509,Benchmark 2022-B34 Mortgage Trust,6189,2022-04-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1393540,IGEN NETWORKS CORP,7363,2022-04-15,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1916018,Wells Fargo Commercial Mortgage Trust 2022-C62,6189,2022-04-18,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1920442,BANK 2022-BNK41,6189,2022-05-05,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1921064,BENCHMARK 2022-B35 MORTGAGE TRUST,6189,2022-05-12,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1346526,"ESP Resources, Inc.",2800,2022-06-06,2022-06-06,0001829126-22-012925,https://www.sec.gov/Archives/edgar/data/1346526/000182912622012925/espresources_8k.htm,2022-06-06,8k_filing_date_fallback,0.0,36,2022-05-23,True,True,True,rejected,"total assets below 50,000,000"
+1926900,BANK 2022-BNK42,6189,2022-06-09,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1784168,"Electric Last Mile Solutions, Inc.",3711,2022-06-14,2022-06-14,0001213900-22-032839,,,,,5,2021-11-12,True,False,False,rejected,only 5 periodic filings before the event
+1274032,"Simply, Inc.",5065,2022-06-16,2022-06-16,0001564590-22-023402,https://www.sec.gov/Archives/edgar/data/1274032/000156459022023402/simp-8k_20220614.htm,,,,71,2022-04-22,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1659183,nDivision Inc.,7374,2022-06-17,2022-06-17,0001477932-22-004506,https://www.sec.gov/Archives/edgar/data/1659183/000147793222004506/ndvn_8k.htm,,,,23,2022-05-16,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1924870,Citigroup Commercial Mortgage Trust 2022-GC48,6189,2022-06-21,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1924780,BBCMS Mortgage Trust 2022-C16,6189,2022-06-28,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+101594,BIG SKY INDUSTRIAL INC.,1311,2022-06-30,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1932997,BMO 2022-C2 Mortgage Trust,6189,2022-07-12,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1934741,John Deere Owner Trust 2022-B,6189,2022-07-13,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1762590,John Deere Receivables LLC,6189,2022-07-20,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1372020,Great Lakes Dredge & Dock CORP,1600,2022-08-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+822370,"Emmaus Life Sciences, Inc.",2834,2022-08-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1528129,"Vital Energy, Inc.",1311,2022-08-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1927678,Benchmark 2022-B36 Mortgage Trust,6189,2022-08-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1937096,BANK 2022-BNK43,6189,2022-08-25,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1684682,"CNL Strategic Capital, LLC",6282,2022-08-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1681941,iFresh Inc,5411,2022-09-06,2022-09-06,0001213900-22-054253,,,,,17,2021-02-22,True,False,False,rejected,stopped reporting 561 days before the event
+1937985,BBCMS Mortgage Trust 2022-C17,6189,2022-09-08,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+888981,NOCOPI TECHNOLOGIES INC/MD/,3944,2022-09-30,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1942599,BMO 2022-C3 Mortgage Trust,6189,2022-10-07,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1833908,"Alfi, Inc.",7370,2022-10-14,2022-10-14,0001104659-22-108790,https://www.sec.gov/Archives/edgar/data/1833908/000110465922108790/tm2228191d1_8k.htm,,,,6,2022-08-15,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1947427,Daimler Trucks Retail Trust 2022-1,6189,2022-10-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1948523,John Deere Owner Trust 2022-C,6189,2022-10-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+821483,"PAR PACIFIC HOLDINGS, INC.",1311,2022-10-21,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1946375,Benchmark 2022-B37 Mortgage Trust,6189,2022-11-03,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1951118,Mercedes-Benz Auto Receivables Trust 2022-1,6189,2022-11-17,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1950141,BANK 2022-BNK44,6189,2022-11-22,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1392694,"SurgePays, Inc.",4813,2022-11-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1750155,"Charlotte's Web Holdings, Inc.",0100,2022-11-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1113809,BUILD-A-BEAR WORKSHOP INC,5945,2022-11-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1948175,3650R 2022-PF2 Commercial Mortgage Trust,6189,2022-11-30,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1782627,"Winc, Inc.",5900,2022-12-01,2022-12-01,0000950170-22-025906,,,,,5,2022-11-14,True,False,False,rejected,only 5 periodic filings before the event
+1950140,BBCMS Mortgage Trust 2022-C18,6189,2022-12-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1451512,"Unrivaled Brands, Inc.",5900,2023-01-04,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1415684,MusclePharm Corp,2834,2023-01-11,2023-01-09,0001415684-23-000001,https://www.sec.gov/Archives/edgar/data/1415684/000141568423000001/Form8K.txt,,,,54,2022-05-16,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1957424,Mercedes-Benz Auto Receivables Trust 2023-1,6189,2023-01-20,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+106040,WESTERN DIGITAL CORP,3572,2023-01-31,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+939930,"PYXUS INTERNATIONAL, INC.",5150,2023-02-10,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1724965,TALOS ENERGY INC.,1311,2023-02-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1957662,BMO 2023-C4 Mortgage Trust,6189,2023-02-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1884697,"Starry Group Holdings, Inc.",4813,2023-02-21,2023-02-21,0000950170-23-003315,,,,,4,2022-11-09,True,False,False,rejected,only 4 periodic filings before the event
+1084577,CYREN Ltd.,7372,2023-02-22,2023-02-22,0001213900-23-013435,https://www.sec.gov/Archives/edgar/data/1084577/000121390023013435/ea174057-8k_cyrenltd.htm,,,,16,2022-11-14,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1965367,John Deere Owner Trust 2023,6189,2023-02-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1958501,BANK 2023-BNK45,6189,2023-02-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1450416,LexaGene Holdings Inc.,3841,2023-02-24,2023-02-24,0001104659-23-025001,,,,,2,2023-01-17,True,False,False,rejected,only 2 periodic filings before the event
+1961629,FIVE 2023-V1 Mortgage Trust,6189,2023-02-28,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+719739,SVB FINANCIAL GROUP,6022,2023-03-10,2023-03-10,0001193125-23-067777,https://www.sec.gov/Archives/edgar/data/719739/000119312523067777/d450664d8k.htm,,,,112,2023-02-24,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1870997,Loyalty Ventures Inc.,7389,2023-03-10,2023-03-10,0001870997-23-000010,,,,,5,2022-11-08,True,False,False,rejected,only 5 periodic filings before the event
+1909152,Kalera Public Ltd Co,0100,2023-04-04,2023-04-04,0001493152-23-010745,,,,,2,2022-11-14,True,False,False,rejected,only 2 periodic filings before the event
+1828791,Viant Technology Inc.,7370,2023-04-06,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1967945,BANK5 2023-5YR1,6189,2023-04-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1872525,"Stran & Company, Inc.",7311,2023-04-20,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1966002,Benchmark 2023-B38 Mortgage Trust,6189,2023-04-21,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1966434,BBCMS Mortgage Trust 2023-C19,6189,2023-04-27,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1974300,Mercedes-Benz Auto Lease Trust 2023-A,6189,2023-05-15,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1970781,Benchmark 2023-V2 Mortgage Trust,6189,2023-05-25,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1974587,MSWF Commercial Mortgage Trust 2023-1,6189,2023-05-25,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1864448,Wejo Group Ltd,7374,2023-05-30,2023-05-30,0001864448-23-000131,https://www.sec.gov/Archives/edgar/data/1864448/000186444823000131/wejo-20230530.htm,,,,7,2023-05-22,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1921963,Atmus Filtration Technologies Inc.,3714,2023-06-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+100716,UNICO AMERICAN CORP,6331,2023-06-02,2023-06-02,0001654954-23-007581,https://www.sec.gov/Archives/edgar/data/100716/000165495423007581/unam_8k.htm,,,,110,2023-01-23,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1444307,ONCOSEC MEDICAL Inc,2834,2023-06-14,2023-06-14,0001493152-23-021288,https://www.sec.gov/Archives/edgar/data/1444307/000149315223021288/form8-k.htm,,,,58,2023-03-14,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1972920,BMO 2023-C5 Mortgage Trust,6189,2023-06-21,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+931148,GRAFTECH INTERNATIONAL LTD,3620,2023-06-26,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1778129,TerrAscend Corp.,0100,2023-06-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1965040,Fortrea Holdings Inc.,8071,2023-06-30,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1869141,Athena Consumer Acquisition Corp.,6770,2023-07-06,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+866439,"DarkPulse, Inc.",7372,2023-07-10,2023-07-10,0001683168-23-004754,https://www.sec.gov/Archives/edgar/data/866439/000168316823004754/darkpulse_8k.htm,,,,61,2023-06-23,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1882607,"ALPINE SUMMIT ENERGY PARTNERS, INC.",1311,2023-07-11,2023-07-11,0001062993-23-014813,,,,,2,2023-05-15,True,False,False,rejected,only 2 periodic filings before the event
+1979748,BANK5 2023-5YR2,6189,2023-07-11,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1981769,BBCMS 2023-C20,6189,2023-07-11,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1880613,"Direct Digital Holdings, Inc.",7310,2023-07-12,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1384195,"RING ENERGY, INC.",1311,2023-07-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+879585,"ATN International, Inc.",4813,2023-07-17,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1551986,"9 METERS BIOPHARMA, INC.",2834,2023-07-18,2023-07-18,0000930413-23-001864,https://www.sec.gov/Archives/edgar/data/1551986/000093041323001864/c106716_8k-ixbrl.htm,,,,28,2023-05-15,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1979859,Benchmark 2023-B39 Mortgage Trust,6189,2023-07-18,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1500123,Item 9 Labs Corp.,3843,2023-07-20,2023-07-20,0001554795-23-000219,https://www.sec.gov/Archives/edgar/data/1500123/000155479523000219/inlb0720form8k.htm,,,,35,2023-05-22,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1982178,Benchmark 2023-V3 Mortgage Trust,6189,2023-08-03,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1984262,BANK 2023-BNK46,6189,2023-08-10,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+792935,ETHEMA HEALTH Corp,8062,2023-08-11,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1025953,"NOVATION COMPANIES, INC.",6531,2023-08-16,2023-08-16,0001193805-23-001191,,,,,93,2021-11-12,True,False,False,rejected,stopped reporting 642 days before the event
+1984246,BMO 2023-5C1 Mortgage Trust,6189,2023-08-16,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1066719,"Taihe Group, Inc.",8071,2023-08-18,2023-08-18,0001683168-23-005869,https://www.sec.gov/Archives/edgar/data/1066719/000168316823005869/taihe_8k.htm,,,,6,2023-05-30,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1534504,PBF Energy Inc.,2911,2023-08-21,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1987419,BMO 2023-C6 Mortgage Trust,6189,2023-08-30,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1087294,CUMBERLAND PHARMACEUTICALS INC,2834,2023-09-06,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1985684,BBCMS Mortgage Trust 2023-C21,6189,2023-09-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1991524,BANK5 2023-5YR3,6189,2023-09-21,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1971264,Daimler Trucks Retail Trust 2023-1,6189,2023-09-22,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+885590,Bausch Health Companies Inc.,2834,2023-09-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1860742,Bausch & Lomb Corp,3851,2023-09-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1043000,"SONIDA SENIOR LIVING, INC.",8050,2023-10-06,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1044378,BIOCEPT INC,8071,2023-10-16,2023-10-16,0001654954-23-012952,https://www.sec.gov/Archives/edgar/data/1044378/000165495423012952/biocept_8k.htm,,,,39,2023-08-14,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1993977,Mercedes-Benz Auto Receivables Trust 2023-2,6189,2023-10-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1994342,BBCMS Mortgage Trust 2023-C22,6189,2023-10-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1994754,BMO 2023-5C2 Mortgage Trust,6189,2023-10-24,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1805087,"GELESIS HOLDINGS, INC.",2834,2023-10-31,2023-10-31,0000950170-23-056517,https://www.sec.gov/Archives/edgar/data/1805087/000095017023056517/gls-20231030.htm,,,,13,2023-08-14,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1617669,"Unique Fabricating, Inc.",3714,2023-11-08,2023-11-08,0001617669-23-000046,https://www.sec.gov/Archives/edgar/data/1617669/000161766923000046/ufab-20231108.htm,,,,30,2022-11-08,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1992084,Benchmark 2023-V4 Mortgage Trust,6189,2023-11-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1750106,Alset Inc.,6500,2023-11-17,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1503658,"Winning Catering Group, Inc.",6500,2023-11-17,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1004980,PG&E Corp,4931,2023-11-20,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1998392,BBCMS Mortgage Trust 2023-5C23,6189,2023-11-20,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1996001,BANK5 2023-5YR4,6189,2023-12-04,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1995500,BMO 2023-C7 Mortgage Trust,6189,2023-12-04,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1478069,CONTRAFECT Corp,2834,2023-12-05,2023-12-05,0001193125-23-288544,https://www.sec.gov/Archives/edgar/data/1478069/000119312523288544/d604203d8k.htm,,,,38,2023-11-14,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1968487,"Worthington Steel, Inc.",3310,2023-12-05,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2002215,MSWF Commercial Mortgage Trust 2023-2,6189,2023-12-12,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1578742,"GPB Automotive Portfolio, LP",5500,2023-12-13,2023-12-13,0001104659-23-125771,https://www.sec.gov/Archives/edgar/data/1578742/000110465923125771/tm2332767d1_8k.htm,,,,10,2023-11-09,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1640265,"GPB Holdings II, LP",8742,2023-12-13,2023-12-13,0001104659-23-125769,https://www.sec.gov/Archives/edgar/data/1640265/000110465923125769/tm2332721d1_8k.htm,,,,6,2023-11-14,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1991192,Benchmark 2023-B40 Mortgage Trust,6189,2023-12-13,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1802749,"Lightning eMotors, Inc.",3711,2023-12-14,2023-12-14,0001802749-23-000141,https://www.sec.gov/Archives/edgar/data/1802749/000180274923000141/zev-20231213.htm,,,,14,2023-11-20,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+845819,"KonaTel, Inc.",4899,2023-12-22,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1855631,AERWINS Technologies Inc.,3721,2024-01-03,2024-01-03,0001493152-24-000337,https://www.sec.gov/Archives/edgar/data/1855631/000149315224000337/form8-k.htm,,,,10,2023-11-28,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1622244,"One World Products, Inc.",2834,2024-01-19,2024-01-19,0001493152-24-003058,https://www.sec.gov/Archives/edgar/data/1622244/000149315224003058/form8-k.htm,,,,34,2023-11-15,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1998822,Mercedes-Benz Auto Receivables Trust 2024-1,6189,2024-01-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2004982,Benchmark 2024-V5 Mortgage Trust,6189,2024-01-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2006440,BMO 2024-5C3 Mortgage Trust,6189,2024-01-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+912728,FORWARD AIR CORP,4731,2024-01-31,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2006370,BBCMS Mortgage Trust 2024-C24,6189,2024-01-31,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+874292,ADDVANTAGE TECHNOLOGIES GROUP INC,5000,2024-02-01,2024-02-01,0001628280-24-002879,https://www.sec.gov/Archives/edgar/data/874292/000162828024002879/aey-20240131.htm,,,,80,2023-11-14,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+2006016,BANK5 2024-5YR5,6189,2024-02-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1402479,"MedAvail Holdings, Inc.",5912,2024-02-02,2024-02-02,0001104659-24-009793,https://www.sec.gov/Archives/edgar/data/1402479/000110465924009793/tm244766d1_8k.htm,,,,61,2023-08-14,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1172631,"Sunworks, Inc.",3690,2024-02-06,2024-02-06,0001493152-24-004968,https://www.sec.gov/Archives/edgar/data/1172631/000149315224004968/form8-k.htm,,,,63,2023-11-13,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1870129,Rose Hill Acquisition Corp,6770,2024-02-13,2024-02-13,0001140361-24-007454,https://www.sec.gov/Archives/edgar/data/1870129/000114036124007454/ef20021578_8k.htm,,,,8,2023-08-15,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1831481,Sable Offshore Corp.,1311,2024-02-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2012265,Benchmark 2024-V6 Mortgage Trust,6189,2024-03-18,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2012263,BMO 2024-C8 Mortgage Trust,6189,2024-03-18,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2013825,BBCMS Mortgage Trust 2024-5C25,6189,2024-03-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1029744,SONIC FOUNDRY INC,3663,2024-03-22,2024-03-22,0001437749-24-008887,https://www.sec.gov/Archives/edgar/data/1029744/000143774924008887/sofo20240321_8k.htm,,,,96,2024-01-04,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+43920,"GREIF, INC",3412,2024-03-27,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1653247,Waitr Holdings Inc.,7389,2024-04-02,2024-04-02,0001653247-24-000019,https://www.sec.gov/Archives/edgar/data/1653247/000165324724000019/wtrh-20240402.htm,,,,30,2023-11-13,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+867028,"FOMO WORLDWIDE, INC.",6799,2024-04-15,2024-04-15,0001472375-24-000019,https://www.sec.gov/Archives/edgar/data/867028/000147237524000019/ixform8ka.htm,,,,44,2023-11-21,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+2015976,Daimler Trucks Retail Trust 2024-1,6189,2024-04-17,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1600847,Gamida Cell Ltd.,2836,2024-04-22,2024-04-22,0001213900-24-035022,https://www.sec.gov/Archives/edgar/data/1600847/000121390024035022/ea0204423-8k_gamidacell.htm,,,,9,2024-03-27,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+2017898,BANK5 Trust 2024-5YR6,6189,2024-04-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2016125,BMO 2024-5C4 Mortgage Trust,6189,2024-04-26,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+834285,REPUBLIC FIRST BANCORP INC,6022,2024-04-29,2024-04-29,0001437749-24-013455,,,,,90,2023-03-15,True,False,False,rejected,stopped reporting 411 days before the event
+1934064,"ProSomnus, Inc.",3841,2024-05-08,2024-05-08,0001104659-24-058473,,,,,5,2024-03-27,True,False,False,rejected,only 5 periodic filings before the event
+1402436,SS&C Technologies Holdings Inc,7372,2024-05-09,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2020017,BBCMS Mortgage Trust 2024-C26,6189,2024-05-13,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2016973,Mercedes-Benz Auto Lease Trust 2024-A,6189,2024-05-21,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2016841,Benchmark 2024-V7 Mortgage Trust,6189,2024-05-24,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1168081,Desert Hawk Gold Corp.,1040,2024-05-28,2024-05-28,0001213900-24-046944,https://www.sec.gov/Archives/edgar/data/1168081/000121390024046944/ea0206831-8k_deserthawk.htm,,,,53,2024-04-01,True,True,False,needs_review,"parsed petition 2024-04-05 is 53d from disclosure 2024-05-28; 8-K may concern a prior case, or the date is mis-parsed"
+1628945,Cue Health Inc.,3826,2024-05-28,2024-05-28,0001193125-24-148163,https://www.sec.gov/Archives/edgar/data/1628945/000119312524148163/d837440d8k.htm,,,,10,2024-03-13,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1504678,"Loop Industries, Inc.",2800,2024-06-04,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2022503,BANK5 2024-5YR7,6189,2024-06-05,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1885336,"FORMATION MINERALS, INC.",1311,2024-06-13,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2023106,BANK 2024-BNK47,6189,2024-06-13,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1790665,Greenrose Holding Co Inc.,5990,2024-06-21,2024-06-21,0001213900-24-054658,,,,,12,2022-11-15,True,False,False,rejected,stopped reporting 584 days before the event
+2022685,BBCMS Mortgage Trust 2024-5C27,6189,2024-06-25,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2024812,BMO 2024-C9 Mortgage Trust,6189,2024-07-02,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1784851,"Shapeways Holdings, Inc.",3990,2024-07-03,2024-07-03,0001628280-24-030980,https://www.sec.gov/Archives/edgar/data/1784851/000162828024030980/shpw-20240702.htm,,,,17,2024-03-28,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+2024274,Benchmark 2024-V8 Mortgage Trust,6189,2024-07-05,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2028411,Wells Fargo Commercial Mortgage Trust 2024-5C1,6189,2024-07-18,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+764195,VBI Vaccines Inc/BC,2834,2024-07-30,2024-07-30,0001493152-24-029537,https://www.sec.gov/Archives/edgar/data/764195/000149315224029537/form8-k.htm,,,,30,2024-05-15,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+2012481,BANK5 2024-5YR8,6189,2024-07-30,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2014596,"Concentra Group Holdings Parent, Inc.",8093,2024-08-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2027304,BMO 2024-5C5 Mortgage Trust,6189,2024-08-02,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+883902,"Cornerstone Building Brands, Inc.",3448,2024-08-07,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1431959,META MATERIALS INC.,3674,2024-08-09,2024-08-09,0000950170-24-094376,https://www.sec.gov/Archives/edgar/data/1431959/000095017024094376/mmat-20240807.htm,,,,65,2024-05-13,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+2030072,BBCMS Mortgage Trust 2024-C28,6189,2024-08-12,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2030476,Benchmark 2024-V9 Mortgage Trust,6189,2024-08-15,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2029929,Wells Fargo Commercial Mortgage Trust 2024-C63,6189,2024-08-20,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2032772,BANK5 2024-5YR9,6189,2024-08-21,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2034419,BMO 2024-5C6 Mortgage Trust,6189,2024-09-12,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1536256,First Capital Real Estate Trust Inc,6798,2024-09-17,2024-09-17,0001731122-24-001425,,,,,12,2015-08-14,True,False,False,rejected,stopped reporting 3322 days before the event
+2034721,BBCMS Mortgage Trust 2024-5C29,6189,2024-09-18,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2033250,Mercedes-Benz Auto Lease Trust 2024-B,6189,2024-09-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1939433,"Cohen & Steers Income Opportunities REIT, Inc.",6798,2024-09-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2034418,Benchmark 2024-V10 Mortgage Trust,6189,2024-09-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+797721,VIASAT INC,4899,2024-10-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2036193,BANK 2024-BNK48,6189,2024-10-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2037111,BANK5 2024-5YR10,6189,2024-10-04,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1876945,Gold Flora Corp.,0100,2024-10-07,2024-10-07,0001876945-24-000090,https://www.sec.gov/Archives/edgar/data/1876945/000187694524000090/gram-20241007.htm,,,,12,2024-08-14,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1603207,"Notable Labs, Ltd.",2834,2024-10-15,2024-10-15,0001493152-24-041006,https://www.sec.gov/Archives/edgar/data/1603207/000149315224041006/form8-k.htm,,,,7,2024-08-14,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+2038433,BMO 2024-5C7 Mortgage Trust,6189,2024-10-21,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+875729,BION ENVIRONMENTAL TECHNOLOGIES INC,2870,2024-10-24,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1621672,"Super League Enterprise, Inc.",7373,2024-10-25,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+356590,"GLOBAL TECH INDUSTRIES GROUP, INC.",8741,2024-10-28,2024-10-28,0001493152-24-042616,https://www.sec.gov/Archives/edgar/data/356590/000149315224042616/form8-k.htm,,,,72,2024-04-16,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+2038432,BMO 2024-C10 Mortgage Trust,6189,2024-10-28,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2039612,BBCMS Mortgage Trust 2024-C30,6189,2024-11-04,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2039535,Benchmark 2024-V11 Mortgage Trust,6189,2024-11-05,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1869198,"Life Time Group Holdings, Inc.",7997,2024-11-06,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2041680,BANK5 2024-5YR11,6189,2024-11-06,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1996210,"BLUM HOLDINGS, INC.",5900,2024-11-08,2024-11-08,0001437749-24-034189,,,,,3,2024-08-14,True,False,False,rejected,only 3 periodic filings before the event
+2039768,Wells Fargo Commercial Mortgage Trust 2024-5C2,6189,2024-11-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2044491,BANK5 2024-5YR12,6189,2024-11-25,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1698990,Magnolia Oil & Gas Corp,1311,2024-11-26,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2044614,BMO 2024-5C8 Mortgage Trust,6189,2024-12-06,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2044180,BBCMS Mortgage Trust 2024-5C31,6189,2024-12-06,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1127993,"GALAXY NEXT GENERATION, INC.",7830,2024-12-12,2024-12-12,0001091818-24-000153,,,,,59,2023-05-22,True,False,False,rejected,stopped reporting 570 days before the event
+37996,FORD MOTOR CO,3711,2024-12-16,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+65596,SIEBERT FINANCIAL CORP,6211,2024-12-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2044630,Benchmark 2024-V12 Mortgage Trust,6189,2024-12-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1770450,Xerox Holdings Corp,3577,2024-12-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1997652,Tamboran Resources Corp,1311,2024-12-31,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+918541,NN INC,3540,2025-01-02,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2047317,Wells Fargo Commercial Mortgage Trust 2025-5C3,6189,2025-01-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1828852,"Mondee Holdings, Inc.",4700,2025-01-15,2025-01-15,0001828852-25-000010,https://www.sec.gov/Archives/edgar/data/1828852/000182885225000010/mond-20250107.htm,,,,14,2024-08-14,True,True,False,needs_review,"parsed petition 2024-01-14 is 367d from disclosure 2025-01-15; 8-K may concern a prior case, or the date is mis-parsed"
+2044492,Mercedes-Benz Auto Receivables Trust 2025-1,6189,2025-01-16,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1750153,Canoo Inc.,3714,2025-01-21,2025-01-21,0001628280-25-001918,https://www.sec.gov/Archives/edgar/data/1750153/000162828025001918/goev-20250117.htm,,,,23,2024-11-14,True,False,True,rejected,item 1.03 present but no Chapter 11 language in the filing
+1959023,RenX Enterprises Corp.,4953,2025-01-22,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1844862,"Solid Power, Inc.",3690,2025-01-24,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2049300,BBCMS Mortgage Trust 2025-C32,6189,2025-01-28,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1719406,"NRX Pharmaceuticals, Inc.",2834,2025-01-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1454938,Teads Holding Co.,7370,2025-02-03,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1438901,"Auto Parts 4Less Group, Inc.",7389,2025-02-05,2025-02-05,0001477932-25-000717,https://www.sec.gov/Archives/edgar/data/1438901/000147793225000717/fles_8k.htm,,,,62,2024-02-14,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1506928,Avinger Inc,3841,2025-02-10,2025-02-10,0001437749-25-003321,https://www.sec.gov/Archives/edgar/data/1506928/000143774925003321/avgr20250208_8k.htm,,,,40,2024-11-07,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+2047638,BANK5 2025-5YR13,6189,2025-02-10,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2049534,Benchmark 2025-V13 Mortgage Trust,6189,2025-02-11,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2053102,Wells Fargo Commercial Mortgage Trust 2025-C64,6189,2025-02-11,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2051421,BMO 2025-C11 Mortgage Trust,6189,2025-02-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2023554,Sandisk Corp,3572,2025-02-24,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2055003,BBCMS Mortgage Trust 2025-5C33,6189,2025-02-25,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1098880,IntelGenx Technologies Corp.,2834,2025-02-28,2025-02-28,0001062993-25-003890,https://www.sec.gov/Archives/edgar/data/1098880/000106299325003890/form8k.htm,,,,65,2024-05-15,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1309108,WEX Inc.,7389,2025-03-06,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2056713,Morgan Stanley Bank of America Merrill Lynch Trust 2025-5C1,6189,2025-03-13,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2058145,BANK 2025-BNK49,6189,2025-03-17,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2048804,BMO 2025-5C9 Mortgage Trust,6189,2025-03-20,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1792581,"Kiromic Biopharma, Inc.",2836,2025-03-21,2025-03-21,0001437749-25-008671,https://www.sec.gov/Archives/edgar/data/1792581/000143774925008671/krbp20250321_8k.htm,,,,18,2025-02-14,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1865187,"Aris Water Solutions, Inc.",1389,2025-03-25,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2056663,Benchmark 2025-V14 Mortgage Trust,6189,2025-03-25,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+876523,EZCORP INC,5900,2025-03-28,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2059498,BANK5 2025-5YR14,6189,2025-04-02,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+742278,RPC INC,1389,2025-04-07,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1099132,MANHATTAN SCIENTIFICS INC,3690,2025-04-08,2025-04-08,0001477932-25-002525,https://www.sec.gov/Archives/edgar/data/1099132/000147793225002525/mhtx_8k.htm,,,,70,2024-08-19,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+2061325,BBCMS Mortgage Trust 2025-5C34,6189,2025-04-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2057363,BMO 2025-5C10 Mortgage Trust,6189,2025-04-30,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1413891,"HIGH WIRE NETWORKS, INC.",4813,2025-05-05,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1947861,Nature's Miracle Holding Inc.,3523,2025-05-07,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1788230,"IP STRATEGY HOLDINGS, INC.",2080,2025-05-15,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2064615,Mercedes-Benz Auto Lease Trust 2025-A,6189,2025-05-16,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1828811,Li-Cycle Holdings Corp.,4955,2025-05-19,2025-05-19,0001193125-25-122542,,,,,5,2025-03-31,True,False,False,rejected,only 5 periodic filings before the event
+867840,"PRECISION OPTICS CORPORATION, INC.",3845,2025-05-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2063020,Wells Fargo Commercial Mortgage Trust 2025-5C4,6189,2025-05-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1852973,Borealis Foods Inc.,2000,2025-05-20,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2060542,Benchmark 2025-V15 Mortgage Trust,6189,2025-05-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2061839,BMO 2025-C12 Mortgage Trust,6189,2025-05-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2062966,BANK 2025-BNK50,6189,2025-06-02,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1783875,4Front Ventures Corp.,2833,2025-06-10,2025-06-10,0001279569-25-000595,https://www.sec.gov/Archives/edgar/data/1783875/000127956925000595/form8k.htm,,,,16,2024-11-14,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1962011,"Kairos Pharma, LTD.",2834,2025-06-12,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2061936,BMO 2025-5C11 Mortgage Trust,6189,2025-06-18,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2071746,BANK5 2025-5YR15,6189,2025-07-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2074653,BBCMS Mortgage Trust 2025-C35,6189,2025-07-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2063021,Wells Fargo Commercial Mortgage Trust 2025-5C5,6189,2025-07-15,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2067195,Morgan Stanley Bank of America Merrill Lynch Trust 2025-C35,6189,2025-07-22,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2076111,BBCMS Mortgage Trust 2025-5C36,6189,2025-07-22,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2060845,Benchmark 2025-V16 Mortgage Trust,6189,2025-07-24,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1883085,Pagaya Technologies Ltd.,6199,2025-07-28,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+799698,LadRx Corp,2836,2025-07-31,2025-07-31,0001641172-25-021728,https://www.sec.gov/Archives/edgar/data/799698/000164117225021728/form8-k.htm,,,,113,2025-05-14,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1723128,"Amneal Pharmaceuticals, Inc.",2834,2025-08-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2078775,BANK5 2025-5YR16,6189,2025-08-13,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2080258,Benchmark 2025-B41 Mortgage Trust,6189,2025-08-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1413909,DSG Global Inc.,7373,2025-08-28,2025-08-28,0001641172-25-025820,,,,,63,2023-08-29,True,False,False,rejected,stopped reporting 730 days before the event
+2077702,BBCMS Mortgage Trust 2025-5C37,6189,2025-09-09,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1805024,Amergent Hospitality Group Inc.,5810,2025-09-12,2025-09-12,0001641172-25-027228,,,,,11,2023-07-17,True,False,False,rejected,stopped reporting 788 days before the event
+2063065,Benchmark 2025-V17 Mortgage Trust,6189,2025-09-15,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1210618,"SPI Energy Co., Ltd.",3674,2025-09-17,2025-09-17,0001683168-25-007069,,,,,39,2023-11-20,True,False,False,rejected,stopped reporting 667 days before the event
+2061934,BMO 2025-5C12 Mortgage Trust,6189,2025-09-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2077898,Wells Fargo Commercial Mortgage Trust 2025-5C6,6189,2025-09-24,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2061838,BMO 2025-C13 Mortgage Trust,6189,2025-09-30,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2084969,BANK5 2025-5YR17,6189,2025-09-30,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1801169,Opendoor Technologies Inc.,6531,2025-10-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1838406,BKV Corp,1311,2025-10-01,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+894556,CitroTech Inc.,2800,2025-10-07,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2064947,WaterBridge Infrastructure LLC,1389,2025-10-07,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2086308,Wells Fargo Commercial Mortgage Trust 2025-C65,6189,2025-10-07,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2089470,Benchmark 2025-V18 Mortgage Trust,6189,2025-10-15,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1643988,"Loop Media, Inc.",7363,2025-10-20,2025-10-20,0001493152-25-018533,https://www.sec.gov/Archives/edgar/data/1643988/000149315225018533/form8-k.htm,,,,39,2025-08-14,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+2079358,Mercedes-Benz Auto Lease Trust 2025-B,6189,2025-10-20,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1654595,"Medalist Diversified, Inc.",6798,2025-10-28,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1722556,BestGofer Inc.,7200,2025-10-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2091562,Morgan Stanley Bank of America Merrill Lynch Trust 2025-5C2,6189,2025-10-30,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1761510,TILT Holdings Inc.,2111,2025-11-07,2025-11-07,0001104659-25-108571,https://www.sec.gov/Archives/edgar/data/1761510/000110465925108571/tilt-20251103x8k.htm,,,,13,2025-08-14,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+2091664,BBCMS Mortgage Trust 2025-5C38,6189,2025-11-10,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1819395,Sonder Holdings Inc.,7000,2025-11-14,2025-11-14,0001628280-25-052329,https://www.sec.gov/Archives/edgar/data/1819395/000162828025052329/son-20251107.htm,,,,18,2025-10-14,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1918102,"DEEP FISSION, INC.",4911,2025-11-21,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2096187,BANK5 2025-5YR18,6189,2025-11-21,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1995807,LandBridge Co LLC,6792,2025-11-25,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1721741,"Lazydays Holdings, Inc.",5500,2025-12-01,2025-12-01,0001493152-25-025447,https://www.sec.gov/Archives/edgar/data/1721741/000149315225025447/form8-k.htm,,,,31,2025-11-14,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+1938338,GlobalTech Corp,4813,2025-12-02,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2093119,Wells Fargo Commercial Mortgage Trust 2025-5C7,6189,2025-12-08,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2097938,BBCMS Mortgage Trust 2025-C39,6189,2025-12-10,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2098810,BANK5 2025-5YR19,6189,2025-12-11,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2093117,Benchmark 2025-V19 Mortgage Trust,6189,2025-12-11,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2098047,BANK 2025-BNK51,6189,2025-12-15,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2061933,BMO 2025-5C13 Mortgage Trust,6189,2025-12-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+7623,ARTS WAY MANUFACTURING CO INC,3523,2025-12-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+720875,DYNATRONICS CORP,3841,2026-01-12,2026-01-12,0001062993-26-000178,https://www.sec.gov/Archives/edgar/data/720875/000106299326000178/form8k.htm,,,,75,2025-11-19,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1823144,"GPGI, Inc.",6199,2026-01-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2096965,Mercedes-Benz Auto Lease Trust 2026-A,6189,2026-01-15,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2104401,BBCMS Mortgage Trust 2026-5C40,6189,2026-01-26,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2011954,Twin Hospitality Group Inc.,5812,2026-01-27,2026-01-27,0001493152-26-003699,,,,,4,2025-11-12,True,False,False,rejected,only 4 periodic filings before the event
+1637147,"zSpace, Inc.",7372,2026-01-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2061932,BMO 2026-C14 Mortgage Trust,6189,2026-01-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2106400,Benchmark 2026-V20 Mortgage Trust,6189,2026-02-02,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2104049,BANK5 2026-5YR20,6189,2026-02-09,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1981792,Howard Hughes Holdings Inc.,6798,2026-02-17,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+861459,GRANITE CONSTRUCTION INC,1600,2026-02-18,2026-02-18,0000861459-26-000006,https://www.sec.gov/Archives/edgar/data/861459/000086145926000006/gva-20260218.htm,,,,120,2026-02-13,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+893538,SM Energy Co,1311,2026-02-18,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2107796,Wells Fargo Commercial Mortgage Trust 2026-5C8,6189,2026-02-19,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2110410,Benchmark 2026-B42 Mortgage Trust,6189,2026-02-25,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2109998,Benchmark 2026-V21 Mortgage Trust,6189,2026-03-05,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2063015,BMO 2026-5C14 Mortgage Trust,6189,2026-03-10,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2029118,"INFINITY NATURAL RESOURCES, INC.",1311,2026-03-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1776738,Cannabist Co Holdings Inc.,0100,2026-03-24,2026-03-24,0001140361-26-010926,https://www.sec.gov/Archives/edgar/data/1776738/000114036126010926/ef20068552_8k.htm,,,,16,2025-11-10,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+764897,"Broad Street Realty, Inc.",6500,2026-03-26,2026-03-26,0001193125-26-126180,https://www.sec.gov/Archives/edgar/data/764897/000119312526126180/d53205d8k.htm,,,,71,2025-08-19,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1659323,Iterum Therapeutics plc,2834,2026-03-27,2026-03-27,0001193125-26-127785,https://www.sec.gov/Archives/edgar/data/1659323/000119312526127785/itrm-20260327.htm,,,,30,2025-11-14,True,False,False,rejected,item 1.03 present but no Chapter 11 language in the filing
+2116726,BANK5 2026-5YR21,6189,2026-03-27,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2109197,Wells Fargo Commercial Mortgage Trust 2026-C66,6189,2026-03-30,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1865494,"IO Biotech, Inc.",2834,2026-03-31,2026-03-31,0001193125-26-133331,https://www.sec.gov/Archives/edgar/data/1865494/000119312526133331/d87973d8k.htm,,,,17,2025-11-14,True,True,True,rejected,"Chapter 7 liquidation, not Chapter 11"
+1413754,"MARIZYME, INC.",3841,2026-04-17,2026-04-17,0001493152-26-017470,,,,,50,2025-03-05,True,False,False,rejected,stopped reporting 408 days before the event
+2130435,BBCMS Mortgage Trust 2026-5C41,6189,2026-05-04,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2121298,Benchmark 2026-B43 Mortgage Trust,6189,2026-05-04,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2104052,Enviri Corp,4953,2026-05-11,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2126766,Benchmark 2026-V22 Mortgage Trust,6189,2026-05-12,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2133003,Wells Fargo Commercial Mortgage Trust 2026-5C9,6189,2026-05-12,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2115657,Mercedes-Benz Auto Receivables Trust 2026-1,6189,2026-05-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2134743,BANK5 2026-5YR22,6189,2026-05-26,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2134864,JPMF1 Multifamily Mortgage Trust 2026-FX1,6189,2026-05-28,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1408100,"Kennedy-Wilson Holdings, Inc.",6500,2026-05-29,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2135998,BBCMS Mortgage Trust 2026-5C42,6189,2026-06-04,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2128774,BMO 2026-5C15 Mortgage Trust,6189,2026-06-16,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2138709,BANK 2026-BNK52,6189,2026-06-16,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2136440,Wells Fargo Commercial Mortgage Trust 2026-5C10,6189,2026-06-23,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2140978,BANK5 2026-5YR23,6189,2026-06-30,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1956741,"CleanCore Solutions, Inc.",2842,2026-07-09,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2064124,"Figure Technology Solutions, Inc.",6163,2026-07-14,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+1084765,"RESOURCES CONNECTION, INC.",7389,2026-07-16,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+842722,"Fuse Science, Inc.",4581,2026-07-17,2026-07-17,0001683168-26-005603,,,,,36,2022-02-23,True,False,False,rejected,stopped reporting 1605 days before the event
+2143199,Citigroup Commercial Mortgage Trust 2026-MFAM1,6189,2026-07-17,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window
+2136643,BMO 2026-5C16 Mortgage Trust,6189,2026-08-13,,,,,,,0,,False,False,False,rejected,no 8-K carrying item 1.03 in window

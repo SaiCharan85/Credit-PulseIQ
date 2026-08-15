@@ -1,0 +1,36 @@
+name: evals
+
+# The eval ladder gates every change. L0-L2 are deterministic and run offline
+# from committed fixtures, so CI never depends on SEC availability.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  l0-l2:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Eval ladder (L0-L2)
+        run: pytest -q
+
+      - name: Label-set integrity
+        run: pytest evals/test_l0_labels.py -q

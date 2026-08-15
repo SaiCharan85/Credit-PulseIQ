@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.keys.json
+data/raw/
+data/cache/
+*.parquet
+*.duckdb
+.pytest_cache/
+.ipynb_checkpoints/
+.ruff_cache/

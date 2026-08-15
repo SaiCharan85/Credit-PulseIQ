@@ -1,0 +1,28 @@
+[project]
+name = "creditpulse-iq"
+version = "0.0.1"
+description = "CreditPulse IQ — corporate credit-distress agent, backtested against real bankruptcy and AAER outcomes."
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2",
+    "pandas",
+    "httpx",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+serve = ["vllm"]
+
+[tool.pytest.ini_options]
+testpaths = ["evals"]
+addopts = "-m 'not network'"
+markers = [
+    "network: hits SEC EDGAR live; deselected by default",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
