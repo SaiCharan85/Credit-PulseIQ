@@ -42,6 +42,8 @@ def main(argv: list[str] | None = None) -> int:
         help="stratified sample: keep all positives, cap negatives (0 = keep all)",
     )
     parser.add_argument("--no-cache", action="store_true", help="bypass the LLM response cache")
+    parser.add_argument("--model", default="", help="agent model id (overrides CREDITPULSE_LLM_MODEL)")
+    parser.add_argument("--base-url", default="", help="OpenAI-compatible endpoint")
     args = parser.parse_args(argv)
 
     rows = load_panel(args.panel)
@@ -63,9 +65,14 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.agent == "react":
         from agents.distress import DistressInvestigator
-        from agents.llm import default_client
+        from agents.llm import default_client, preflight
 
-        client = default_client()
+        client = default_client(model=args.model, base_url=args.base_url)
+        ok, detail = preflight(client)
+        if not ok:
+            print(f"endpoint preflight failed: {detail}", file=sys.stderr)
+            return 2
+        print(f"endpoint ok: {detail}", file=sys.stderr)
         if not args.no_cache:
             client = CachingClient(inner=client)
         investigator = DistressInvestigator(client)

@@ -226,7 +226,25 @@ python -m data.outcomes                                       # survived or not
 
 # Fit the deterministic baselines the agent has to beat
 python -m models.run_baseline
+
+# L3 backtest. The rule-based control needs no model at all:
+python -m evals.run_l3 --agent rules --max-negatives 300
+
+# The ReAct investigator needs an OpenAI-compatible endpoint (vLLM or hosted).
+# A ~20B mixture-of-experts is the default: few active parameters, so it runs
+# at small-model cost. Measured floor is below it -- 0.5B could not hold the
+# tool protocol, 1.5B fabricated a metric it had never fetched.
+export CREDITPULSE_LLM_BASE_URL="https://api.groq.com/openai/v1"
+export CREDITPULSE_LLM_MODEL="openai/gpt-oss-20b"
+export CREDITPULSE_LLM_API_KEY="..."
+python -m evals.run_l3 --agent react --max-negatives 300
+
+# The judge must be a different model (hard rule 7); cross-provider is safest.
+export CREDITPULSE_JUDGE_MODEL="gemini-2.5-flash"
 ```
+
+Responses are cached by model and conversation, so re-running a backtest after
+changing only the grading code costs nothing and reproduces exactly.
 
 ---
 

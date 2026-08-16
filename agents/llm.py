@@ -205,15 +205,60 @@ class CachingClient:
         return {"hits": self.hits, "misses": self.misses}
 
 
-def default_client() -> LLMClient:
+#: Default agent model. A ~20B mixture-of-experts: only a few billion
+#: parameters are active per token, so it costs and runs like a small model
+#: while reasoning like a mid-tier one -- the right trade for a backtest that
+#: is throughput-bound rather than capability-bound.
+#:
+#: The measured floor is below it: 0.5B could not hold the tool protocol at
+#: all, and 1.5B fabricated a metric it had never fetched. Whether 20B is
+#: actually needed over 8B is an open question the harness is built to answer.
+DEFAULT_AGENT_MODEL = "openai/gpt-oss-20b"
+
+#: Providers exposing an OpenAI-compatible endpoint. Model IDs churn -- check
+#: the provider's current list if one 404s.
+KNOWN_ENDPOINTS = {
+    "groq": "https://api.groq.com/openai/v1",
+    "openrouter": "https://openrouter.ai/api/v1",
+    "together": "https://api.together.xyz/v1",
+    "gemini": "https://generativelanguage.googleapis.com/v1beta/openai",
+    "vllm": "http://localhost:8000/v1",
+}
+
+
+def default_client(model: str = "", base_url: str = "") -> LLMClient:
     """The configured agent model, or a clear error explaining what is missing."""
-    if os.environ.get(DEFAULT_MODEL_ENV):
-        return OpenAICompatibleClient()
+    model = model or os.environ.get(DEFAULT_MODEL_ENV, "")
+    key = os.environ.get(DEFAULT_KEY_ENV, "")
+    base = base_url or os.environ.get(DEFAULT_BASE_URL_ENV, "")
+    if model and (key or base):
+        return OpenAICompatibleClient(model=model, base_url=base, api_key=key)
     raise RuntimeError(
-        f"no agent model configured. Set {DEFAULT_MODEL_ENV} and optionally "
-        f"{DEFAULT_BASE_URL_ENV} (e.g. http://localhost:8000/v1 for vLLM). "
-        "The L0-L2 suite and the deterministic baselines run without one."
+        "no agent model configured. Set:\n"
+        f"  {DEFAULT_BASE_URL_ENV}   e.g. {KNOWN_ENDPOINTS['groq']}\n"
+        f"  {DEFAULT_MODEL_ENV}      e.g. {DEFAULT_AGENT_MODEL}\n"
+        f"  {DEFAULT_KEY_ENV}        your provider key\n"
+        "The L0-L2 suite, the deterministic baselines and the rule-based "
+        "control all run without one."
     )
+
+
+def preflight(client: LLMClient) -> tuple[bool, str]:
+    """One cheap round-trip to confirm the endpoint answers.
+
+    Worth two seconds: a bad model ID or key would otherwise surface partway
+    through a 400-case backtest, after real tokens had been spent.
+    """
+    try:
+        reply = client.complete(
+            [{"role": "user", "content": 'Reply with exactly: {"ok": true}'}],
+            max_tokens=16,
+        )
+    except Exception as exc:  # noqa: BLE001
+        return False, f"{type(exc).__name__}: {exc}"
+    if not (reply or "").strip():
+        return False, "endpoint returned an empty completion"
+    return True, reply.strip()[:80]
 
 
 def judge_client() -> LLMClient:
