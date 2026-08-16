@@ -255,7 +255,7 @@ class L3Report:
 #: Termination reasons that mean the agent could not complete the protocol,
 #: as opposed to deciding it lacked evidence.
 PROTOCOL_FAILURE_REASONS = frozenset(
-    {"step_budget_exhausted", "retries_exhausted", "unparseable_response"}
+    {"step_budget_exhausted", "retries_exhausted", "unparseable_response", "case_error"}
 )
 
 
@@ -340,10 +340,30 @@ def run_backtest(
     that date and nothing else, so the as-of discipline is inherited from the
     panel rather than reimplemented here.
     """
+    from agents.llm import BudgetExhausted
+
     results: list[CaseResult] = []
     for n, case in enumerate(cases, 1):
         facts = facts_for(case.cik)
-        output = investigator.run(case.cik, case.observation_date, facts, **run_kwargs)
+        try:
+            output = investigator.run(case.cik, case.observation_date, facts, **run_kwargs)
+        except BudgetExhausted:
+            # A deliberate stop, not a failure: propagate so the caller can
+            # report cleanly with everything completed already cached.
+            raise
+        except Exception as exc:  # noqa: BLE001
+            # One bad case must not destroy the run. A three-hour sweep will
+            # hit provider errors and malformed edge cases; each becomes a
+            # recorded protocol failure so the other 399 still produce numbers.
+            output = InvestigatorOutput(
+                cik=case.cik,
+                as_of=case.observation_date,
+                signal=SIGNAL_INSUFFICIENT,
+                confidence=0.0,
+                rationale=f"case failed: {type(exc).__name__}: {str(exc)[:200]}",
+                terminated_because="case_error",
+                verification_passed=False,
+            )
         result = CaseResult(
             cik=case.cik,
             as_of=case.observation_date,

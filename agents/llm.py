@@ -282,6 +282,28 @@ class RateLimitedClient:
         return "429" in text or "rate limit" in text or "too many requests" in text
 
     @staticmethod
+    def _is_transient(exc: Exception) -> bool:
+        """Network blips and provider 5xx: worth retrying, unlike a bad request.
+
+        A three-hour unattended run will meet at least one dropped connection.
+        Treating that as fatal threw away 40 completed cases the first time.
+        """
+        status = getattr(exc, "status_code", None) or getattr(
+            getattr(exc, "response", None), "status_code", None
+        )
+        if isinstance(status, int) and 500 <= status < 600:
+            return True
+        name = type(exc).__name__.lower()
+        if any(k in name for k in ("connection", "timeout", "apierror", "internalserver")):
+            return True
+        text = str(exc).lower()
+        return any(
+            k in text
+            for k in ("connection error", "timed out", "timeout", "temporarily unavailable",
+                      "bad gateway", "service unavailable", "502", "503", "504")
+        )
+
+    @staticmethod
     def _is_daily_cap(exc: Exception) -> bool:
         """A daily or credit limit. Retrying will not clear it."""
         text = str(exc).lower()
@@ -316,9 +338,9 @@ class RateLimitedClient:
                 self.calls += 1
                 return reply
             except Exception as exc:  # noqa: BLE001
-                if not self._is_rate_limit(exc):
+                if not (self._is_rate_limit(exc) or self._is_transient(exc)):
                     raise
-                if self._is_daily_cap(exc):
+                if self._is_rate_limit(exc) and self._is_daily_cap(exc):
                     raise BudgetExhausted(
                         f"provider daily/credit limit reached: {str(exc)[:160]}. "
                         "Completed work is cached; re-run when the quota resets."
