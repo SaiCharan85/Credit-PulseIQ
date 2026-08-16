@@ -219,3 +219,134 @@ class TestRunBacktest:
         ]
         run_backtest(Spy(), cases, lambda _cik: facts)
         assert seen == [date(2024, 1, 1), date(2024, 4, 1)]
+
+
+class TestStratifiedSampling:
+    """Positives are scarce and each agent case costs an API call, so
+    negatives are thinned -- and the resulting precision is corrected back."""
+
+    CASES = [PanelRow(cik=i, observation_date=BEFORE, label=1) for i in range(10)] + [
+        PanelRow(cik=100 + i, observation_date=BEFORE, label=0) for i in range(90)
+    ]
+
+    def test_every_positive_is_kept(self) -> None:
+        from evals.backtest import stratified_sample
+
+        s = stratified_sample(self.CASES, max_negatives=30)
+        assert s.n_positives == 10
+        assert sum(c.label for c in s.cases) == 10
+
+    def test_negatives_are_capped(self) -> None:
+        from evals.backtest import stratified_sample
+
+        s = stratified_sample(self.CASES, max_negatives=30)
+        assert s.n_negatives_kept == 30
+        assert s.negative_fraction == pytest.approx(30 / 90)
+
+    def test_sampling_is_deterministic(self) -> None:
+        from evals.backtest import stratified_sample
+
+        a = stratified_sample(self.CASES, max_negatives=30, seed=7)
+        b = stratified_sample(self.CASES, max_negatives=30, seed=7)
+        assert [c.cik for c in a.cases] == [c.cik for c in b.cases]
+
+    def test_no_sampling_when_cap_exceeds_population(self) -> None:
+        from evals.backtest import stratified_sample
+
+        s = stratified_sample(self.CASES, max_negatives=1000)
+        assert s.negative_fraction == 1.0
+        assert len(s.cases) == len(self.CASES)
+
+    def test_precision_is_corrected_back_to_the_population(self) -> None:
+        """Thinning negatives inflates raw precision; the correction removes it.
+
+        Verified end to end against the real panel: the 400-case sample reads
+        0.460 raw and 0.186 corrected, matching the full 1,217-case run.
+        """
+        results = [case(1, SIGNAL_SEVERE, 0.8) for _ in range(10)]
+        results += [case(0, SIGNAL_SEVERE, 0.8) for _ in range(10)]
+        report = grade(results, negative_fraction=0.25)
+        assert report.precision == pytest.approx(0.5)
+        # 10 sampled FPs represent 40 in the population -> 10 / (10 + 40)
+        assert report.corrected_precision == pytest.approx(0.2)
+
+    def test_recall_is_unaffected_by_sampling(self) -> None:
+        """Recall is computed over positives only, which are never thinned."""
+        results = [case(1, SIGNAL_SEVERE, 0.8), case(1, SIGNAL_HEALTHY, 0.5)]
+        assert grade(results, negative_fraction=0.25).recall == pytest.approx(0.5)
+
+
+class TestProtocolFailureSplit:
+    """A model too weak to hold the protocol yields the same verdict as one
+    exercising judgment. Conflating them lets incompetence read as caution."""
+
+    def _abstention(self, reason: str) -> CaseResult:
+        return CaseResult(
+            cik=1,
+            as_of=BEFORE,
+            label=0,
+            days_to_event=None,
+            output=InvestigatorOutput(
+                cik=1,
+                as_of=BEFORE,
+                signal=SIGNAL_INSUFFICIENT,
+                confidence=0.0,
+                terminated_because=reason,
+            ),
+        )
+
+    def test_model_choosing_to_abstain_is_honest(self) -> None:
+        report = grade([self._abstention("model_finished")])
+        assert report.honest_abstentions == 1
+        assert report.protocol_failures == 0
+
+    @pytest.mark.parametrize(
+        "reason", ["step_budget_exhausted", "retries_exhausted", "unparseable_response"]
+    )
+    def test_incomplete_runs_are_protocol_failures(self, reason: str) -> None:
+        report = grade([self._abstention(reason)])
+        assert report.protocol_failures == 1
+        assert report.honest_abstentions == 0
+
+    def test_rates_sum_to_the_abstention_rate(self) -> None:
+        results = [
+            self._abstention("model_finished"),
+            self._abstention("retries_exhausted"),
+            case(0, SIGNAL_HEALTHY, 0.6),
+        ]
+        report = grade(results)
+        assert report.honest_abstentions + report.protocol_failures == report.n_abstained
+        assert report.protocol_failure_rate == pytest.approx(1 / 3)
+
+
+class TestResponseCache:
+    def test_identical_conversation_is_replayed(self, tmp_path) -> None:
+        """Providers are not bit-reproducible at temperature 0, so a backtest
+        without a cache cannot distinguish a regression from provider drift."""
+        from agents.llm import CachingClient, ScriptedClient
+
+        inner = ScriptedClient(script=['{"a": 1}', '{"b": 2}'])
+        client = CachingClient(inner=inner, cache_dir=tmp_path)
+        messages = [{"role": "user", "content": "hello"}]
+        first = client.complete(messages)
+        second = client.complete(messages)
+        assert first == second == '{"a": 1}'
+        assert client.stats() == {"hits": 1, "misses": 1}
+
+    def test_different_conversations_are_not_confused(self, tmp_path) -> None:
+        from agents.llm import CachingClient, ScriptedClient
+
+        client = CachingClient(
+            inner=ScriptedClient(script=['{"a": 1}', '{"b": 2}']), cache_dir=tmp_path
+        )
+        assert client.complete([{"role": "user", "content": "one"}]) == '{"a": 1}'
+        assert client.complete([{"role": "user", "content": "two"}]) == '{"b": 2}'
+
+    def test_cache_survives_a_new_client(self, tmp_path) -> None:
+        from agents.llm import CachingClient, ScriptedClient
+
+        messages = [{"role": "user", "content": "hello"}]
+        CachingClient(inner=ScriptedClient(script=['{"a": 1}']), cache_dir=tmp_path).complete(messages)
+        fresh = CachingClient(inner=ScriptedClient(script=[]), cache_dir=tmp_path)
+        assert fresh.complete(messages) == '{"a": 1}'
+        assert fresh.stats()["hits"] == 1

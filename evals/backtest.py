@@ -99,12 +99,58 @@ class CaseResult:
 
 
 @dataclass
+class Sample:
+    """A stratified subsample and the correction it implies.
+
+    Positives are scarce (100 in the test split) and each agent case costs an
+    API call, so negatives are subsampled while every positive is kept. That
+    inflates the apparent base rate, which inflates precision -- so the
+    sampling fraction is carried alongside the cases and used to correct it.
+    Recall, lead time and the false-confidence rate are unaffected, because
+    they are computed over positives only.
+    """
+
+    cases: list[PanelRow]
+    negative_fraction: float = 1.0
+    n_positives: int = 0
+    n_negatives_kept: int = 0
+    n_negatives_total: int = 0
+
+
+def stratified_sample(
+    cases: Sequence[PanelRow], max_negatives: int, seed: int = 0
+) -> Sample:
+    """Keep every positive, sample negatives down to ``max_negatives``."""
+    import random
+
+    positives = [c for c in cases if c.label == 1]
+    negatives = [c for c in cases if c.label == 0]
+    if max_negatives <= 0 or max_negatives >= len(negatives):
+        kept = negatives
+        fraction = 1.0
+    else:
+        kept = random.Random(seed).sample(negatives, max_negatives)
+        fraction = max_negatives / len(negatives)
+    selected = sorted(positives + kept, key=lambda c: (c.observation_date, c.cik))
+    return Sample(
+        cases=selected,
+        negative_fraction=fraction,
+        n_positives=len(positives),
+        n_negatives_kept=len(kept),
+        n_negatives_total=len(negatives),
+    )
+
+
+@dataclass
 class L3Report:
     """Aggregate backtest metrics."""
 
     n_cases: int = 0
     n_positives: int = 0
     n_abstained: int = 0
+    honest_abstentions: int = 0
+    protocol_failures: int = 0
+    negative_fraction: float = 1.0
     true_positives: int = 0
     false_positives: int = 0
     false_negatives: int = 0
@@ -140,8 +186,34 @@ class L3Report:
         return 2 * p * r / (p + r)
 
     @property
+    def corrected_precision(self) -> float | None:
+        """Precision adjusted back to the full negative population.
+
+        Under subsampling only false positives are undercounted, by the
+        sampling fraction, so scaling them back recovers the population value.
+        Without this a 400-case sample would report a flattering precision
+        purely because negatives were thinned.
+        """
+        if self.negative_fraction >= 1.0:
+            return self.precision
+        scaled_fp = self.false_positives / self.negative_fraction
+        denominator = self.true_positives + scaled_fp
+        return self.true_positives / denominator if denominator else None
+
+    @property
     def abstention_rate(self) -> float:
         return self.n_abstained / self.n_cases if self.n_cases else 0.0
+
+    @property
+    def protocol_failure_rate(self) -> float:
+        """Share of cases the agent could not complete.
+
+        Kept apart from honest abstention. A model too weak to hold the tool
+        protocol produces the same ``insufficient_evidence`` verdict as a model
+        exercising good judgment, and conflating them would let incompetence
+        read as admirable caution -- exactly what happened with the local 1.5B.
+        """
+        return self.protocol_failures / self.n_cases if self.n_cases else 0.0
 
     @property
     def false_confidence_rate(self) -> float | None:
@@ -157,11 +229,18 @@ class L3Report:
             return f"{x:.3f}" if x is not None else "n/a"
 
         lead = self.median_lead_time_days
+        corrected = (
+            ""
+            if self.negative_fraction >= 1.0
+            else f"  [base-rate corrected {pct(self.corrected_precision)}]"
+        )
         return "\n".join(
             [
                 f"cases                 {self.n_cases}  (positives {self.n_positives})",
-                f"abstained             {self.n_abstained}  ({self.abstention_rate:.1%})",
-                f"precision / recall    {pct(self.precision)} / {pct(self.recall)}   F1 {pct(self.f1)}",
+                f"abstained             {self.n_abstained}  ({self.abstention_rate:.1%})"
+                f"  honest {self.honest_abstentions} / protocol-failure {self.protocol_failures}",
+                f"precision / recall    {pct(self.precision)} / {pct(self.recall)}"
+                f"   F1 {pct(self.f1)}{corrected}",
                 f"median lead time      {f'{lead:.0f} days' if lead is not None else 'n/a'}",
                 f"FALSE-CONFIDENCE RATE {pct(self.false_confidence_rate)}"
                 f"  ({self.false_confidence_cases}/{self.n_positives})",
@@ -173,9 +252,16 @@ class L3Report:
         )
 
 
-def grade(results: Sequence[CaseResult]) -> L3Report:
+#: Termination reasons that mean the agent could not complete the protocol,
+#: as opposed to deciding it lacked evidence.
+PROTOCOL_FAILURE_REASONS = frozenset(
+    {"step_budget_exhausted", "retries_exhausted", "unparseable_response"}
+)
+
+
+def grade(results: Sequence[CaseResult], negative_fraction: float = 1.0) -> L3Report:
     """Aggregate graded predictions into the L3 report."""
-    report = L3Report(n_cases=len(results))
+    report = L3Report(n_cases=len(results), negative_fraction=negative_fraction)
     if not results:
         return report
 
@@ -185,6 +271,10 @@ def grade(results: Sequence[CaseResult]) -> L3Report:
             report.n_positives += 1
         if r.abstained:
             report.n_abstained += 1
+            if r.output.terminated_because in PROTOCOL_FAILURE_REASONS:
+                report.protocol_failures += 1
+            else:
+                report.honest_abstentions += 1
             continue
         if r.true_positive:
             report.true_positives += 1

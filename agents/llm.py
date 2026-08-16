@@ -19,10 +19,12 @@ configuration change, not a code change.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Protocol
 
 DEFAULT_BASE_URL_ENV = "CREDITPULSE_LLM_BASE_URL"
@@ -155,6 +157,52 @@ class TransformersClient:
         return tokenizer.decode(
             generated[0][inputs["input_ids"].shape[1] :], skip_special_tokens=True
         )
+
+
+@dataclass
+class CachingClient:
+    """Caches completions on disk, keyed by model and exact conversation.
+
+    Hosted providers are not bit-reproducible even at temperature 0, so an
+    uncached backtest gives different numbers on every run and a regression
+    cannot be distinguished from provider drift. For a project whose central
+    claim is reproducibility that is not acceptable.
+
+    It also makes iteration nearly free: re-running a backtest after changing
+    only the grading code replays the cached completions instead of paying for
+    them again.
+    """
+
+    inner: Any
+    cache_dir: Path = Path("data/cache/llm")
+    name: str = ""
+    hits: int = 0
+    misses: int = 0
+
+    def __post_init__(self) -> None:
+        self.name = f"cached:{getattr(self.inner, 'name', 'unknown')}"
+        self.cache_dir = Path(self.cache_dir)
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+
+    def _key(self, messages: Sequence[dict[str, str]]) -> str:
+        payload = json.dumps(
+            {"model": getattr(self.inner, "name", ""), "messages": list(messages)},
+            sort_keys=True,
+        )
+        return hashlib.sha256(payload.encode("utf8")).hexdigest()[:32]
+
+    def complete(self, messages: Sequence[dict[str, str]], **kwargs: Any) -> str:
+        path = self.cache_dir / f"{self._key(messages)}.txt"
+        if path.exists():
+            self.hits += 1
+            return path.read_text(encoding="utf8")
+        reply = self.inner.complete(messages, **kwargs)
+        path.write_text(reply, encoding="utf8")
+        self.misses += 1
+        return reply
+
+    def stats(self) -> dict[str, int]:
+        return {"hits": self.hits, "misses": self.misses}
 
 
 def default_client() -> LLMClient:
