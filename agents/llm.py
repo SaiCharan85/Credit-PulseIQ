@@ -102,6 +102,61 @@ class OpenAICompatibleClient:
         return response.choices[0].message.content or ""
 
 
+@dataclass
+class TransformersClient:
+    """A local Hugging Face instruct model, for machines without a GPU.
+
+    A fallback, not the target. SPEC 11 calls for a strong instruct model on
+    vLLM; this exists so the loop can be exercised end to end on CPU. Small
+    models follow the JSON tool protocol unreliably, and the loop's abstention
+    path will absorb that -- which makes "the agent abstained" ambiguous
+    between honest uncertainty and the model being too weak to comply. Treat
+    results from this client as a wiring check, not as evidence.
+    """
+
+    model_id: str = "Qwen/Qwen2.5-1.5B-Instruct"
+    max_new_tokens: int = 220
+    temperature: float = 0.0
+    name: str = ""
+    _pipe: Any = None
+
+    def __post_init__(self) -> None:
+        self.name = f"transformers:{self.model_id}"
+
+    def _load(self):
+        if self._pipe is None:
+            import torch
+            from transformers import AutoModelForCausalLM, AutoTokenizer
+
+            tokenizer = AutoTokenizer.from_pretrained(self.model_id)
+            model = AutoModelForCausalLM.from_pretrained(
+                self.model_id, torch_dtype=torch.float32, low_cpu_mem_usage=True
+            )
+            model.eval()
+            self._pipe = (tokenizer, model)
+        return self._pipe
+
+    def complete(self, messages: Sequence[dict[str, str]], **kwargs: Any) -> str:
+        import torch
+
+        tokenizer, model = self._load()
+        prompt = tokenizer.apply_chat_template(
+            list(messages), tokenize=False, add_generation_prompt=True
+        )
+        inputs = tokenizer(prompt, return_tensors="pt")
+        with torch.no_grad():
+            generated = model.generate(
+                **inputs,
+                max_new_tokens=kwargs.get("max_new_tokens", self.max_new_tokens),
+                do_sample=self.temperature > 0,
+                temperature=self.temperature if self.temperature > 0 else None,
+                pad_token_id=tokenizer.eos_token_id,
+            )
+        return tokenizer.decode(
+            generated[0][inputs["input_ids"].shape[1] :], skip_special_tokens=True
+        )
+
+
 def default_client() -> LLMClient:
     """The configured agent model, or a clear error explaining what is missing."""
     if os.environ.get(DEFAULT_MODEL_ENV):
