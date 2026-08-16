@@ -460,3 +460,41 @@ class TestTwoPeriodScoresWithoutAPriorYear:
         cv = ToolBox(1, date(2025, 6, 1), facts).get_metric("ohlson_o_score")
         assert cv["defined"] is True
         assert "2023-12-31" in " ".join(cv["notes"])
+
+
+class TestTrendsOfYearOnYearScores:
+    """Second regression from the same live crash, via a different caller.
+
+    ``get_trend`` reached ``compute_metric`` with a two-period score, which
+    raised deep in concept resolution. Fixed in two places: ``compute_metric``
+    now refuses such formulas outright (protecting every caller), and
+    ``get_trend`` pairs consecutive periods so the trend is actually computed.
+    """
+
+    @pytest.mark.parametrize("metric", ["ohlson_o_score", "piotroski_f_score", "beneish_m_score"])
+    def test_trend_does_not_raise(self, facts, metric: str) -> None:
+        result = ToolBox(SLEEP_NUMBER, BEFORE_BANKRUPTCY, facts).get_trend(metric, 4)
+        assert "values" in result or "error" in result
+
+    def test_ohlson_trend_has_real_points(self, facts) -> None:
+        result = ToolBox(SLEEP_NUMBER, BEFORE_BANKRUPTCY, facts).get_trend("ohlson_o_score", 4)
+        assert len(result["values"]) >= 2
+        assert result["direction"] in ("improving", "deteriorating", "flat")
+
+    def test_each_point_uses_its_own_prior_year(self, facts) -> None:
+        """Not one shared prior: every point compares consecutive years."""
+        result = ToolBox(SLEEP_NUMBER, BEFORE_BANKRUPTCY, facts).get_trend("ohlson_o_score", 4)
+        assert len(result["periods"]) == len(set(result["periods"]))
+
+    def test_compute_metric_refuses_two_period_formulas(self) -> None:
+        """The safety net that protects callers we have not written yet."""
+        from compute.ratios import compute_metric
+        from evals.conftest import DISTRESSED, make_facts
+
+        cv = compute_metric("ohlson_o_score", make_facts(DISTRESSED), date(2024, 12, 31))
+        assert not cv.is_defined
+        assert "two fiscal years" in cv.notes[0]
+
+    def test_single_period_trends_are_unaffected(self, facts) -> None:
+        result = ToolBox(SLEEP_NUMBER, BEFORE_BANKRUPTCY, facts).get_trend("current_ratio", 4)
+        assert len(result["values"]) == 4

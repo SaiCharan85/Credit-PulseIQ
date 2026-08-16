@@ -404,6 +404,20 @@ def compute_metric(metric: str, facts: Sequence[XbrlFact], period_end: date) -> 
 
     if metric not in FORMULAS:
         raise KeyError(f"unknown metric: {metric}")
+
+    # Year-on-year formulas declare `<concept>_prior` inputs, which are not
+    # line items. Reaching resolution with one would raise ConceptError deep in
+    # the stack -- it crashed a live backtest twice, from two different callers.
+    # Refusing here protects every caller rather than each one separately.
+    prior_inputs = [k for k in FORMULAS[metric].inputs if k.endswith("_prior")]
+    if prior_inputs:
+        return undefined(
+            metric,
+            metric,
+            period_end,
+            f"{metric} compares two fiscal years; use compute_two_period_score",
+        )
+
     refs, notes = _inputs_for(metric, facts, period_end)
     missing = [c for c in FORMULAS[metric].inputs if c not in refs]
     if missing:

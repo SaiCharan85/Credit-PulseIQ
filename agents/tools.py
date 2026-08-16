@@ -290,7 +290,21 @@ class ToolBox:
             err = "fewer than two visible periods; no trend can be computed"
             self._record("get_trend", args, False, "", err)
             return ToolError(tool="get_trend", error=err).as_dict()
-        trend: Trend = build_trend(metric, self._view, periods)
+        if metric in TWO_PERIOD_SCORES:
+            # Each point needs its own prior year, so pair consecutive periods
+            # and drop the oldest, which has no predecessor.
+            pairs = list(zip(periods[:-1], periods[1:], strict=True))
+            if not pairs:
+                err = "not enough periods for a year-on-year score trend"
+                self._record("get_trend", args, False, "", err)
+                return ToolError(tool="get_trend", error=err).as_dict()
+            points = [
+                compute_two_period_score(metric, self._view, current, prior)
+                for current, prior in reversed(pairs)
+            ]
+            trend = Trend(metric=metric, points=points)
+        else:
+            trend = build_trend(metric, self._view, periods)
         self.cited.extend(trend.points)
         summary = trend.summary()
         self._record("get_trend", args, True, f"{metric} {trend.direction}")
