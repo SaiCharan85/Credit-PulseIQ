@@ -22,6 +22,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import time
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -203,6 +204,141 @@ class CachingClient:
 
     def stats(self) -> dict[str, int]:
         return {"hits": self.hits, "misses": self.misses}
+
+
+#: Read once at import so a key never has to be typed into a shell or a chat.
+ENV_FILE = Path(".env")
+
+
+def load_env_file(path: Path | str = ENV_FILE) -> list[str]:
+    """Load ``KEY=value`` pairs from a gitignored ``.env``.
+
+    Exists because the alternative is worse. A key pasted into a terminal or a
+    message is exposed the moment it is written, and provider secret-scanning
+    revokes exposed keys within minutes -- which is exactly how the first Groq
+    key here died mid-session. A file that git ignores and nothing echoes is
+    the only handling that does not leak.
+
+    Returns the names it set, never the values.
+    """
+    path = Path(path)
+    if not path.exists():
+        return []
+    loaded: list[str] = []
+    for line in path.read_text(encoding="utf8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip().strip("'\"")
+        if key and value and not os.environ.get(key):
+            os.environ[key] = value
+            loaded.append(key)
+    return loaded
+
+
+class BudgetExhausted(RuntimeError):
+    """Raised when the run hits its own spending cap, not the provider's."""
+
+
+@dataclass
+class RateLimitedClient:
+    """Retries on rate limits and stops before a budget is exhausted.
+
+    Free tiers limit tokens per minute and per day. Two distinct problems:
+
+    * **Transient** (per-minute): the right response is to wait and retry.
+      Providers send ``retry-after``; otherwise exponential backoff.
+    * **Terminal** (daily cap): retrying cannot help. The run should stop
+      cleanly while whatever it completed is already in the response cache,
+      so tomorrow resumes instead of restarting.
+
+    ``max_calls`` is a self-imposed ceiling, deliberately separate from the
+    provider's. Hitting our own limit stops the run in a known state; hitting
+    theirs means discovering it mid-request with a partial conversation.
+    """
+
+    inner: Any
+    max_calls: int = 0
+    max_retries: int = 5
+    base_delay: float = 2.0
+    name: str = ""
+    calls: int = 0
+    retries: int = 0
+    waited_seconds: float = 0.0
+
+    def __post_init__(self) -> None:
+        self.name = f"ratelimited:{getattr(self.inner, 'name', 'unknown')}"
+
+    @staticmethod
+    def _is_rate_limit(exc: Exception) -> bool:
+        status = getattr(exc, "status_code", None) or getattr(
+            getattr(exc, "response", None), "status_code", None
+        )
+        if status == 429:
+            return True
+        text = str(exc).lower()
+        return "429" in text or "rate limit" in text or "too many requests" in text
+
+    @staticmethod
+    def _is_daily_cap(exc: Exception) -> bool:
+        """A daily or credit limit. Retrying will not clear it."""
+        text = str(exc).lower()
+        return any(
+            phrase in text
+            for phrase in ("per day", "daily", "quota", "credits", "insufficient_quota")
+        )
+
+    @staticmethod
+    def _retry_after(exc: Exception) -> float | None:
+        headers = getattr(getattr(exc, "response", None), "headers", None) or {}
+        for key in ("retry-after", "x-ratelimit-reset-tokens", "x-ratelimit-reset-requests"):
+            raw = headers.get(key)
+            if not raw:
+                continue
+            try:
+                return float(str(raw).rstrip("s"))
+            except ValueError:
+                continue
+        return None
+
+    def complete(self, messages: Sequence[dict[str, str]], **kwargs: Any) -> str:
+        if self.max_calls and self.calls >= self.max_calls:
+            raise BudgetExhausted(
+                f"self-imposed budget of {self.max_calls} calls reached; "
+                "completed work is cached, so a re-run resumes rather than repeats"
+            )
+        delay = self.base_delay
+        for attempt in range(self.max_retries + 1):
+            try:
+                reply = self.inner.complete(messages, **kwargs)
+                self.calls += 1
+                return reply
+            except Exception as exc:  # noqa: BLE001
+                if not self._is_rate_limit(exc):
+                    raise
+                if self._is_daily_cap(exc):
+                    raise BudgetExhausted(
+                        f"provider daily/credit limit reached: {str(exc)[:160]}. "
+                        "Completed work is cached; re-run when the quota resets."
+                    ) from exc
+                if attempt >= self.max_retries:
+                    raise
+                wait = self._retry_after(exc) or delay
+                wait = min(wait, 60.0)
+                self.retries += 1
+                self.waited_seconds += wait
+                time.sleep(wait)
+                delay *= 2
+        raise RuntimeError("unreachable")
+
+    def stats(self) -> dict[str, float]:
+        return {
+            "calls": self.calls,
+            "retries": self.retries,
+            "waited_seconds": round(self.waited_seconds, 1),
+        }
 
 
 #: Default agent model. A ~20B mixture-of-experts: only a few billion

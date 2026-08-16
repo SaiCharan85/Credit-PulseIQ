@@ -15,7 +15,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from agents.llm import CachingClient
+from agents.llm import BudgetExhausted, CachingClient, RateLimitedClient, load_env_file
 from agents.rulebased import RuleBasedInvestigator
 from data.edgar import EdgarClient
 from evals.backtest import (
@@ -44,7 +44,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--no-cache", action="store_true", help="bypass the LLM response cache")
     parser.add_argument("--model", default="", help="agent model id (overrides CREDITPULSE_LLM_MODEL)")
     parser.add_argument("--base-url", default="", help="OpenAI-compatible endpoint")
+    parser.add_argument(
+        "--max-calls",
+        type=int,
+        default=0,
+        help="self-imposed API call ceiling; stops cleanly, cached work is kept (0 = no cap)",
+    )
     args = parser.parse_args(argv)
+
+    loaded = load_env_file()
+    if loaded:
+        print(f"loaded from .env: {', '.join(loaded)}", file=sys.stderr)
 
     rows = load_panel(args.panel)
     if not rows:
@@ -73,7 +83,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"endpoint preflight failed: {detail}", file=sys.stderr)
             return 2
         print(f"endpoint ok: {detail}", file=sys.stderr)
+        client = RateLimitedClient(inner=client, max_calls=args.max_calls)
         if not args.no_cache:
+            # Cache outside the limiter: a cache hit costs no quota.
             client = CachingClient(inner=client)
         investigator = DistressInvestigator(client)
         label = f"ReAct investigator ({client.name})"
@@ -98,7 +110,11 @@ def main(argv: list[str] | None = None) -> int:
         if n % 200 == 0:
             print(f"  {n}/{len(test)}", file=sys.stderr)
 
-    results = run_backtest(investigator, test, facts_for, on_case=progress)
+    try:
+        results = run_backtest(investigator, test, facts_for, on_case=progress)
+    except BudgetExhausted as exc:
+        print(f"\nstopped early: {exc}", file=sys.stderr)
+        return 3
     assert_no_lookahead(results)
 
     report = grade(results, negative_fraction=sample.negative_fraction)
