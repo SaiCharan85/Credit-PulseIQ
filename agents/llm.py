@@ -76,7 +76,7 @@ class OpenAICompatibleClient:
     base_url: str = ""
     api_key: str = ""
     temperature: float = 0.0
-    max_tokens: int = 1024
+    max_tokens: int = 1600
     name: str = "openai-compatible"
 
     def __post_init__(self) -> None:
@@ -349,7 +349,7 @@ class RateLimitedClient:
 #: The measured floor is below it: 0.5B could not hold the tool protocol at
 #: all, and 1.5B fabricated a metric it had never fetched. Whether 20B is
 #: actually needed over 8B is an open question the harness is built to answer.
-DEFAULT_AGENT_MODEL = "openai/gpt-oss-20b"
+DEFAULT_AGENT_MODEL = "mistralai/mistral-small-3.2-24b-instruct"
 
 #: Providers exposing an OpenAI-compatible endpoint. Model IDs churn -- check
 #: the provider's current list if one 404s.
@@ -379,6 +379,14 @@ def default_client(model: str = "", base_url: str = "") -> LLMClient:
     )
 
 
+#: Reasoning models (the gpt-oss family among them) emit reasoning tokens
+#: before any content, and those count against ``max_tokens``. A tight budget
+#: returns ``finish_reason=length`` with empty content, which looks exactly
+#: like a broken endpoint. Measured: gpt-oss-20b used all 16 tokens on
+#: reasoning and returned nothing; at 400 it answered correctly in 72.
+PREFLIGHT_MAX_TOKENS = 400
+
+
 def preflight(client: LLMClient) -> tuple[bool, str]:
     """One cheap round-trip to confirm the endpoint answers.
 
@@ -388,12 +396,15 @@ def preflight(client: LLMClient) -> tuple[bool, str]:
     try:
         reply = client.complete(
             [{"role": "user", "content": 'Reply with exactly: {"ok": true}'}],
-            max_tokens=16,
+            max_tokens=PREFLIGHT_MAX_TOKENS,
         )
     except Exception as exc:  # noqa: BLE001
         return False, f"{type(exc).__name__}: {exc}"
     if not (reply or "").strip():
-        return False, "endpoint returned an empty completion"
+        return False, (
+            "endpoint returned empty content. If this is a reasoning model, "
+            "reasoning tokens consumed the whole budget -- raise max_tokens"
+        )
     return True, reply.strip()[:80]
 
 
