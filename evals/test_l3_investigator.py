@@ -410,3 +410,53 @@ class TestJsonExtraction:
 
     def test_malformed_returns_none(self) -> None:
         assert extract_json('{"a": }') is None
+
+
+class TestTwoPeriodScoresWithoutAPriorYear:
+    """Regression: a year-on-year score with only one visible period.
+
+    Crashed a live 400-case backtest 139 calls in. ``get_metric`` fell through
+    to the single-period path, whose formulas declare ``<concept>_prior``
+    inputs -- not line items -- so concept resolution raised. A tool must hand
+    the agent a result it can reason about, never an exception.
+    """
+
+    def one_period_facts(self):
+        from evals.conftest import DISTRESSED, make_facts
+
+        return make_facts(DISTRESSED, period_end=date(2024, 12, 31), filed=date(2025, 2, 20))
+
+    def toolbox(self):
+        return ToolBox(1, date(2025, 6, 1), self.one_period_facts())
+
+    def test_only_one_period_is_visible(self) -> None:
+        assert self.toolbox().available_periods()["count"] == 1
+
+    @pytest.mark.parametrize("metric", ["ohlson_o_score", "piotroski_f_score", "beneish_m_score"])
+    def test_get_metric_returns_undefined_not_an_exception(self, metric: str) -> None:
+        result = self.toolbox().get_metric(metric)
+        assert "error" not in result
+        assert result["defined"] is False
+        assert "prior fiscal year" in " ".join(result["notes"])
+
+    @pytest.mark.parametrize("metric", ["ohlson_o_score", "piotroski_f_score"])
+    def test_check_threshold_reports_unknown(self, metric: str) -> None:
+        result = self.toolbox().check_threshold(metric)
+        assert "error" not in result
+        assert result["status"] == "unknown"
+        assert result["value"] is None
+
+    def test_single_period_metrics_still_compute(self) -> None:
+        """The guard must not disable ordinary single-period metrics."""
+        assert self.toolbox().get_metric("current_ratio")["defined"] is True
+
+    def test_prior_year_is_never_the_same_period(self) -> None:
+        """check_threshold previously passed the period as its own prior,
+        silently producing year-on-year ratios of 1.0 rather than failing."""
+        from evals.conftest import DISTRESSED, make_facts
+
+        facts = make_facts(DISTRESSED, period_end=date(2024, 12, 31), filed=date(2025, 2, 20))
+        facts += make_facts(DISTRESSED, period_end=date(2023, 12, 31), filed=date(2024, 2, 20))
+        cv = ToolBox(1, date(2025, 6, 1), facts).get_metric("ohlson_o_score")
+        assert cv["defined"] is True
+        assert "2023-12-31" in " ".join(cv["notes"])

@@ -29,7 +29,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from compute import lineitems
 from compute.lineitems import FactIndex, annual_period_ends
 from compute.peers import PeerComparison, build_peer_group, compare_to_peers
-from compute.provenance import FORMULAS, ComputedValue
+from compute.provenance import FORMULAS, ComputedValue, undefined
 from compute.ratios import STANDARD_METRICS, compute_metric
 from compute.scores import ALL_SCORES, TWO_PERIOD_SCORES, compute_two_period_score
 from compute.trends import Trend, build_trend
@@ -179,6 +179,23 @@ class ToolBox:
             return None
         return parsed if parsed in self._periods else None
 
+    def _no_prior_period(self, metric: str, period_end: date) -> ComputedValue:
+        """A year-on-year score with only one visible period.
+
+        Cannot fall through to the single-period path: those formulas declare
+        ``<concept>_prior`` inputs, which are not line items, so resolution
+        raises. Returning an undefined value keeps the tool contract intact --
+        the agent sees "not computable and why", which it can act on, rather
+        than an exception it cannot.
+        """
+        return undefined(
+            metric,
+            metric,
+            period_end,
+            "requires a prior fiscal year; only one period is visible as of "
+            f"{self.as_of.isoformat()}",
+        )
+
     # ---- the tool surface ----------------------------------------------
 
     def available_periods(self) -> dict[str, Any]:
@@ -240,7 +257,7 @@ class ToolBox:
             cv = (
                 compute_two_period_score(metric, self._view, pe, prior)
                 if prior is not None
-                else compute_metric(metric, self._view, pe)
+                else self._no_prior_period(metric, pe)
             )
         else:
             cv = compute_metric(metric, self._view, pe)
@@ -345,16 +362,14 @@ class ToolBox:
                 err = "no visible period"
                 self._record("check_threshold", args, False, "", err)
                 return ToolError(tool="check_threshold", error=err).as_dict()
-            cv = (
-                compute_two_period_score(
-                    metric,
-                    self._view,
-                    pe,
-                    self._periods[1] if len(self._periods) > 1 else pe,
+            if metric in TWO_PERIOD_SCORES:
+                cv = (
+                    compute_two_period_score(metric, self._view, pe, self._periods[1])
+                    if len(self._periods) > 1
+                    else self._no_prior_period(metric, pe)
                 )
-                if metric in TWO_PERIOD_SCORES
-                else compute_metric(metric, self._view, pe)
-            )
+            else:
+                cv = compute_metric(metric, self._view, pe)
             self.cited.append(cv)
             value = cv.value
 
