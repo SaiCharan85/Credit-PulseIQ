@@ -44,7 +44,11 @@ from agents.tools import TOOL_SCHEMAS, ToolBox
 #: successful runs used 8-10 tool calls, so 8 is a real budget rather than a
 #: token-saving guess -- but it does trade some depth for throughput under a
 #: daily token cap.
-MAX_STEPS = 8
+#: Raised to 14 after measurement: gemini-3.1-flash-lite used 8 investigative
+#: calls and then needed room to conclude, exhausting a budget of 8 without
+#: ever reaching finish. A budget that truncates the investigation turns a
+#: capable model into an abstention, which would then be misread as caution.
+MAX_STEPS = 14
 MAX_RETRIES = 2
 
 TERMINATED_MODEL = "model_finished"
@@ -147,8 +151,12 @@ class DistressInvestigator:
             # been declared. Accepting both shapes is more robust than
             # insisting on one.
             if completion.has_tool_calls:
+                # Replay the provider's own message when we have it: some
+                # providers attach fields to function calls that must come back
+                # unchanged, and a reconstructed message loses them.
                 messages.append(
-                    {
+                    completion.raw_message
+                    or {
                         "role": "assistant",
                         "content": completion.content or None,
                         "tool_calls": [

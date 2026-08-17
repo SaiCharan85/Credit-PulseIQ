@@ -46,6 +46,13 @@ class Completion:
 
     content: str = ""
     tool_calls: list[dict[str, Any]] = field(default_factory=list)
+    #: The provider's assistant message, verbatim.
+    #:
+    #: Replayed rather than reconstructed. Providers attach fields to tool
+    #: calls that must be echoed back unchanged -- Gemini 3.x rejects a
+    #: conversation whose function calls have lost their thought_signature --
+    #: and rebuilding the message from name and arguments silently drops them.
+    raw_message: dict[str, Any] | None = None
 
     @property
     def has_tool_calls(self) -> bool:
@@ -180,7 +187,11 @@ class OpenAICompatibleClient:
             except json.JSONDecodeError:
                 args = {}
             calls.append({"id": call.id, "name": call.function.name, "arguments": args})
-        return Completion(content=message.content or "", tool_calls=calls)
+        try:
+            raw = message.model_dump(exclude_none=True)
+        except AttributeError:
+            raw = None
+        return Completion(content=message.content or "", tool_calls=calls, raw_message=raw)
 
 
 @dataclass
@@ -288,10 +299,20 @@ class CachingClient:
         if path.exists():
             self.hits += 1
             data = json.loads(path.read_text(encoding="utf8"))
-            return Completion(content=data["content"], tool_calls=data["tool_calls"])
+            return Completion(
+                content=data["content"],
+                tool_calls=data["tool_calls"],
+                raw_message=data.get("raw_message"),
+            )
         result = _dispatch_complete_call(self.inner, messages, tools, **kwargs)
         path.write_text(
-            json.dumps({"content": result.content, "tool_calls": result.tool_calls}),
+            json.dumps(
+                {
+                    "content": result.content,
+                    "tool_calls": result.tool_calls,
+                    "raw_message": result.raw_message,
+                }
+            ),
             encoding="utf8",
         )
         self.misses += 1
@@ -411,15 +432,30 @@ class RateLimitedClient:
 
     @staticmethod
     def _is_daily_cap(exc: Exception) -> bool:
-        """A daily or credit limit. Retrying will not clear it."""
-        text = str(exc).lower()
+        """A daily or credit limit, which retrying cannot clear.
+
+        Deliberately narrow. Matching the bare word "quota" was wrong: Gemini
+        phrases its *per-minute* limit as "You exceeded your current quota"
+        with quotaId GenerateRequestsPerMinutePerProjectPerModel, so a
+        transient throttle was being treated as terminal and killed the run.
+        A per-minute signal wins over any generic quota wording.
+        """
+        text = str(exc).lower().replace(" ", "")
+        if "perminute" in text or "requestsperminute" in text:
+            return False
         return any(
             phrase in text
-            for phrase in ("per day", "daily", "quota", "credits", "insufficient_quota")
+            for phrase in ("perday", "daily", "insufficient_quota", "insufficientcredit", "credits")
         )
 
     @staticmethod
     def _retry_after(exc: Exception) -> float | None:
+        import re
+
+        match = re.search(r"retry in ([0-9.]+)(ms|s)", str(exc), re.IGNORECASE)
+        if match:
+            value = float(match.group(1))
+            return value / 1000.0 if match.group(2).lower() == "ms" else value
         headers = getattr(getattr(exc, "response", None), "headers", None) or {}
         for key in ("retry-after", "x-ratelimit-reset-tokens", "x-ratelimit-reset-requests"):
             raw = headers.get(key)
