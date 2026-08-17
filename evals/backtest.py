@@ -258,6 +258,23 @@ class L3Report:
         )
 
 
+#: Consecutive case failures that mean the environment broke, not the agent.
+#:
+#: A sustained network outage would otherwise fail every remaining case and be
+#: recorded as protocol failure -- an agent-quality metric -- producing a report
+#: that blames the model for a dropped connection. Past this many in a row the
+#: run pauses and retries the same case instead of consuming the remainder.
+MAX_CONSECUTIVE_FAILURES = 5
+
+#: First pause once an outage is suspected; doubles per attempt, capped at 5 min.
+OUTAGE_RETRY_SECONDS = 30.0
+
+#: Total time to wait for the environment to recover before giving up and
+#: grading what completed. Long enough to ride out a router reboot or a
+#: provider incident overnight; short of waiting forever.
+MAX_OUTAGE_WAIT_SECONDS = 3600.0
+
+
 #: Termination reasons that mean the agent could not complete the protocol,
 #: as opposed to deciding it lacked evidence.
 PROTOCOL_FAILURE_REASONS = frozenset(
@@ -346,30 +363,63 @@ def run_backtest(
     that date and nothing else, so the as-of discipline is inherited from the
     panel rather than reimplemented here.
     """
+    import sys
+    import time
+
     from agents.llm import BudgetExhausted, InfrastructureError
 
     results: list[CaseResult] = []
-    for n, case in enumerate(cases, 1):
+    consecutive_failures = 0
+    outage_waited = 0.0
+    index = 0
+
+    while index < len(cases):
+        case = cases[index]
         facts = facts_for(case.cik)
         try:
             output = investigator.run(case.cik, case.observation_date, facts, **run_kwargs)
+            consecutive_failures = 0
+            outage_waited = 0.0
         except InfrastructureError:
-            # Not an agent failure and not a partial result worth grading: an
-            # unusable endpoint means no case ran properly.
+            # A bad key or exhausted credit: no case can run, and grading any
+            # of it would blame the model for the endpoint.
             raise
         except BudgetExhausted as exc:
-            # A quota stop is not a failure. Everything completed so far is
-            # real and already cached, so return it rather than discarding a
-            # partial run -- the metrics computed over positives (lead time,
-            # false-confidence rate) are valid on any subset.
-            import sys
-
+            # A quota stop is not a failure. Everything completed is real and
+            # already cached, so return it rather than discarding a partial
+            # run -- metrics over positives stay valid on a subset.
             print(f"\nquota reached after {len(results)} cases: {exc}", file=sys.stderr)
             break
         except Exception as exc:  # noqa: BLE001
-            # One bad case must not destroy the run. A three-hour sweep will
-            # hit provider errors and malformed edge cases; each becomes a
-            # recorded protocol failure so the other 399 still produce numbers.
+            consecutive_failures += 1
+
+            # A run of failures means the environment broke -- usually the
+            # network -- not the agent. Wait for it to come back and retry the
+            # *same* case rather than burning through the remainder recording
+            # protocol failures that are really dropped connections.
+            if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                if outage_waited >= MAX_OUTAGE_WAIT_SECONDS:
+                    print(
+                        f"\nGIVING UP after {outage_waited / 60:.0f} min of failures "
+                        f"({type(exc).__name__}). Grading the {len(results)} completed cases.",
+                        file=sys.stderr,
+                    )
+                    break
+                overshoot = consecutive_failures - MAX_CONSECUTIVE_FAILURES
+                wait = min(OUTAGE_RETRY_SECONDS * (2**overshoot), 300)
+                print(
+                    f"\n{consecutive_failures} failures in a row "
+                    f"({type(exc).__name__}: {str(exc)[:90]}). Environment looks down; "
+                    f"waiting {wait:.0f}s and retrying case {index + 1}/{len(cases)}. "
+                    f"Completed work is cached.",
+                    file=sys.stderr,
+                )
+                time.sleep(wait)
+                outage_waited += wait
+                continue  # retry this case, do not skip it
+
+            # An isolated failure: record it and move on so one bad filer
+            # cannot destroy the sweep.
             output = InvestigatorOutput(
                 cik=case.cik,
                 as_of=case.observation_date,
@@ -379,6 +429,7 @@ def run_backtest(
                 terminated_because="case_error",
                 verification_passed=False,
             )
+
         result = CaseResult(
             cik=case.cik,
             as_of=case.observation_date,
@@ -387,8 +438,9 @@ def run_backtest(
             output=output,
         )
         results.append(result)
+        index += 1
         if on_case:
-            on_case(n, result)
+            on_case(index, result)
     return results
 
 
