@@ -89,15 +89,19 @@ def main(argv: list[str] | None = None) -> int:
         from agents.distress import DistressInvestigator
         from agents.llm import default_client, preflight
 
-        client = default_client(model=args.model, base_url=args.base_url)
+        # Wrap in the limiter *before* preflighting. An unwrapped preflight
+        # dies on a transient per-minute 429, which is exactly the condition
+        # the limiter exists to ride out -- it killed a restart once.
+        client = RateLimitedClient(
+            inner=default_client(model=args.model, base_url=args.base_url),
+            max_calls=args.max_calls,
+            tokens_per_minute=args.tpm,
+        )
         ok, detail = preflight(client)
         if not ok:
             print(f"endpoint preflight failed: {detail}", file=sys.stderr)
             return 2
         print(f"endpoint ok: {detail}", file=sys.stderr)
-        client = RateLimitedClient(
-            inner=client, max_calls=args.max_calls, tokens_per_minute=args.tpm
-        )
         if not args.no_cache:
             # Cache outside the limiter: a cache hit costs no quota.
             client = CachingClient(inner=client)
