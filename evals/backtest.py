@@ -353,11 +353,19 @@ def run_backtest(
         facts = facts_for(case.cik)
         try:
             output = investigator.run(case.cik, case.observation_date, facts, **run_kwargs)
-        except (BudgetExhausted, InfrastructureError):
-            # Neither is an agent failure. A deliberate stop, or an unusable
-            # endpoint: propagate so the caller reports the real cause instead
-            # of grading the model on it.
+        except InfrastructureError:
+            # Not an agent failure and not a partial result worth grading: an
+            # unusable endpoint means no case ran properly.
             raise
+        except BudgetExhausted as exc:
+            # A quota stop is not a failure. Everything completed so far is
+            # real and already cached, so return it rather than discarding a
+            # partial run -- the metrics computed over positives (lead time,
+            # false-confidence rate) are valid on any subset.
+            import sys
+
+            print(f"\nquota reached after {len(results)} cases: {exc}", file=sys.stderr)
+            break
         except Exception as exc:  # noqa: BLE001
             # One bad case must not destroy the run. A three-hour sweep will
             # hit provider errors and malformed edge cases; each becomes a

@@ -149,6 +149,10 @@ class ToolBox:
         self._events = list(events)
         self.calls: list[ToolCall] = []
         self.cited: list[ComputedValue] = []
+        #: Raw line items the agent fetched. Citable evidence in their own
+        #: right: a filed value with provenance needs no recomputation, and
+        #: treating it as uncited made the critic reject correct behaviour.
+        self.cited_line_items: dict[str, float] = {}
         self._periods = annual_period_ends(self._view)
 
     # ---- helpers -------------------------------------------------------
@@ -235,6 +239,7 @@ class ToolBox:
             accession=ref.accession,
             filed=ref.filed,
         )
+        self.cited_line_items[concept] = ref.value
         self._record("get_line_item", args, True, f"{concept}={ref.value:,.0f}")
         return result.model_dump(mode="json")
 

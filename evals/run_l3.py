@@ -16,8 +16,8 @@ from datetime import date
 from pathlib import Path
 
 from agents.llm import (
-    BudgetExhausted,
     CachingClient,
+    InfrastructureError,
     RateLimitedClient,
     load_env_file,
 )
@@ -113,18 +113,31 @@ def main(argv: list[str] | None = None) -> int:
     print(f"L3 backtest: {label} over {len(test)} test cases (cutoff {args.cutoff})", file=sys.stderr)
 
     def progress(n: int, _result) -> None:
-        if n % 200 == 0:
+        if n % 25 == 0:
             print(f"  {n}/{len(test)}", file=sys.stderr)
 
     try:
         results = run_backtest(investigator, test, facts_for, on_case=progress)
-    except BudgetExhausted as exc:
-        print(f"\nstopped early: {exc}", file=sys.stderr)
+    except InfrastructureError as exc:
+        print(f"\nABORTED -- endpoint unusable, no metrics are valid:\n  {exc}", file=sys.stderr)
+        return 4
+    if not results:
+        print("\nno cases completed", file=sys.stderr)
         return 3
     assert_no_lookahead(results)
 
+    # A quota stop yields a partial run. Report it as such rather than
+    # discarding it: metrics computed over positives stay valid on a subset.
+    partial = len(results) < len(test)
     report = grade(results, negative_fraction=sample.negative_fraction)
-    print(f"\n=== L3: {label} ===", file=sys.stderr)
+    print(f"\n=== L3: {label}{' [PARTIAL]' if partial else ''} ===", file=sys.stderr)
+    if partial:
+        print(
+            f"ran {len(results)}/{len(test)} cases before the quota stopped it. "
+            "Recall, lead time and false-confidence are computed over positives "
+            "and remain valid; precision carries wider error bars.",
+            file=sys.stderr,
+        )
     print(report.summary(), file=sys.stderr)
 
     print("\n  reliability curve (confidence -> observed failure rate):", file=sys.stderr)

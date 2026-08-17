@@ -156,7 +156,7 @@ class RuleBasedInvestigator:
 
         # The control agent passes through the same critic as the ReAct loop,
         # so a comparison is not flattered by skipping verification.
-        critic = review(output, tools.cited, as_of)
+        critic = review(output, tools.cited, as_of, tools.cited_line_items)
         return output.model_copy(
             update={
                 "verification_passed": critic.passed,

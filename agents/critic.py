@@ -26,6 +26,7 @@ a signal the investigator should be reasoning about.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from datetime import date
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -84,6 +85,7 @@ def review(
     output: InvestigatorOutput,
     cited: list[ComputedValue],
     as_of: date,
+    cited_line_items: Iterable[str] = (),
 ) -> CriticReport:
     """Run every hard check over a finished response."""
     defects: list[Defect] = []
@@ -140,7 +142,10 @@ def review(
 
     # A figure asserted in the evidence list that was never produced by a tool
     # cannot be verified, so it cannot be cited.
-    computed = {c.metric for c in cited}
+    # Raw line items count as cited: they are filed values with provenance,
+    # not derived figures needing recomputation. Omitting them made the critic
+    # reject an agent for citing data it had correctly fetched.
+    computed = {c.metric for c in cited} | set(cited_line_items)
     for item in output.evidence:
         if item.metric not in computed:
             defects.append(

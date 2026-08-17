@@ -351,7 +351,7 @@ class DistressInvestigator:
             candidate = self._build_output(
                 parsed, tools, cik, as_of, total_steps, reason, attempt
             )
-            critic = review(candidate, tools.cited, as_of)
+            critic = review(candidate, tools.cited, as_of, tools.cited_line_items)
             if critic.passed:
                 return self._build_output(
                     parsed, tools, cik, as_of, total_steps, reason, attempt, critic
