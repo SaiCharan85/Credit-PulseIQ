@@ -31,13 +31,13 @@ from datetime import date
 from typing import Any
 
 from agents.critic import CriticReport, review
-from agents.llm import LLMClient, extract_json
+from agents.llm import LLMClient, _dispatch_complete_call, extract_json
 from agents.schemas import (
     SIGNAL_INSUFFICIENT,
     Evidence,
     InvestigatorOutput,
 )
-from agents.tools import ToolBox
+from agents.tools import TOOL_SCHEMAS, ToolBox
 
 MAX_STEPS = 12
 MAX_RETRIES = 2
@@ -151,7 +151,53 @@ class DistressInvestigator:
         """Drive the loop until the model finishes or the budget runs out."""
         steps = 0
         for _ in range(self.max_steps):
-            reply = self.client.complete(messages)
+            completion = _dispatch_complete_call(self.client, messages, tools=TOOL_SCHEMAS)
+
+            # Native tool calls take precedence. Several models emit them
+            # whatever the prompt says -- gpt-oss-20b called a tool natively
+            # and the provider rejected the request outright because none had
+            # been declared. Accepting both shapes is more robust than
+            # insisting on one.
+            if completion.has_tool_calls:
+                messages.append(
+                    {
+                        "role": "assistant",
+                        "content": completion.content or None,
+                        "tool_calls": [
+                            {
+                                "id": c["id"],
+                                "type": "function",
+                                "function": {
+                                    "name": c["name"],
+                                    "arguments": json.dumps(c["arguments"]),
+                                },
+                            }
+                            for c in completion.tool_calls
+                        ],
+                    }
+                )
+                finished = None
+                for call in completion.tool_calls:
+                    if call["name"] == "finish":
+                        finished = call["arguments"]
+                        observation: dict[str, Any] = {"ok": True}
+                    else:
+                        steps += 1
+                        observation = self._dispatch(tools, call["name"], call["arguments"])
+                        if self.on_step:
+                            self.on_step(steps, {"tool": call["name"], "arguments": call["arguments"]})
+                    messages.append(
+                        {
+                            "role": "tool",
+                            "tool_call_id": call["id"],
+                            "content": json.dumps(observation, default=str),
+                        }
+                    )
+                if finished is not None:
+                    return finished, TERMINATED_MODEL, steps
+                continue
+
+            reply = completion.content
             messages.append({"role": "assistant", "content": reply})
             parsed = extract_json(reply)
 

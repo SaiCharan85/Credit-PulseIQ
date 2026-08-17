@@ -35,6 +35,36 @@ DEFAULT_KEY_ENV = "CREDITPULSE_LLM_API_KEY"
 JUDGE_MODEL_ENV = "CREDITPULSE_JUDGE_MODEL"
 
 
+@dataclass
+class Completion:
+    """A model reply: free text, native tool calls, or both.
+
+    Modern instruct models emit tool calls through the API's own mechanism
+    rather than as JSON in prose, and several do so regardless of prompting.
+    Carrying both shapes lets the loop accept whichever the model produces.
+    """
+
+    content: str = ""
+    tool_calls: list[dict[str, Any]] = field(default_factory=list)
+
+    @property
+    def has_tool_calls(self) -> bool:
+        return bool(self.tool_calls)
+
+
+def _dispatch_complete_call(
+    client: Any, messages: Sequence[dict[str, Any]], tools: list[dict] | None = None, **kwargs: Any
+) -> Completion:
+    """Use a client's native tool calling if it has any, else adapt its text.
+
+    Keeps the wrappers (cache, rate limiter) agnostic: a ScriptedClient that
+    only speaks text still works unchanged through the same path.
+    """
+    if hasattr(client, "complete_call"):
+        return client.complete_call(messages, tools=tools, **kwargs)
+    return Completion(content=client.complete(messages, **kwargs))
+
+
 class LLMClient(Protocol):
     """Minimal chat interface. Deliberately small: the loop, not the client,
     owns tool dispatch and control flow."""
@@ -103,6 +133,36 @@ class OpenAICompatibleClient:
             max_tokens=kwargs.get("max_tokens", self.max_tokens),
         )
         return response.choices[0].message.content or ""
+
+    def complete_call(
+        self, messages: Sequence[dict[str, Any]], tools: list[dict] | None = None, **kwargs: Any
+    ) -> Completion:
+        """A completion that may carry native tool calls."""
+        if not self.model:
+            raise RuntimeError(f"no model configured; set {DEFAULT_MODEL_ENV}")
+        from openai import OpenAI
+
+        client = OpenAI(api_key=self.api_key or "not-needed", base_url=self.base_url or None)
+        extra: dict[str, Any] = {}
+        if tools:
+            extra["tools"] = tools
+            extra["tool_choice"] = "auto"
+        response = client.chat.completions.create(
+            model=self.model,
+            messages=list(messages),
+            temperature=kwargs.get("temperature", self.temperature),
+            max_tokens=kwargs.get("max_tokens", self.max_tokens),
+            **extra,
+        )
+        message = response.choices[0].message
+        calls = []
+        for call in getattr(message, "tool_calls", None) or []:
+            try:
+                args = json.loads(call.function.arguments or "{}")
+            except json.JSONDecodeError:
+                args = {}
+            calls.append({"id": call.id, "name": call.function.name, "arguments": args})
+        return Completion(content=message.content or "", tool_calls=calls)
 
 
 @dataclass
@@ -201,6 +261,23 @@ class CachingClient:
         path.write_text(reply, encoding="utf8")
         self.misses += 1
         return reply
+
+
+    def complete_call(self, messages, tools=None, **kwargs):
+        """Cache native tool calls too, keyed by the same conversation hash."""
+        key = self._key(messages) + ("_t" if tools else "")
+        path = self.cache_dir / f"{key}.json"
+        if path.exists():
+            self.hits += 1
+            data = json.loads(path.read_text(encoding="utf8"))
+            return Completion(content=data["content"], tool_calls=data["tool_calls"])
+        result = _dispatch_complete_call(self.inner, messages, tools, **kwargs)
+        path.write_text(
+            json.dumps({"content": result.content, "tool_calls": result.tool_calls}),
+            encoding="utf8",
+        )
+        self.misses += 1
+        return result
 
     def stats(self) -> dict[str, int]:
         return {"hits": self.hits, "misses": self.misses}
@@ -337,6 +414,9 @@ class RateLimitedClient:
         return None
 
     def complete(self, messages: Sequence[dict[str, str]], **kwargs: Any) -> str:
+        return self._with_retries(lambda: self.inner.complete(messages, **kwargs))
+
+    def _with_retries(self, action):
         if self.max_calls and self.calls >= self.max_calls:
             raise BudgetExhausted(
                 f"self-imposed budget of {self.max_calls} calls reached; "
@@ -345,9 +425,9 @@ class RateLimitedClient:
         delay = self.base_delay
         for attempt in range(self.max_retries + 1):
             try:
-                reply = self.inner.complete(messages, **kwargs)
+                result = action()
                 self.calls += 1
-                return reply
+                return result
             except Exception as exc:  # noqa: BLE001
                 status = getattr(exc, "status_code", None) or getattr(
                     getattr(exc, "response", None), "status_code", None
@@ -373,6 +453,12 @@ class RateLimitedClient:
                 time.sleep(wait)
                 delay *= 2
         raise RuntimeError("unreachable")
+
+
+    def complete_call(self, messages, tools=None, **kwargs):
+        return self._with_retries(
+            lambda: _dispatch_complete_call(self.inner, messages, tools, **kwargs)
+        )
 
     def stats(self) -> dict[str, float]:
         return {

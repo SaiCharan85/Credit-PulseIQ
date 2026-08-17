@@ -444,3 +444,103 @@ class ToolBox:
 
     def call_count(self) -> int:
         return len(self.calls)
+
+
+#: OpenAI-style function schemas for the same seven tools.
+#:
+#: Modern instruct models are trained to emit native tool calls, and several
+#: will do so whatever the prompt says: gpt-oss-20b on Groq ignored the
+#: JSON-in-text protocol and called ``available_periods`` natively, which the
+#: provider then rejected because no tools had been declared.
+#:
+#: Declaring them is better than fighting it. Arguments arrive validated by the
+#: provider, and the whole class of "model wrote prose around its JSON" parsing
+#: failures disappears. Note there is still no ``as_of`` parameter anywhere --
+#: the ToolBox is bound to one date, so the model cannot ask for the future
+#: through this interface either.
+def _fn(name: str, description: str, properties: dict, required: list[str] | None = None) -> dict:
+    return {
+        "type": "function",
+        "function": {
+            "name": name,
+            "description": description,
+            "parameters": {
+                "type": "object",
+                "properties": properties,
+                "required": required or [],
+            },
+        },
+    }
+
+
+_PERIOD = {
+    "type": "string",
+    "description": 'Fiscal period: "latest", "latest-1", "latest-2", or an ISO date.',
+}
+_METRIC = {"type": "string", "description": "Metric name, e.g. current_ratio."}
+
+TOOL_SCHEMAS: list[dict[str, Any]] = [
+    _fn("available_periods", "Fiscal periods visible at the prediction date.", {}),
+    _fn(
+        "get_metric",
+        "A computed ratio or score with provenance. The only source of numbers.",
+        {"metric": _METRIC, "period": _PERIOD},
+        ["metric"],
+    ),
+    _fn(
+        "get_trend",
+        "A metric across recent fiscal years, with direction and change.",
+        {"metric": _METRIC, "n_periods": {"type": "integer", "description": "2-6 years."}},
+        ["metric"],
+    ),
+    _fn(
+        "get_line_item",
+        "A raw XBRL line item, e.g. total_assets, revenue, long_term_debt.",
+        {"concept": {"type": "string"}, "period": _PERIOD},
+        ["concept"],
+    ),
+    _fn(
+        "get_peer_comparison",
+        "Percentile against sector peers at the same vintage.",
+        {"metric": _METRIC, "period": _PERIOD},
+        ["metric"],
+    ),
+    _fn(
+        "check_threshold",
+        "Compare a metric against reference distress levels; fetches the value itself.",
+        {"metric": _METRIC},
+        ["metric"],
+    ),
+    _fn(
+        "get_prior_distress_events",
+        "Distress signals already public at the prediction date.",
+        {},
+    ),
+    _fn(
+        "finish",
+        "Conclude the investigation. Call this when you have enough evidence, "
+        "or when you do not and should abstain.",
+        {
+            "signal": {
+                "type": "string",
+                "enum": ["healthy", "watch", "elevated_risk", "severe_risk",
+                         "insufficient_evidence"],
+            },
+            "confidence": {"type": "number", "description": "0.0-1.0. Cap at 0.6 if residual is set."},
+            "rationale": {"type": "string"},
+            "residual": {"type": "string", "description": "What remains unexplained."},
+            "evidence": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "metric": {"type": "string"},
+                        "value": {"type": "number"},
+                        "note": {"type": "string"},
+                    },
+                },
+            },
+        },
+        ["signal", "confidence", "rationale"],
+    ),
+]
