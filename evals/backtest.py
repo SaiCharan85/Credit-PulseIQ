@@ -340,16 +340,17 @@ def run_backtest(
     that date and nothing else, so the as-of discipline is inherited from the
     panel rather than reimplemented here.
     """
-    from agents.llm import BudgetExhausted
+    from agents.llm import BudgetExhausted, InfrastructureError
 
     results: list[CaseResult] = []
     for n, case in enumerate(cases, 1):
         facts = facts_for(case.cik)
         try:
             output = investigator.run(case.cik, case.observation_date, facts, **run_kwargs)
-        except BudgetExhausted:
-            # A deliberate stop, not a failure: propagate so the caller can
-            # report cleanly with everything completed already cached.
+        except (BudgetExhausted, InfrastructureError):
+            # Neither is an agent failure. A deliberate stop, or an unusable
+            # endpoint: propagate so the caller reports the real cause instead
+            # of grading the model on it.
             raise
         except Exception as exc:  # noqa: BLE001
             # One bad case must not destroy the run. A three-hour sweep will

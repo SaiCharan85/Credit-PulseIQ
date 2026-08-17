@@ -15,7 +15,12 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from agents.llm import BudgetExhausted, CachingClient, RateLimitedClient, load_env_file
+from agents.llm import (
+    BudgetExhausted,
+    CachingClient,
+    RateLimitedClient,
+    load_env_file,
+)
 from agents.rulebased import RuleBasedInvestigator
 from data.edgar import EdgarClient
 from evals.backtest import (

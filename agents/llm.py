@@ -242,6 +242,17 @@ class BudgetExhausted(RuntimeError):
     """Raised when the run hits its own spending cap, not the provider's."""
 
 
+class InfrastructureError(RuntimeError):
+    """The endpoint is unusable: bad key, no credits, forbidden.
+
+    Kept distinct from any agent-quality signal. A 402 swallowed as a per-case
+    failure once produced an L3 report reading "94.8% protocol failure", which
+    blamed the model for an unpaid account -- a wrong conclusion stated
+    confidently, which is the exact failure mode this project exists to catch.
+    These abort the run instead.
+    """
+
+
 @dataclass
 class RateLimitedClient:
     """Retries on rate limits and stops before a budget is exhausted.
@@ -338,6 +349,14 @@ class RateLimitedClient:
                 self.calls += 1
                 return reply
             except Exception as exc:  # noqa: BLE001
+                status = getattr(exc, "status_code", None) or getattr(
+                    getattr(exc, "response", None), "status_code", None
+                )
+                text = str(exc).lower()
+                if status in (401, 402, 403) or "insufficient credit" in text:
+                    raise InfrastructureError(
+                        f"endpoint unusable ({status}): {str(exc)[:200]}"
+                    ) from exc
                 if not (self._is_rate_limit(exc) or self._is_transient(exc)):
                     raise
                 if self._is_rate_limit(exc) and self._is_daily_cap(exc):
