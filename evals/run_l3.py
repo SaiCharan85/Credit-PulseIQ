@@ -49,6 +49,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--no-cache", action="store_true", help="bypass the LLM response cache")
     parser.add_argument("--model", default="", help="agent model id (overrides CREDITPULSE_LLM_MODEL)")
     parser.add_argument("--base-url", default="", help="OpenAI-compatible endpoint")
+    parser.add_argument("--max-positives", type=int, default=0, help="cap positives (pilot runs)")
     parser.add_argument(
         "--max-calls",
         type=int,
@@ -68,7 +69,7 @@ def main(argv: list[str] | None = None) -> int:
     train, test = split_by_date(rows, args.cutoff)
     if args.limit:
         test = test[: args.limit]
-    sample = stratified_sample(test, args.max_negatives)
+    sample = stratified_sample(test, args.max_negatives, max_positives=args.max_positives)
     test = sample.cases
     if sample.negative_fraction < 1.0:
         print(

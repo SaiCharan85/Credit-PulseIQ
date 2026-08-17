@@ -118,12 +118,18 @@ class Sample:
 
 
 def stratified_sample(
-    cases: Sequence[PanelRow], max_negatives: int, seed: int = 0
+    cases: Sequence[PanelRow], max_negatives: int, seed: int = 0, max_positives: int = 0
 ) -> Sample:
-    """Keep every positive, sample negatives down to ``max_negatives``."""
+    """Keep every positive, sample negatives down to ``max_negatives``.
+
+    ``max_positives`` caps positives too, for a pilot run under a token budget.
+    It weakens every metric, so it is opt-in and reported.
+    """
     import random
 
     positives = [c for c in cases if c.label == 1]
+    if max_positives and max_positives < len(positives):
+        positives = random.Random(seed).sample(positives, max_positives)
     negatives = [c for c in cases if c.label == 0]
     if max_negatives <= 0 or max_negatives >= len(negatives):
         kept = negatives

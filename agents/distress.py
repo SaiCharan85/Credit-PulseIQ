@@ -39,7 +39,12 @@ from agents.schemas import (
 )
 from agents.tools import TOOL_SCHEMAS, ToolBox
 
-MAX_STEPS = 12
+#: Each step resends the whole conversation plus the tool schemas, so the token
+#: cost is roughly quadratic in step count and linear in prompt size. Observed
+#: successful runs used 8-10 tool calls, so 8 is a real budget rather than a
+#: token-saving guess -- but it does trade some depth for throughput under a
+#: daily token cap.
+MAX_STEPS = 8
 MAX_RETRIES = 2
 
 TERMINATED_MODEL = "model_finished"
@@ -68,33 +73,16 @@ let it decide your next call. Follow up on what looks wrong: if leverage is \
 high, check coverage and liquidity; if a metric is undefined, try a related one \
 or a different period. Do not call tools at random, and do not stop after one.
 
-AVAILABLE TOOLS
-- available_periods()                      fiscal periods you can see
-- get_metric(metric, period)               a computed ratio or score
-- get_trend(metric, n_periods)             a metric across recent years
-- get_line_item(concept, period)           a raw filing value
-- get_peer_comparison(metric, period)      percentile against sector peers
-- check_threshold(metric)                  compare against reference levels
-- get_prior_distress_events()              distress signals already public
+Call finish when you have enough evidence, or when you are sure you cannot get \
+it. "period" accepts "latest", "latest-1", "latest-2", or an ISO date. \
+signal is one of: healthy, watch, elevated_risk, severe_risk, \
+insufficient_evidence. confidence is 0.0-1.0 and must reflect real \
+uncertainty; keep it at or below 0.6 if you report a residual.
 
-"period" accepts "latest", "latest-1", "latest-2", or an ISO date.
-
-RESPONSE FORMAT
-Reply with a single JSON object and nothing else.
-
-To investigate:
-{"thought": "why this call", "action": "call_tool", "tool": "get_metric", \
-"arguments": {"metric": "current_ratio", "period": "latest"}}
-
-To finish:
-{"thought": "...", "action": "finish", "signal": "elevated_risk", \
-"confidence": 0.72, "rationale": "...", "residual": "what remains unexplained", \
-"evidence": [{"metric": "current_ratio", "value": 0.2, "note": "far below 1.0"}]}
-
-signal must be one of: healthy, watch, elevated_risk, severe_risk, \
-insufficient_evidence.
-confidence is 0.0-1.0 and must reflect real uncertainty. If you report a \
-residual, keep confidence at or below 0.6.
+If tool calling is unavailable, reply with one JSON object instead:
+{"action": "call_tool", "tool": "get_metric", "arguments": {"metric": "..."}}
+or {"action": "finish", "signal": "...", "confidence": 0.7, "rationale": "...", \
+"evidence": [{"metric": "...", "value": 0.0}]}
 """
 
 USER_TEMPLATE = """\
