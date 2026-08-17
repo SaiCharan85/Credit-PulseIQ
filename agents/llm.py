@@ -390,10 +390,19 @@ class RateLimitedClient:
     max_calls: int = 0
     max_retries: int = 5
     base_delay: float = 2.0
+    #: Proactive tokens-per-minute ceiling. 0 disables pacing.
+    #:
+    #: Reactive backoff alone wastes throughput: it fires until the provider
+    #: returns 429, then sleeps exponentially, which overshoots. Measured on a
+    #: 16K-TPM model, that idled at ~8.7K TPM -- barely half the allowance.
+    #: Spacing calls to sit just under the ceiling avoids the 429 entirely.
+    tokens_per_minute: int = 0
     name: str = ""
     calls: int = 0
     retries: int = 0
     waited_seconds: float = 0.0
+    paced_seconds: float = 0.0
+    _window: list = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self.name = f"ratelimited:{getattr(self.inner, 'name', 'unknown')}"
@@ -467,7 +476,38 @@ class RateLimitedClient:
                 continue
         return None
 
+    @staticmethod
+    def _estimate_tokens(messages: Sequence[dict[str, Any]], tools: list | None) -> int:
+        """Rough token count for pacing. ~4 characters per token.
+
+        Deliberately approximate: pacing only needs to be close enough to stay
+        under the ceiling, and an exact count would mean tokenising every
+        request.
+        """
+        size = sum(len(str(m.get("content") or "")) for m in messages)
+        size += sum(len(json.dumps(m.get("tool_calls") or [])) for m in messages)
+        if tools:
+            size += len(json.dumps(tools))
+        return int(size / 4) + 200  # + headroom for the reply
+
+    def _pace(self, estimated: int) -> None:
+        """Sleep just long enough to stay under the per-minute ceiling."""
+        if not self.tokens_per_minute:
+            return
+        now = time.monotonic()
+        self._window = [(t, n) for t, n in self._window if now - t < 60.0]
+        used = sum(n for _, n in self._window)
+        if used + estimated > self.tokens_per_minute and self._window:
+            wait = 60.0 - (now - self._window[0][0]) + 0.25
+            if wait > 0:
+                time.sleep(wait)
+                self.paced_seconds += wait
+                now = time.monotonic()
+                self._window = [(t, n) for t, n in self._window if now - t < 60.0]
+        self._window.append((time.monotonic(), estimated))
+
     def complete(self, messages: Sequence[dict[str, str]], **kwargs: Any) -> str:
+        self._pace(self._estimate_tokens(messages, None))
         return self._with_retries(lambda: self.inner.complete(messages, **kwargs))
 
     def _with_retries(self, action):
@@ -510,6 +550,7 @@ class RateLimitedClient:
 
 
     def complete_call(self, messages, tools=None, **kwargs):
+        self._pace(self._estimate_tokens(messages, tools))
         return self._with_retries(
             lambda: _dispatch_complete_call(self.inner, messages, tools, **kwargs)
         )
@@ -519,6 +560,7 @@ class RateLimitedClient:
             "calls": self.calls,
             "retries": self.retries,
             "waited_seconds": round(self.waited_seconds, 1),
+            "paced_seconds": round(self.paced_seconds, 1),
         }
 
 

@@ -51,6 +51,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--base-url", default="", help="OpenAI-compatible endpoint")
     parser.add_argument("--max-positives", type=int, default=0, help="cap positives (pilot runs)")
     parser.add_argument(
+        "--tpm",
+        type=int,
+        default=0,
+        help="proactive tokens-per-minute ceiling (e.g. 16000 for gemma-4-31b-it)",
+    )
+    parser.add_argument(
         "--max-calls",
         type=int,
         default=0,
@@ -89,7 +95,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"endpoint preflight failed: {detail}", file=sys.stderr)
             return 2
         print(f"endpoint ok: {detail}", file=sys.stderr)
-        client = RateLimitedClient(inner=client, max_calls=args.max_calls)
+        client = RateLimitedClient(
+            inner=client, max_calls=args.max_calls, tokens_per_minute=args.tpm
+        )
         if not args.no_cache:
             # Cache outside the limiter: a cache hit costs no quota.
             client = CachingClient(inner=client)
