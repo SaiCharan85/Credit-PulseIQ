@@ -137,7 +137,25 @@ class OpenAICompatibleClient:
     def complete_call(
         self, messages: Sequence[dict[str, Any]], tools: list[dict] | None = None, **kwargs: Any
     ) -> Completion:
-        """A completion that may carry native tool calls."""
+        """A completion that may carry native tool calls.
+
+        Falls back to the text protocol when the provider rejects the model's
+        own tool call. gpt-oss-20b intermittently leaks harmony control tokens
+        into the function name -- "get_metric<|channel|>analysis" -- and the
+        provider 400s the whole request. Retrying identically at temperature 0
+        would reproduce it, so the retry drops the tool declarations and lets
+        the model answer as text instead.
+        """
+        try:
+            return self._complete_call(messages, tools, **kwargs)
+        except Exception as exc:  # noqa: BLE001
+            if tools and "tool_use_failed" in str(exc):
+                return self._complete_call(messages, None, **kwargs)
+            raise
+
+    def _complete_call(
+        self, messages: Sequence[dict[str, Any]], tools: list[dict] | None = None, **kwargs: Any
+    ) -> Completion:
         if not self.model:
             raise RuntimeError(f"no model configured; set {DEFAULT_MODEL_ENV}")
         from openai import OpenAI
