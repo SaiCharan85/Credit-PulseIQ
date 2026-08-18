@@ -57,6 +57,15 @@ class InvestigatorOutput(BaseModel):
     as_of: date
     signal: str
     confidence: float = Field(ge=0.0, le=1.0)
+    #: Continuous 0-100 distress score, finer-grained than the five-level
+    #: signal.
+    #:
+    #: AUC is a ranking metric, and the signal plus a confidence that clusters
+    #: on round values gave roughly a dozen distinct scores across 200 cases --
+    #: 146 of them in just two buckets. Ties cap discrimination structurally,
+    #: independently of reasoning quality. This lets the agent separate cases
+    #: it already distinguishes but had no way to express.
+    risk_score: float | None = Field(default=None, ge=0.0, le=100.0)
     rationale: str = ""
     evidence: list[Evidence] = Field(default_factory=list)
     residual: str = ""

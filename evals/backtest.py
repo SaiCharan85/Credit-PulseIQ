@@ -95,6 +95,8 @@ class CaseResult:
         """
         if self.abstained:
             return 0.5
+        if self.output.risk_score is not None:
+            return self.output.risk_score / 100.0
         return self.output.confidence if self.predicted_positive else 1.0 - self.output.confidence
 
 
@@ -355,6 +357,7 @@ def run_backtest(
     cases: Sequence[PanelRow],
     facts_for: Callable[[int], Sequence[Any]],
     on_case: Callable[[int, CaseResult], None] | None = None,
+    case_kwargs: Callable[[PanelRow], dict[str, Any]] | None = None,
     **run_kwargs: Any,
 ) -> list[CaseResult]:
     """Run the investigator over panel cases and grade each prediction.
@@ -377,7 +380,10 @@ def run_backtest(
         case = cases[index]
         facts = facts_for(case.cik)
         try:
-            output = investigator.run(case.cik, case.observation_date, facts, **run_kwargs)
+            extra = case_kwargs(case) if case_kwargs else {}
+            output = investigator.run(
+                case.cik, case.observation_date, facts, **run_kwargs, **extra
+            )
             consecutive_failures = 0
             outage_waited = 0.0
         except InfrastructureError:

@@ -539,3 +539,71 @@ class TestForcedFinish:
         last = client.calls[-1]
         warnings = [m for m in last if m["role"] == "user" and "one step left" in m["content"]]
         assert len(warnings) == 1
+
+
+class TestRiskScoreAndBaseline:
+    """Two changes aimed at the measured gap to the hazard model.
+
+    The first run's scores clustered: 146 of 198 cases in two buckets, because
+    a five-level signal times a few round confidences yields ~12 distinct
+    values. AUC is a ranking metric, so ties cap it regardless of reasoning.
+    """
+
+    def test_risk_score_is_used_for_ranking_when_present(self) -> None:
+        from evals.backtest import CaseResult
+
+        out = InvestigatorOutput(
+            cik=1, as_of=BEFORE_BANKRUPTCY, signal=SIGNAL_SEVERE,
+            confidence=0.85, risk_score=93.0,
+        )
+        case = CaseResult(cik=1, as_of=BEFORE_BANKRUPTCY, label=1, days_to_event=10, output=out)
+        assert case.risk_probability == pytest.approx(0.93)
+
+    def test_confidence_mapping_still_applies_without_a_score(self) -> None:
+        from evals.backtest import CaseResult
+
+        out = InvestigatorOutput(
+            cik=1, as_of=BEFORE_BANKRUPTCY, signal=SIGNAL_HEALTHY, confidence=0.9
+        )
+        case = CaseResult(cik=1, as_of=BEFORE_BANKRUPTCY, label=0, days_to_event=None, output=out)
+        assert case.risk_probability == pytest.approx(0.1)
+
+    def test_risk_score_breaks_ties_the_signal_cannot(self) -> None:
+        """Two severe calls at equal confidence must be rankable."""
+        from evals.backtest import CaseResult
+
+        def sev(score):
+            return CaseResult(
+                cik=1, as_of=BEFORE_BANKRUPTCY, label=1, days_to_event=1,
+                output=InvestigatorOutput(
+                    cik=1, as_of=BEFORE_BANKRUPTCY, signal=SIGNAL_SEVERE,
+                    confidence=0.85, risk_score=score,
+                ),
+            )
+        assert sev(95).risk_probability > sev(72).risk_probability
+
+    def test_risk_score_is_bounded(self) -> None:
+        with pytest.raises(ValueError):
+            InvestigatorOutput(
+                cik=1, as_of=BEFORE_BANKRUPTCY, signal=SIGNAL_SEVERE,
+                confidence=0.5, risk_score=140.0,
+            )
+
+    def test_baseline_tool_returns_the_score(self, facts) -> None:
+        tools = ToolBox(SLEEP_NUMBER, BEFORE_BANKRUPTCY, facts, model_score=0.87)
+        result = tools.get_model_score()
+        assert result["baseline_probability"] == pytest.approx(0.87)
+        assert "disagree" in result["note"].lower()
+
+    def test_baseline_tool_errors_when_not_supplied(self, facts) -> None:
+        """Absent baseline must be a recoverable observation, not a crash."""
+        result = ToolBox(SLEEP_NUMBER, BEFORE_BANKRUPTCY, facts).get_model_score()
+        assert "error" in result
+
+    def test_loop_can_call_the_baseline_tool(self, facts) -> None:
+        script = [tool_call("get_model_score"), FETCH_CURRENT_RATIO, GOOD_FINISH]
+        out = DistressInvestigator(ScriptedClient(script=script)).run(
+            SLEEP_NUMBER, BEFORE_BANKRUPTCY, facts, model_score=0.9
+        )
+        assert "get_model_score" in [c["tool"] for c in out.audit_trail]
+        assert out.signal == SIGNAL_SEVERE

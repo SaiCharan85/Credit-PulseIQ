@@ -129,6 +129,7 @@ class DistressInvestigator:
             "get_peer_comparison": tools.get_peer_comparison,
             "check_threshold": tools.check_threshold,
             "get_prior_distress_events": tools.get_prior_distress_events,
+            "get_model_score": tools.get_model_score,
         }
         handler = handlers.get(name)
         if handler is None:
@@ -293,6 +294,13 @@ class DistressInvestigator:
                     note=str(item.get("note", "")),
                 )
             )
+        raw_score = parsed.get("risk_score")
+        try:
+            risk_score = (
+                max(0.0, min(100.0, float(raw_score))) if raw_score is not None else None
+            )
+        except (TypeError, ValueError):
+            risk_score = None
         confidence = parsed.get("confidence", 0.0)
         try:
             confidence = max(0.0, min(1.0, float(confidence)))
@@ -303,6 +311,7 @@ class DistressInvestigator:
             as_of=as_of,
             signal=str(parsed.get("signal", SIGNAL_INSUFFICIENT)),
             confidence=confidence,
+            risk_score=risk_score,
             rationale=str(parsed.get("rationale", "")),
             evidence=evidence,
             residual=str(parsed.get("residual", "")),
@@ -342,6 +351,7 @@ class DistressInvestigator:
         peer_facts: dict[int, Sequence[Any]] | None = None,
         sic_by_cik: dict[int, str] | None = None,
         events: Sequence[Any] = (),
+        model_score: float | None = None,
     ) -> InvestigatorOutput:
         """Investigate one filer at one prediction date."""
         tools = ToolBox(
@@ -351,6 +361,7 @@ class DistressInvestigator:
             peer_facts=peer_facts,
             sic_by_cik=sic_by_cik,
             events=events,
+            model_score=model_score,
         )
         messages: list[dict[str, str]] = [
             {"role": "system", "content": SYSTEM_PROMPT},

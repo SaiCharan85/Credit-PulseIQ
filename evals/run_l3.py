@@ -51,6 +51,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--base-url", default="", help="OpenAI-compatible endpoint")
     parser.add_argument("--max-positives", type=int, default=0, help="cap positives (pilot runs)")
     parser.add_argument(
+        "--with-baseline",
+        action="store_true",
+        help="let the agent consult the hazard baseline via get_model_score",
+    )
+    parser.add_argument(
         "--tpm",
         type=int,
         default=0,
@@ -128,8 +133,19 @@ def main(argv: list[str] | None = None) -> int:
         if n % 25 == 0:
             print(f"  {n}/{len(test)}", file=sys.stderr)
 
+    # The agent may consult the baseline as one piece of evidence. It is fitted
+    # only on the training window, so exposing it introduces no lookahead.
+    case_kwargs = None
+    if args.agent == "react" and args.with_baseline:
+        scorer = HazardBaseline().fit(train)
+        scores = dict(zip([id(c) for c in test], scorer.predict_proba(test), strict=True))
+        case_kwargs = lambda row: {"model_score": scores[id(row)]}  # noqa: E731
+        print("agent has access to the hazard baseline via get_model_score", file=sys.stderr)
+
     try:
-        results = run_backtest(investigator, test, facts_for, on_case=progress)
+        results = run_backtest(
+            investigator, test, facts_for, on_case=progress, case_kwargs=case_kwargs
+        )
     except InfrastructureError as exc:
         print(f"\nABORTED -- endpoint unusable, no metrics are valid:\n  {exc}", file=sys.stderr)
         return 4

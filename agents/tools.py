@@ -140,8 +140,13 @@ class ToolBox:
         peer_facts: dict[int, Sequence[Any]] | None = None,
         sic_by_cik: dict[int, str] | None = None,
         events: Sequence[DistressEvent] = (),
+        model_score: float | None = None,
     ) -> None:
         self.cik = cik
+        #: A fitted baseline's probability for this filer, if one was supplied.
+        #: Fitted only on data before the prediction date, so exposing it adds
+        #: no lookahead.
+        self.model_score = model_score
         self.as_of = as_of
         self._view = FactIndex(as_of_view(facts, as_of))
         self._peer_facts = peer_facts or {}
@@ -442,6 +447,31 @@ class ToolBox:
         self._record("get_prior_distress_events", {}, True, f"{len(rows)} prior events")
         return {"count": len(rows), "events": rows}
 
+    def get_model_score(self) -> dict[str, Any]:
+        """A statistical baseline's view, offered as evidence rather than an answer.
+
+        The agent is told to weigh it against what it observes and to say so if
+        it disagrees. Two reasons for the framing: an agent that simply repeats
+        the number adds nothing, and disagreement is where the reasoning earns
+        its cost -- a filer the model ranks safe but whose debt has just been
+        reclassified to current is exactly the case worth catching.
+        """
+        if self.model_score is None:
+            err = "no baseline model was supplied for this run"
+            self._record("get_model_score", {}, False, "", err)
+            return ToolError(tool="get_model_score", error=err).as_dict()
+        self._record("get_model_score", {}, True, f"baseline={self.model_score:.3f}")
+        return {
+            "baseline_probability": round(self.model_score, 4),
+            "scale": "0.0-1.0, probability of a Chapter 11 petition within 12 months",
+            "fitted_on": "historical outcomes strictly before this prediction date",
+            "note": (
+                "One statistical opinion. It sees ratios only -- it cannot read "
+                "a reclassification, a going-concern flag, or a filing that "
+                "stopped arriving. Disagree with it where your evidence warrants."
+            ),
+        }
+
     # ---- audit ---------------------------------------------------------
 
     def audit_trail(self) -> list[dict[str, Any]]:
@@ -522,6 +552,14 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         {},
     ),
     _fn(
+        "get_model_score",
+        "A statistical baseline's estimated distress probability for this filer, "
+        "fitted on historical outcomes before the prediction date. One opinion "
+        "among your evidence, not an answer: weigh it against what you observe, "
+        "and say so if you disagree.",
+        {},
+    ),
+    _fn(
         "finish",
         "Conclude the investigation. Call this when you have enough evidence, "
         "or when you do not and should abstain.",
@@ -532,6 +570,14 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
                          "insufficient_evidence"],
             },
             "confidence": {"type": "number", "description": "0.0-1.0. Cap at 0.6 if residual is set."},
+            "risk_score": {
+                "type": "number",
+                "description": (
+                    "0-100 probability this filer petitions within 12 months. "
+                    "Use the full range and be granular: two companies both in "
+                    "severe distress should not receive the same score."
+                ),
+            },
             "rationale": {"type": "string"},
             "residual": {"type": "string", "description": "What remains unexplained."},
             "evidence": {
