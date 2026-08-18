@@ -51,6 +51,11 @@ from agents.tools import TOOL_SCHEMAS, ToolBox
 MAX_STEPS = 14
 MAX_RETRIES = 2
 
+#: Steps remaining when the loop asks for a verdict. Two, so the model has a
+#: turn to comply after being told -- warning it on the very last step leaves
+#: no room to act on the warning.
+FINISH_WARNING_STEPS = 2
+
 TERMINATED_MODEL = "model_finished"
 TERMINATED_BUDGET = "step_budget_exhausted"
 TERMINATED_RETRIES = "retries_exhausted"
@@ -142,7 +147,30 @@ class DistressInvestigator:
     ) -> tuple[dict[str, Any] | None, str, int]:
         """Drive the loop until the model finishes or the budget runs out."""
         steps = 0
-        for _ in range(self.max_steps):
+        warned = False
+        for remaining in range(self.max_steps, 0, -1):
+            # Ask for a verdict before the budget runs out rather than after.
+            #
+            # Measured: gemma-4-31b-it averaged 13.3 of 14 steps and failed to
+            # conclude on 75% of cases. Those became step-budget abstentions --
+            # recorded as protocol failures, which made a truncated
+            # investigation look like the model declining to answer. The model
+            # was not incapable, it was cut off mid-thought.
+            if remaining <= FINISH_WARNING_STEPS and not warned:
+                warned = True
+                messages.append(
+                    {
+                        "role": "user",
+                        "content": (
+                            "You have one step left. Call finish now with your best "
+                            "assessment from the evidence gathered so far. If that "
+                            "evidence genuinely does not support a conclusion, finish "
+                            "with signal 'insufficient_evidence' -- but do so as a "
+                            "judgment, not by running out of steps."
+                        ),
+                    }
+                )
+
             completion = _dispatch_complete_call(self.client, messages, tools=TOOL_SCHEMAS)
 
             # Native tool calls take precedence. Several models emit them

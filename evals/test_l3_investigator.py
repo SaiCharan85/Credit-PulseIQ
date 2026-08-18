@@ -498,3 +498,44 @@ class TestTrendsOfYearOnYearScores:
     def test_single_period_trends_are_unaffected(self, facts) -> None:
         result = ToolBox(SLEEP_NUMBER, BEFORE_BANKRUPTCY, facts).get_trend("current_ratio", 4)
         assert len(result["values"]) == 4
+
+
+class TestForcedFinish:
+    """The loop asks for a verdict before the budget runs out.
+
+    Measured on a real 200-case run: gemma-4-31b-it averaged 13.3 of 14 steps
+    and never called finish on 75% of cases. Those became step-budget
+    abstentions and were recorded as protocol failures -- a truncated
+    investigation reported as the model declining to answer.
+    """
+
+    def test_model_is_warned_before_the_budget_runs_out(self, facts) -> None:
+        client = ScriptedClient(script=[FETCH_CURRENT_RATIO] * 20)
+        DistressInvestigator(client, max_steps=4).run(SLEEP_NUMBER, BEFORE_BANKRUPTCY, facts)
+        prompts = [m["content"] for call in client.calls for m in call if m["role"] == "user"]
+        assert any("one step left" in p for p in prompts)
+
+    def test_warning_arrives_with_a_turn_left_to_act_on_it(self, facts) -> None:
+        """Warning on the final step would leave no room to comply."""
+        client = ScriptedClient(script=[FETCH_CURRENT_RATIO] * 20)
+        DistressInvestigator(client, max_steps=6).run(SLEEP_NUMBER, BEFORE_BANKRUPTCY, facts)
+        warned_at = [
+            i for i, call in enumerate(client.calls)
+            if any("one step left" in m["content"] for m in call if m["role"] == "user")
+        ]
+        assert warned_at and warned_at[0] < len(client.calls) - 1
+
+    def test_a_model_that_complies_produces_a_verdict(self, facts) -> None:
+        script = [FETCH_CURRENT_RATIO, FETCH_CURRENT_RATIO, GOOD_FINISH]
+        out = DistressInvestigator(ScriptedClient(script=script), max_steps=4).run(
+            SLEEP_NUMBER, BEFORE_BANKRUPTCY, facts
+        )
+        assert out.signal == SIGNAL_SEVERE
+        assert out.terminated_because == TERMINATED_MODEL
+
+    def test_warning_is_issued_once(self, facts) -> None:
+        client = ScriptedClient(script=[FETCH_CURRENT_RATIO] * 20)
+        DistressInvestigator(client, max_steps=5).run(SLEEP_NUMBER, BEFORE_BANKRUPTCY, facts)
+        last = client.calls[-1]
+        warnings = [m for m in last if m["role"] == "user" and "one step left" in m["content"]]
+        assert len(warnings) == 1
