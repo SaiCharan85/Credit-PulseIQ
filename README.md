@@ -62,7 +62,7 @@ Backtest methodology, including as-of cutoff enforcement, is in [`SPEC.md`](SPEC
 
 ## What exists today
 
-Phases 1–2 are complete: the EDGAR data plane, the deterministic spine, the severity ladder, the deterministic baselines, and the L0–L2 eval ladder. **270 tests pass; no LLM is involved in any of it.**
+Phases 1–2 are complete (data plane, deterministic spine, severity ladder, baselines, L0–L2), and Phase 3 — the ReAct investigator and the L3 backtest harness — is built and running. **397 tests pass, all offline: the L3 loop is tested against a scripted model, so agentic behaviour is verified without an endpoint.**
 
 | | |
 |---|---|
@@ -71,7 +71,7 @@ Phases 1–2 are complete: the EDGAR data plane, the deterministic spine, the se
 | Graded distress events | **3,005** across four severity tiers |
 | Filings behind the universe | ~89k for the original 50 alone; 4,109 10-K/10-Q |
 | Deterministic metrics | 29, each with a hand-computed L0 assertion |
-| Tests | 270 (L0 arithmetic, L1 extraction, L2 peers/trends, panel, metrics) |
+| Tests | **397** (L0 arithmetic, L1 extraction, L2 peers/trends, L3 loop/critic/harness, resilience) |
 
 Labels by cohort, and the ladder by tier:
 
@@ -100,6 +100,20 @@ Without a baseline an L3 precision figure is uninterpretable. If the ReAct inves
 
 The hazard framing is deliberate: Shumway (2001) showed that static one-observation-per-firm models are biased, and it handles the fact that survivors are **censored** rather than proven negatives.
 
+### Calibration
+
+Measuring ECE says a model is overconfident; it does not fix it. Monotonic recalibration is fitted on a **separate temporal fold** — the model trains on the earliest window, the calibrator on a later slice it never saw, and the test set stays untouched:
+
+| Calibrator | ECE | AUC |
+|---|---|---|
+| None | 0.1653 | 0.9393 |
+| Platt | 0.0431 | 0.9393 |
+| **Isotonic** | **0.0250** | 0.9386 |
+
+**6.6× better calibrated with the ranking intact** — AUC holding constant is the correctness check, since both maps are monotonic. The raw model stated 0.091 where the event occurred 0.3% of the time.
+
+Holding out a calibration fold costs some discrimination (AUC 0.957 → 0.939, fitting on 3,209 rows instead of 4,365). Stated rather than hidden.
+
 Panel: **5,582 firm-period observations**, 354 filers, 500 positives, 1-year horizon. Split **temporally** at 2024-06-01 (a random split would leak, since a firm's adjacent quarters are near-identical). Test set: 1,217 rows, 100 positives, 8.2% base rate.
 
 | Model | Test AUC | P@10 | P@25 | ECE |
@@ -116,6 +130,48 @@ Read these honestly:
 - **Coefficients are not individually interpretable.** `current_ratio` and `quick_ratio` come out with large opposite signs — textbook multicollinearity between near-identical covariates.
 - **Test AUC exceeds train AUC (0.957 vs 0.897).** With 100 test positives that is ~2 standard errors, and the periods have different base rates; it is not treated as a real improvement.
 - **Missingness helps, but modestly.** Metrics alone reach 0.937; missingness indicators alone reach 0.740 with P@25 of just 0.20. Ablation confirms the model reads distress rather than proxying sector — a real risk, since survivors are missing `Liabilities` (and hence Altman/Ohlson) far more often than distressed filers (46% vs 19%), largely a REIT/financial composition effect.
+
+---
+
+### The distress investigator (Phase 3)
+
+A real ReAct loop, not one prompted call: it hypothesises, calls a typed tool, reads the structured result, chooses the next call *from that result*, and terminates on its own judgment — including at *insufficient evidence*.
+
+The division of control is the design:
+
+| The loop owns | The model owns |
+|---|---|
+| Tool dispatch and argument validation | Which tool to call next |
+| The step budget, and forced abstention | When it has enough evidence |
+| The deterministic critic and bounded retries (≤2) | Signal, confidence, residual |
+
+**The as-of date is not a tool argument.** A `ToolBox` is constructed for one filer at one prediction date, so the model cannot request data it should not see — lookahead is unrepresentable rather than merely guarded against.
+
+Tools are declared through the API's native function-calling interface, so arguments arrive provider-validated. A JSON-in-text fallback remains for models without it.
+
+Live example — Sleep Number at 2026-03-01, three months before it filed:
+
+```
+tools : available_periods → get_metric ×3 → check_threshold → get_prior_distress_events → get_trend
+signal: severe_risk (0.9)   verification: passed   retries: 0
+cited : current_ratio 0.20, quick_ratio 0.086, equity −$451.6m, interest_coverage 0.47
+```
+
+### What the capability floor actually is
+
+Eight models were tried against this loop. The failures were as informative as the successes:
+
+| Model | Outcome |
+|---|---|
+| Qwen2.5-0.5B / 1.5B (local CPU) | Too weak — 1.5B **fabricated a metric it never fetched**; the critic caught it |
+| `openai/gpt-oss-20b` | Harmony control tokens corrupt content *and* tool names on every configuration |
+| `llama-3.1-8b-instant` | Loops without deciding — 12 calls, repeating tools, never concludes |
+| `llama-3.3-70b-versatile` | **Works** — but 100K tokens/day ≈ 6 cases |
+| `gemini-3.7-flash` | Works — but 20 requests/day |
+| `mistral-small-3.2-24b` | **Works well** — 10 tool calls, correct call, verification passed |
+| `gemma-4-31b-it` | **Works** — 14,400 requests/day; the run model |
+
+Two conclusions worth stating. First, the floor is real: below roughly 8B the model cannot hold a multi-step tool protocol, and at 1.5B it invents figures — which is exactly what the numeric guard exists to catch, and did. Second, **free-tier quotas vary by ~700×** between models on the same provider, and that, not capability, was the binding constraint throughout.
 
 ---
 
@@ -161,7 +217,7 @@ The eval harness is the point. Tooling is matched to what each layer actually is
 | **L0** | Deterministic ratio/trend/peer math | Unit test | pytest | ✅ |
 | **L1** | XBRL extraction accuracy | Unit test | pytest | ✅ |
 | **L2** | Peer-group + trend correctness | Unit test | pytest | ✅ |
-| **L3** | Investigator diagnosis vs real labels | **Outcome-based backtest** | **custom harness** (pytest-driven) | next |
+| **L3** | Investigator diagnosis vs real labels | **Outcome-based backtest** | **custom harness** (pytest-driven) | built, running |
 | **L4** | End-to-end (name → memo), cost/latency | Outcome + behavioral | custom harness + DeepEval | |
 | **L5** | Guardrails / adversarial; retrieval groundedness | LLM-as-judge / behavioral | DeepEval; RAGAS (context leg) | |
 | Online | Live drift, groundedness, calibration | LLM-as-judge + tracing | Langfuse / Opik | |
@@ -198,7 +254,8 @@ The headline is the **custom outcome-based backtest** (L3) with lookahead contro
 | [`verify/`](verify/) | Numeric recomputation, lookahead + staleness guards | built |
 | [`models/`](models/) | Firm-period panel, hazard + Altman baselines, evaluation metrics | built |
 | [`evals/`](evals/) | L0–L2 suite, real-filing fixtures | built |
-| `agents/` | Orchestrator + distress / earnings-quality / covenant / context workers | Phase 3 |
+| [`agents/`](agents/) | Distress investigator (ReAct loop), typed tools, deterministic critic, model clients | built |
+| `agents/` (rest) | Orchestrator + earnings-quality / covenant / context workers | Phase 4–5 |
 | `serving/` | vLLM config + judge model | Phase 3 |
 | `feedback/` | Input-quality gate + online judge + flywheel | Phase 5 |
 
