@@ -47,16 +47,47 @@ Most "agentic finance" projects demo well on three hand-picked tickers and were 
 
 ## Headline results
 
-> Not yet run. Phase 3 produces these. Leading with an empty table is the point: the numbers go here or nowhere.
+L3 backtest, distress leg. 200 firm-period cases (100 Chapter 11 positives + 100 sampled negatives), strict as-of cutoffs, temporal hold-out from 2024-06-01. Agent is `gemma-4-31b-it` driving the ReAct loop.
 
-| Metric | Distress (Ch. 11) | Earnings quality (AAER) |
+| Metric | **Agent** | Altman Z'' | Hazard (Shumway) |
+|---|---|---|---|
+| AUC | 0.892 | 0.885 | **0.966** |
+| **Calibration (ECE)** | **0.078** | 0.141 | 0.101 |
+| Precision / recall | 0.781 / 0.899 | — | — |
+| Precision, base-rate corrected | 0.242 | — | — |
+| **Median lead time** | **164 days** | — | — |
+| **False-confidence rate** | **0.060** (6/100) | — | — |
+| Verification failures | **0** / ~2,900 calls | — | — |
+| Abstentions | 2 (1.0%), both honest | — | — |
+
+**The agent does not beat the hazard baseline.** AUC 0.892 against 0.966 — it roughly ties a 1968 discriminant model and loses clearly to a 2001 penalised logit on the same as-of features. An LLM making ~12 tool calls per company does not justify its inference cost on discrimination alone. That is the finding, and it is why the baselines were built first.
+
+**It is, however, the best calibrated of the three**, and by a clear margin. Its reliability curve tracks the diagonal — states 0.85 and observes 0.83; states 0.13 and observes 0.05 — where the fitted models are systematically overconfident. It knows what it does not know better than they do.
+
+**Zero verification failures.** Across ~2,900 model calls, not one fabricated figure reached the output. Every cited number was independently recomputed from its provenance.
+
+**The false-confidence rate is 6%** — six of the hundred companies that failed were called healthy or watch at ≥0.7 confidence. This is the designated kill-signal metric (SPEC §10) and it is not zero. An earlier run reported 0.000, but only because the agent was abstaining on three-quarters of cases; that number was an artefact, not a result.
+
+Reproduce with `python -m evals.run_l3 --agent react --max-negatives 100`. Methodology, including as-of enforcement, is in [`SPEC.md`](SPEC.md) §7.
+
+<details>
+<summary>Reliability curve</summary>
+
+| Stated | Observed | n |
 |---|---|---|
-| Precision / recall | — | — |
-| Median lead time | — | — |
-| False-confidence rate | — | — |
-| Calibration (ECE) | — | — |
+| 0.13 | 0.05 | 60 |
+| 0.30 | 0.25 | 12 |
+| 0.42 | 0.38 | 13 |
+| 0.69 | 0.63 | 27 |
+| 0.85 | 0.83 | 86 |
 
-Backtest methodology, including as-of cutoff enforcement, is in [`SPEC.md`](SPEC.md) and reproducible via [`evals/`](evals/).
+</details>
+
+### A result that only appeared because abstention was instrumented
+
+The first full run reported AUC 0.965 — apparently matching the hazard model. It was wrong. 151 of 200 cases (75.5%) had abstained, **every one a step-budget exhaustion and not a single honest judgment**: the model averaged 13.3 of 14 steps, investigating thoroughly and getting cut off before it could conclude. The metrics rested on the 49 cases that happened to finish, a self-selected quarter.
+
+Splitting abstentions into *honest* versus *protocol failure* is what surfaced it. Without that split it would have read as admirable caution and shipped as a headline number.
 
 ---
 
