@@ -398,6 +398,23 @@ def run_backtest(
             # *same* case rather than burning through the remainder recording
             # protocol failures that are really dropped connections.
             if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+                # Roll back the failures already recorded in this run. They were
+                # filed as protocol failures before the outage was recognised,
+                # and leaving them would attribute a network drop to the agent
+                # -- the precise error this branch exists to prevent.
+                rolled_back = 0
+                while results and results[-1].output.terminated_because == "case_error":
+                    results.pop()
+                    index -= 1
+                    rolled_back += 1
+                if rolled_back:
+                    print(
+                        f"\nreclassified {rolled_back} earlier failure(s) as part of "
+                        "this outage; they will be retried, not scored.",
+                        file=sys.stderr,
+                    )
+                    case = cases[index]
+
                 if outage_waited >= MAX_OUTAGE_WAIT_SECONDS:
                     print(
                         f"\nGIVING UP after {outage_waited / 60:.0f} min of failures "
