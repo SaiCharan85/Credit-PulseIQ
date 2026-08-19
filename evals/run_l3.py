@@ -49,6 +49,11 @@ def main(argv: list[str] | None = None) -> int:
         help="stratified sample: keep all positives, cap negatives (0 = keep all)",
     )
     parser.add_argument("--no-cache", action="store_true", help="bypass the LLM response cache")
+    parser.add_argument(
+        "--offline",
+        action="store_true",
+        help="grade only what the cache already holds; makes no API calls",
+    )
     parser.add_argument("--model", default="", help="agent model id (overrides CREDITPULSE_LLM_MODEL)")
     parser.add_argument("--base-url", default="", help="OpenAI-compatible endpoint")
     parser.add_argument("--max-positives", type=int, default=0, help="cap positives (pilot runs)")
@@ -104,14 +109,23 @@ def main(argv: list[str] | None = None) -> int:
             max_calls=args.max_calls,
             tokens_per_minute=args.tpm,
         )
-        ok, detail = preflight(client)
-        if not ok:
-            print(f"endpoint preflight failed: {detail}", file=sys.stderr)
-            return 2
-        print(f"endpoint ok: {detail}", file=sys.stderr)
-        if not args.no_cache:
-            # Cache outside the limiter: a cache hit costs no quota.
-            client = CachingClient(inner=client)
+        if args.offline:
+            # Build the identical client chain but never call through it. The
+            # cache key includes the inner client's name, so a stand-in with a
+            # different name would miss on every entry the real run wrote --
+            # the replay would look like an empty cache rather than a hit.
+            # Preflight is skipped: offline mode must touch no endpoint.
+            client = CachingClient(inner=client, offline=True)
+            print("offline replay: no API calls will be made", file=sys.stderr)
+        else:
+            ok, detail = preflight(client)
+            if not ok:
+                print(f"endpoint preflight failed: {detail}", file=sys.stderr)
+                return 2
+            print(f"endpoint ok: {detail}", file=sys.stderr)
+            if not args.no_cache:
+                # Cache outside the limiter: a cache hit costs no quota.
+                client = CachingClient(inner=client)
         investigator = DistressInvestigator(client, with_baseline=args.with_baseline)
         label = f"ReAct investigator ({client.name})"
     else:

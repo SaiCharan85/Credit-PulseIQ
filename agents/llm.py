@@ -265,6 +265,13 @@ class CachingClient:
 
     inner: Any
     cache_dir: Path = Path("data/cache/llm")
+    #: Replay only; a miss raises :class:`BudgetExhausted` instead of calling.
+    #:
+    #: Lets a long run be graded from what it has already completed, while it
+    #: is still going, without spending a single call or touching the running
+    #: process. The stop reuses the budget path, so the partial run is handled
+    #: by machinery that already exists rather than a second code path.
+    offline: bool = False
     name: str = ""
     hits: int = 0
     misses: int = 0
@@ -300,6 +307,9 @@ class CachingClient:
         if path.exists():
             self.hits += 1
             return path.read_text(encoding="utf8")
+        if self.offline:
+            self.misses += 1
+            raise BudgetExhausted("offline replay: conversation not in cache")
         reply = self.inner.complete(messages, **kwargs)
         path.write_text(reply, encoding="utf8")
         self.misses += 1
@@ -318,6 +328,9 @@ class CachingClient:
                 tool_calls=data["tool_calls"],
                 raw_message=data.get("raw_message"),
             )
+        if self.offline:
+            self.misses += 1
+            raise BudgetExhausted("offline replay: conversation not in cache")
         result = _dispatch_complete_call(self.inner, messages, tools, **kwargs)
         path.write_text(
             json.dumps(
