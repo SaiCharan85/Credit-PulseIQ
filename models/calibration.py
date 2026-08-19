@@ -4,15 +4,24 @@ Measuring ECE says a model is overconfident; it does not fix it. This module
 fits a monotonic map from raw score to calibrated probability, so that a stated
 0.8 means the event happens about 80% of the time.
 
-Two methods, both order-preserving so **AUC is unchanged** -- recalibration
-moves probabilities, never the ranking:
+Two methods. Both are monotonic, but they are not equally safe for ranking:
+
+:class:`PlattCalibrator` is *strictly* monotonic, so AUC is preserved exactly.
+:class:`IsotonicCalibrator` is a step function -- only *weakly* monotonic -- and
+on a small fold it collapses many inputs onto the same output. Those ties
+destroy ranking information. Measured on 58 agent predictions it cost 0.025
+AUC (0.9725 -> 0.9474) while barely improving ECE, where on 1,156 hazard-model
+predictions it was the best of the three. Fold size decides which to use:
 
 :class:`PlattCalibrator`
     Logistic regression on the score. Two parameters, so it is stable on small
-    samples. The default here, because the calibration fold has ~100 positives.
+    samples and cannot introduce ties. The right choice whenever the
+    calibration fold is small -- on ~58 agent predictions it cut ECE 39% with
+    AUC exactly preserved.
 :class:`IsotonicCalibrator`
-    Non-parametric monotonic fit. More flexible, needs more data, and will
-    happily overfit a small fold.
+    Non-parametric monotonic fit. More flexible and stronger given data --
+    best of the three on 1,156 hazard-model predictions -- but on a small fold
+    it overfits into flat steps that tie predictions together and lower AUC.
 
 **The fold discipline is the whole point.** A calibrator fitted on the same
 rows the model was trained on learns the model's training-set optimism and
