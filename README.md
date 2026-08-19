@@ -83,6 +83,32 @@ Reproduce with `python -m evals.run_l3 --agent react --max-negatives 100`. Metho
 
 </details>
 
+### Does giving the agent the baseline help? No.
+
+A second arm let the agent consult the fitted hazard model through a
+`get_model_score` tool, framed as one opinion to weigh rather than an answer to
+copy. It copied it.
+
+| | |
+|---|---|
+| Called `get_model_score` | **143 / 143 cases** |
+| Correlation, agent score vs baseline | **0.967** |
+| Cases differing by more than 0.25 | 6 (4%) |
+
+On the same 143 cases: **baseline alone AUC 0.980, agent alone 0.972, the two
+averaged 0.979.** The agent reproduces the baseline slightly worse than the
+baseline reproduces itself, and blending them beats neither. Where the two
+disagree by more than 0.2 (7 cases), the agent is closer to the truth 3 times
+and the baseline 4 — indistinguishable from chance.
+
+So the apparent parity with the hazard model in that arm was an artefact of
+copying, not reasoning. The uncontaminated number remains **0.892**.
+
+This only became visible because per-case results record whether the tool was
+called and what the agent scored. The aggregate metrics were identical either
+way: an agent that reasons its way to 0.97 and an agent that copies its way
+there produce the same summary table.
+
 ### A result that only appeared because abstention was instrumented
 
 The first full run reported AUC 0.965 — apparently matching the hazard model. It was wrong. 151 of 200 cases (75.5%) had abstained, **every one a step-budget exhaustion and not a single honest judgment**: the model averaged 13.3 of 14 steps, investigating thoroughly and getting cut off before it could conclude. The metrics rested on the 49 cases that happened to finish, a self-selected quarter.
