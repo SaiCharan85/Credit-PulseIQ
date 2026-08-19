@@ -394,12 +394,13 @@ def run_backtest(
     import sys
     import time
 
-    from agents.llm import BudgetExhausted, InfrastructureError
+    from agents.llm import BudgetExhausted, CacheMiss, InfrastructureError
 
     results: list[CaseResult] = []
     consecutive_failures = 0
     outage_waited = 0.0
     index = 0
+    skipped = 0
 
     while index < len(cases):
         case = cases[index]
@@ -415,6 +416,12 @@ def run_backtest(
             # A bad key or exhausted credit: no case can run, and grading any
             # of it would blame the model for the endpoint.
             raise
+        except CacheMiss:
+            # Skip, do not record. An ungraded case is honest; recording it as
+            # a failure would blame the agent for a gap in the replay cache.
+            skipped += 1
+            index += 1
+            continue
         except BudgetExhausted as exc:
             # A quota stop is not a failure. Everything completed is real and
             # already cached, so return it rather than discarding a partial
@@ -489,6 +496,8 @@ def run_backtest(
         index += 1
         if on_case:
             on_case(index, result)
+    if skipped:
+        print(f"skipped {skipped} case(s) missing from the replay cache", file=sys.stderr)
     return results
 
 

@@ -309,7 +309,7 @@ class CachingClient:
             return path.read_text(encoding="utf8")
         if self.offline:
             self.misses += 1
-            raise BudgetExhausted("offline replay: conversation not in cache")
+            raise CacheMiss("offline replay: conversation not in cache")
         reply = self.inner.complete(messages, **kwargs)
         path.write_text(reply, encoding="utf8")
         self.misses += 1
@@ -330,7 +330,7 @@ class CachingClient:
             )
         if self.offline:
             self.misses += 1
-            raise BudgetExhausted("offline replay: conversation not in cache")
+            raise CacheMiss("offline replay: conversation not in cache")
         result = _dispatch_complete_call(self.inner, messages, tools, **kwargs)
         path.write_text(
             json.dumps(
@@ -383,6 +383,17 @@ def load_env_file(path: Path | str = ENV_FILE) -> list[str]:
 
 class BudgetExhausted(RuntimeError):
     """Raised when the run hits its own spending cap, not the provider's."""
+
+
+class CacheMiss(RuntimeError):
+    """Offline replay reached a conversation the cache does not hold.
+
+    Distinct from :class:`BudgetExhausted`, which ends the run. A miss applies
+    to one case only: the live run may have diverged there (a transient EDGAR
+    failure changes the tool observations, hence the conversation) while every
+    later case replays perfectly. Stopping at the first miss would discard them
+    all, so this skips the case instead.
+    """
 
 
 class InfrastructureError(RuntimeError):
