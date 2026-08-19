@@ -124,6 +124,8 @@ class DistressInvestigator:
             "get_peer_comparison": tools.get_peer_comparison,
             "check_threshold": tools.check_threshold,
             "get_prior_distress_events": tools.get_prior_distress_events,
+            "get_filing_events": tools.get_filing_events,
+            "check_going_concern": tools.check_going_concern,
             "get_model_score": tools.get_model_score,
         }
         handler = handlers.get(name)
@@ -347,6 +349,8 @@ class DistressInvestigator:
         sic_by_cik: dict[int, str] | None = None,
         events: Sequence[Any] = (),
         model_score: float | None = None,
+        filing_index: Sequence[dict[str, Any]] = (),
+        fetch_document: Callable[[str, str], str] | None = None,
     ) -> InvestigatorOutput:
         """Investigate one filer at one prediction date."""
         tools = ToolBox(
@@ -357,6 +361,8 @@ class DistressInvestigator:
             sic_by_cik=sic_by_cik,
             events=events,
             model_score=model_score,
+            filing_index=filing_index,
+            fetch_document=fetch_document,
         )
         messages: list[dict[str, str]] = [
             {"role": "system", "content": SYSTEM_PROMPT},

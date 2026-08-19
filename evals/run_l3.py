@@ -136,12 +136,42 @@ def main(argv: list[str] | None = None) -> int:
     cache: dict[int, list] = {}
 
     def facts_for(cik: int):
+        """Facts for one filer, or a hard failure.
+
+        This used to swallow the exception and substitute ``[]``. That is the
+        worst possible handling: a transient EDGAR error silently handed the
+        agent an empty universe, it investigated nothing and was then graded on
+        the guess -- scoring a data outage as a judgment. It also made the run
+        irreproducible, because the same case replayed differently depending on
+        whether the fetch happened to succeed.
+        """
         if cik not in cache:
-            try:
-                cache[cik] = edgar.facts(cik)
-            except Exception:  # noqa: BLE001
-                cache[cik] = []
+            cache[cik] = edgar.facts(cik)
         return cache[cik]
+
+    index_cache: dict[int, list] = {}
+
+    def filings_for(cik: int) -> list:
+        if cik not in index_cache:
+            try:
+                index_cache[cik] = edgar.filing_index(cik)
+            except Exception:  # noqa: BLE001
+                # Unlike facts, an absent index is survivable: the tools report
+                # it as unavailable and the agent can say so, rather than being
+                # handed a fabricated "no adverse events found".
+                index_cache[cik] = []
+        return index_cache[cik]
+
+    def make_kwargs(row):
+        extra = {
+            "filing_index": filings_for(row.cik),
+            "fetch_document": lambda acc, doc, _c=row.cik: edgar.fetch_filing_document(
+                _c, acc, doc
+            ),
+        }
+        if base_scores is not None:
+            extra["model_score"] = base_scores[id(row)]
+        return extra
 
     print(f"L3 backtest: {label} over {len(test)} test cases (cutoff {args.cutoff})", file=sys.stderr)
 
@@ -151,12 +181,12 @@ def main(argv: list[str] | None = None) -> int:
 
     # The agent may consult the baseline as one piece of evidence. It is fitted
     # only on the training window, so exposing it introduces no lookahead.
-    case_kwargs = None
+    base_scores = None
     if args.agent == "react" and args.with_baseline:
         scorer = HazardBaseline().fit(train)
-        scores = dict(zip([id(c) for c in test], scorer.predict_proba(test), strict=True))
-        case_kwargs = lambda row: {"model_score": scores[id(row)]}  # noqa: E731
+        base_scores = dict(zip([id(c) for c in test], scorer.predict_proba(test), strict=True))
         print("agent has access to the hazard baseline via get_model_score", file=sys.stderr)
+    case_kwargs = make_kwargs if args.agent == "react" else None
 
     try:
         results = run_backtest(

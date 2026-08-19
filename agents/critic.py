@@ -48,6 +48,17 @@ ABSTENTION_CONFIDENCE_CAP = 0.5
 DEFECT_NUMERIC = "numeric"
 DEFECT_LOOKAHEAD = "lookahead"
 DEFECT_SCOPE = "scope"
+DEFECT_CONSISTENCY = "self_contradiction"
+
+#: The 0-100 risk_score each signal must fall inside. Mirrors the bands the
+#: backtest grades with, so the agent is held to the scale it is scored on.
+SIGNAL_BANDS: dict[str, tuple[float, float]] = {
+    "healthy": (0.0, 20.0),
+    "watch": (20.0, 45.0),
+    "elevated_risk": (45.0, 75.0),
+    "severe_risk": (75.0, 100.0),
+}
+
 DEFECT_CALIBRATION = "calibration"
 
 
@@ -116,6 +127,27 @@ def review(
                 ),
             )
         )
+
+    # The verdict and the score must agree. Measured on 165 graded cases, 9 of
+    # the missed bankruptcies were signalled `elevated_risk` while carrying a
+    # risk_score below 45 -- the two outputs contradicted each other, and the
+    # grader reads risk_score, so the ordinal judgment was silently discarded.
+    # This is the model disagreeing with itself, so it is a defect to send back
+    # rather than something to quietly clamp.
+    if output.risk_score is not None and output.signal in SIGNAL_BANDS:
+        low, high = SIGNAL_BANDS[output.signal]
+        if not (low <= output.risk_score <= high):
+            defects.append(
+                Defect(
+                    kind=DEFECT_CONSISTENCY,
+                    detail=(
+                        f"signal '{output.signal}' implies a risk_score in "
+                        f"[{low:.0f}, {high:.0f}], but {output.risk_score:.0f} was "
+                        "given. Pick the signal that matches your score, or the "
+                        "score that matches your signal."
+                    ),
+                )
+            )
 
     if output.residual.strip() and output.confidence > RESIDUAL_CONFIDENCE_CAP:
         defects.append(

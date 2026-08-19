@@ -20,7 +20,7 @@ Plain deterministic code -- the tools are not agents (PROMPT hard rule 3).
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from datetime import date, datetime
 from typing import Any
 
@@ -35,6 +35,7 @@ from compute.scores import ALL_SCORES, TWO_PERIOD_SCORES, compute_two_period_sco
 from compute.trends import Trend, build_trend
 from data.distress_events import DistressEvent, events_visible_as_of
 from data.facts import as_of_view
+from data.signals import filing_events, latest_report, scan_report_text
 
 #: Reference thresholds for ``check_threshold``. Conventional credit-analysis
 #: levels, not fitted parameters -- they exist so the agent compares against a
@@ -141,6 +142,8 @@ class ToolBox:
         sic_by_cik: dict[int, str] | None = None,
         events: Sequence[DistressEvent] = (),
         model_score: float | None = None,
+        filing_index: Sequence[dict[str, Any]] = (),
+        fetch_document: Callable[[str, str], str] | None = None,
     ) -> None:
         self.cik = cik
         #: A fitted baseline's probability for this filer, if one was supplied.
@@ -159,6 +162,10 @@ class ToolBox:
         #: treating it as uncited made the critic reject correct behaviour.
         self.cited_line_items: dict[str, float] = {}
         self._periods = annual_period_ends(self._view)
+        #: Filing metadata and text, the signals a ratio model cannot read.
+        #: Both are as-of filtered on use, never by the model.
+        self._filing_index = list(filing_index)
+        self._fetch_document = fetch_document
 
     # ---- helpers -------------------------------------------------------
 
@@ -447,6 +454,87 @@ class ToolBox:
         self._record("get_prior_distress_events", {}, True, f"{len(rows)} prior events")
         return {"count": len(rows), "events": rows}
 
+    def get_filing_events(self, lookback_days: int = 540) -> dict[str, Any]:
+        """Dated credit events from filing metadata: late filings, 8-K items.
+
+        None of these appear in the ratio panel, which is the point. A company
+        that files an NT 10-K, dismisses its auditor, or discloses a covenant
+        breach is telling you something the balance sheet has not yet said.
+        """
+        args = {"lookback_days": lookback_days}
+        if not self._filing_index:
+            self._record("get_filing_events", args, False, "", "no filing index available")
+            return ToolError(
+                tool="get_filing_events",
+                error="no filing index was supplied for this filer",
+            ).as_dict()
+        lookback = max(1, min(int(lookback_days), 1826))
+        events = filing_events(self._filing_index, self.as_of, lookback)
+        summary = (
+            ", ".join(f"{e.code}@{e.filing_date}" for e in events[:6]) or "none"
+        )
+        self._record(
+            "get_filing_events", args, True, f"{len(events)} event(s): {summary}"
+        )
+        return {
+            "cik": self.cik,
+            "as_of": self.as_of.isoformat(),
+            "lookback_days": lookback,
+            "n_events": len(events),
+            "events": [e.as_dict() for e in events],
+            "note": (
+                "empty means no such filing in the window, which is itself "
+                "evidence of stability"
+            ),
+        }
+
+    def check_going_concern(self) -> dict[str, Any]:
+        """Search the latest periodic report for going-concern doubt.
+
+        An auditor's substantial-doubt paragraph is the single most direct
+        written statement of distress a filing contains, and no ratio encodes
+        it. Reads only the most recent report filed on or before the
+        prediction date.
+        """
+        if not self._filing_index or self._fetch_document is None:
+            self._record("check_going_concern", {}, False, "", "no filing text available")
+            return ToolError(
+                tool="check_going_concern",
+                error="filing text was not made available for this filer",
+            ).as_dict()
+        report = latest_report(self._filing_index, self.as_of)
+        if report is None:
+            self._record("check_going_concern", {}, False, "", "no report on or before as_of")
+            return ToolError(
+                tool="check_going_concern",
+                error=f"no 10-K/10-Q/20-F filed on or before {self.as_of}",
+            ).as_dict()
+        try:
+            text = self._fetch_document(report["accession"], report["primary_document"])
+        except Exception as exc:  # noqa: BLE001
+            # Surface the failure rather than reporting "no going concern
+            # found", which would read as reassurance drawn from nothing.
+            self._record("check_going_concern", {}, False, "", str(exc))
+            return ToolError(
+                tool="check_going_concern",
+                error=f"could not retrieve the filing text: {exc}",
+            ).as_dict()
+        found = scan_report_text(text)
+        self._record(
+            "check_going_concern",
+            {},
+            True,
+            f"going_concern={found['going_concern_doubt']} "
+            f"material_weakness={found['material_weakness']}",
+        )
+        return {
+            "cik": self.cik,
+            "as_of": self.as_of.isoformat(),
+            "form": report["form"],
+            "filing_date": report["filing_date"].isoformat(),
+            **found,
+        }
+
     def get_model_score(self) -> dict[str, Any]:
         """A statistical baseline's view, offered as evidence rather than an answer.
 
@@ -558,6 +646,24 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
     _fn(
         "get_prior_distress_events",
         "Distress signals already public.",
+        {},
+    ),
+    _fn(
+        "get_filing_events",
+        "Dated 8-K credit events and late-filing notices: covenant breach (2.04), "
+        "delisting notice (3.01), auditor change (4.01), restatement (4.02), "
+        "impairment (2.06). Not in any ratio.",
+        {
+            "lookback_days": {
+                "type": "integer",
+                "description": "window ending at the prediction date; default 540",
+            }
+        },
+    ),
+    _fn(
+        "check_going_concern",
+        "Search the latest 10-K/10-Q for auditor going-concern doubt and material "
+        "weakness. The most direct written statement of distress a filing holds.",
         {},
     ),
     _fn(
