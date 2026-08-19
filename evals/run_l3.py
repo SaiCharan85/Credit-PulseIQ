@@ -28,6 +28,7 @@ from evals.backtest import (
     grade,
     reliability_curve,
     run_backtest,
+    save_results,
     stratified_sample,
 )
 from models.hazard import AltmanBaseline, HazardBaseline
@@ -37,6 +38,7 @@ from models.panel import load_panel, split_by_date
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--panel", type=Path, default=Path("data/cache/panel.csv"))
+    parser.add_argument("--results", type=Path, default=Path("data/cache/l3_results.csv"))
     parser.add_argument("--cutoff", type=date.fromisoformat, default=date(2024, 6, 1))
     parser.add_argument("--agent", choices=("rules", "react"), default="rules")
     parser.add_argument("--limit", type=int, default=0, help="cap test cases (0 = all)")
@@ -153,6 +155,8 @@ def main(argv: list[str] | None = None) -> int:
         print("\nno cases completed", file=sys.stderr)
         return 3
     assert_no_lookahead(results)
+    save_results(results, args.results)
+    print(f"per-case results -> {args.results}", file=sys.stderr)
 
     # A quota stop yields a partial run. Report it as such rather than
     # discarding it: metrics computed over positives stay valid on a subset.

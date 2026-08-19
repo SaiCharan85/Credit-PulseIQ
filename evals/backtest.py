@@ -467,6 +467,40 @@ def run_backtest(
     return results
 
 
+def save_results(results: Sequence[CaseResult], path) -> None:
+    """Persist per-case outcomes for post-hoc analysis.
+
+    Needed to answer questions the aggregate cannot: when the agent can see a
+    baseline score, does its own score merely track it, or diverge on evidence?
+    An agent that echoes the baseline reproduces its AUC and adds nothing, and
+    the summary metrics look identical either way.
+    """
+    import csv
+    from pathlib import Path as _P
+
+    path = _P(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf8", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow([
+            "cik", "as_of", "label", "days_to_event", "signal", "confidence",
+            "risk_score", "risk_probability", "steps", "terminated_because",
+            "verification_passed", "tools_called", "baseline_seen",
+        ])
+        for r in results:
+            trail = r.output.audit_trail
+            saw_baseline = any(c.get("tool") == "get_model_score" for c in trail)
+            w.writerow([
+                r.cik, r.as_of.isoformat(), r.label,
+                r.days_to_event if r.days_to_event is not None else "",
+                r.output.signal, r.output.confidence,
+                r.output.risk_score if r.output.risk_score is not None else "",
+                round(r.risk_probability, 4), r.output.steps_taken,
+                r.output.terminated_because, int(r.output.verification_passed),
+                "|".join(c.get("tool", "") for c in trail), int(saw_baseline),
+            ])
+
+
 def assert_no_lookahead(results: Sequence[CaseResult]) -> None:
     """Every cited figure must predate its own prediction date.
 
