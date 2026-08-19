@@ -508,6 +508,11 @@ def save_results(results: Sequence[CaseResult], path) -> None:
     baseline score, does its own score merely track it, or diverge on evidence?
     An agent that echoes the baseline reproduces its AUC and adds nothing, and
     the summary metrics look identical either way.
+
+    The rationale, the residual and the cited evidence are written alongside
+    the score. For a system whose product is the *explanation*, keeping only
+    the number would discard the deliverable and leave no way to ask afterwards
+    why a case was called the way it was.
     """
     import csv
     from pathlib import Path as _P
@@ -520,6 +525,7 @@ def save_results(results: Sequence[CaseResult], path) -> None:
             "cik", "as_of", "label", "days_to_event", "signal", "confidence",
             "risk_score", "risk_probability", "steps", "terminated_because",
             "verification_passed", "tools_called", "baseline_seen",
+            "rationale", "residual", "evidence",
         ])
         for r in results:
             trail = r.output.audit_trail
@@ -532,6 +538,13 @@ def save_results(results: Sequence[CaseResult], path) -> None:
                 round(r.risk_probability, 4), r.output.steps_taken,
                 r.output.terminated_because, int(r.output.verification_passed),
                 "|".join(c.get("tool", "") for c in trail), int(saw_baseline),
+                r.output.rationale,
+                r.output.residual,
+                " | ".join(
+                    f"{e.metric}={e.value}"
+                    + (f"@{e.period_end.isoformat()}" if e.period_end else "")
+                    for e in r.output.evidence
+                ),
             ])
 
 
