@@ -508,78 +508,79 @@ def _fn(name: str, description: str, properties: dict, required: list[str] | Non
     }
 
 
-_PERIOD = {
-    "type": "string",
-    "description": 'Fiscal period: "latest", "latest-1", "latest-2", or an ISO date.',
-}
-_METRIC = {"type": "string", "description": "Metric name, e.g. current_ratio."}
+_PERIOD = {"type": "string", "description": '"latest", "latest-1", or ISO date.'}
+_METRIC = {"type": "string", "description": "e.g. current_ratio"}
+
+def tool_schemas(with_baseline: bool = False) -> list[dict[str, Any]]:
+    """Schemas to send. Omits the baseline tool unless asked for.
+
+    An unused schema is pure token cost on every step of every case, and
+    tokens-per-minute is the binding rate limit.
+    """
+    return [
+        t for t in TOOL_SCHEMAS
+        if with_baseline or t["function"]["name"] != "get_model_score"
+    ]
+
 
 TOOL_SCHEMAS: list[dict[str, Any]] = [
-    _fn("available_periods", "Fiscal periods visible at the prediction date.", {}),
+    _fn("available_periods", "Fiscal periods you can see.", {}),
     _fn(
         "get_metric",
-        "A computed ratio or score with provenance. The only source of numbers.",
+        "A ratio or score. Your only source of numbers.",
         {"metric": _METRIC, "period": _PERIOD},
         ["metric"],
     ),
     _fn(
         "get_trend",
-        "A metric across recent fiscal years, with direction and change.",
+        "A metric across recent years.",
         {"metric": _METRIC, "n_periods": {"type": "integer", "description": "2-6 years."}},
         ["metric"],
     ),
     _fn(
         "get_line_item",
-        "A raw XBRL line item, e.g. total_assets, revenue, long_term_debt.",
+        "A raw filing value, e.g. total_assets.",
         {"concept": {"type": "string"}, "period": _PERIOD},
         ["concept"],
     ),
     _fn(
         "get_peer_comparison",
-        "Percentile against sector peers at the same vintage.",
+        "Percentile vs sector peers.",
         {"metric": _METRIC, "period": _PERIOD},
         ["metric"],
     ),
     _fn(
         "check_threshold",
-        "Compare a metric against reference distress levels; fetches the value itself.",
+        "Compare a metric to reference levels.",
         {"metric": _METRIC},
         ["metric"],
     ),
     _fn(
         "get_prior_distress_events",
-        "Distress signals already public at the prediction date.",
+        "Distress signals already public.",
         {},
     ),
     _fn(
         "get_model_score",
-        "A statistical baseline's estimated distress probability for this filer, "
-        "fitted on historical outcomes before the prediction date. One opinion "
-        "among your evidence, not an answer: weigh it against what you observe, "
-        "and say so if you disagree.",
+        "A statistical baseline's distress probability. One opinion, not an answer.",
         {},
     ),
     _fn(
         "finish",
-        "Conclude the investigation. Call this when you have enough evidence, "
-        "or when you do not and should abstain.",
+        "Conclude. Call when you have enough evidence, or know you cannot get it.",
         {
             "signal": {
                 "type": "string",
                 "enum": ["healthy", "watch", "elevated_risk", "severe_risk",
                          "insufficient_evidence"],
             },
-            "confidence": {"type": "number", "description": "0.0-1.0. Cap at 0.6 if residual is set."},
+            "confidence": {"type": "number", "description": "0.0-1.0. Max 0.6 if residual set."},
             "risk_score": {
                 "type": "number",
-                "description": (
-                    "0-100 probability this filer petitions within 12 months. "
-                    "Use the full range and be granular: two companies both in "
-                    "severe distress should not receive the same score."
-                ),
+                "description": "0-100 chance of a petition within 12 months. Be granular.",
             },
             "rationale": {"type": "string"},
-            "residual": {"type": "string", "description": "What remains unexplained."},
+            "residual": {"type": "string", "description": "What is unexplained."},
             "evidence": {
                 "type": "array",
                 "items": {

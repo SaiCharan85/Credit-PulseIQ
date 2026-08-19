@@ -274,9 +274,23 @@ class CachingClient:
         self.cache_dir = Path(self.cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
-    def _key(self, messages: Sequence[dict[str, str]]) -> str:
+    def _key(self, messages: Sequence[dict[str, str]], tools: Any = None) -> str:
+        """Hash the model, the conversation, and the tools that were offered.
+
+        The tool list belongs in the key. Without it, toggling a tool on or off
+        while leaving the prompt untouched is invisible to the cache, so an
+        arm run *without* the baseline tool would silently replay completions
+        generated *with* it -- the two arms would differ only in the flag, not
+        in the answers. That is the exact contamination this cache exists to
+        make impossible, so the schema names are part of the identity.
+        """
+        names = sorted(t.get("function", {}).get("name", "") for t in (tools or []))
         payload = json.dumps(
-            {"model": getattr(self.inner, "name", ""), "messages": list(messages)},
+            {
+                "model": getattr(self.inner, "name", ""),
+                "messages": list(messages),
+                "tools": names,
+            },
             sort_keys=True,
         )
         return hashlib.sha256(payload.encode("utf8")).hexdigest()[:32]
@@ -294,7 +308,7 @@ class CachingClient:
 
     def complete_call(self, messages, tools=None, **kwargs):
         """Cache native tool calls too, keyed by the same conversation hash."""
-        key = self._key(messages) + ("_t" if tools else "")
+        key = self._key(messages, tools) + ("_t" if tools else "")
         path = self.cache_dir / f"{key}.json"
         if path.exists():
             self.hits += 1

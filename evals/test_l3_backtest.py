@@ -120,10 +120,25 @@ class TestFalseConfidence:
 
 
 class TestCalibrationMapping:
-    def test_benign_confidence_inverts_to_risk(self) -> None:
-        """The agent states confidence in its assessment, not P(bankruptcy)."""
-        assert case(0, SIGNAL_HEALTHY, 0.9).risk_probability == pytest.approx(0.1)
-        assert case(1, SIGNAL_SEVERE, 0.9).risk_probability == pytest.approx(0.9)
+    def test_signal_order_is_preserved(self) -> None:
+        """Each verdict maps into its own band, so the four levels stay ordered.
+
+        The previous mapping used only direction -- `confidence if flags_risk
+        else 1 - confidence` -- which scored "watch at 0.9" identically to
+        "healthy at 0.9". Four verdicts collapsed to two numbers, and the ties
+        cost AUC the model had actually earned.
+        """
+        healthy = case(0, SIGNAL_HEALTHY, 0.9).risk_probability
+        watch = case(0, SIGNAL_WATCH, 0.9).risk_probability
+        elevated = case(1, SIGNAL_ELEVATED, 0.9).risk_probability
+        severe = case(1, SIGNAL_SEVERE, 0.9).risk_probability
+        assert healthy < watch < elevated < severe
+
+    def test_confidence_positions_within_the_band(self) -> None:
+        """A confident healthy call is less risky than a hesitant one."""
+        assert case(0, SIGNAL_HEALTHY, 0.9).risk_probability < case(
+            0, SIGNAL_HEALTHY, 0.4
+        ).risk_probability
 
     def test_abstention_is_neutral(self) -> None:
         assert case(1, SIGNAL_INSUFFICIENT, 0.0).risk_probability == pytest.approx(0.5)

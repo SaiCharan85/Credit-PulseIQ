@@ -559,14 +559,16 @@ class TestRiskScoreAndBaseline:
         case = CaseResult(cik=1, as_of=BEFORE_BANKRUPTCY, label=1, days_to_event=10, output=out)
         assert case.risk_probability == pytest.approx(0.93)
 
-    def test_confidence_mapping_still_applies_without_a_score(self) -> None:
-        from evals.backtest import CaseResult
+    def test_band_mapping_applies_without_a_score(self) -> None:
+        """Falls back to the ordinal band, not the old direction-only mapping."""
+        from evals.backtest import SIGNAL_BANDS, CaseResult
 
         out = InvestigatorOutput(
             cik=1, as_of=BEFORE_BANKRUPTCY, signal=SIGNAL_HEALTHY, confidence=0.9
         )
         case = CaseResult(cik=1, as_of=BEFORE_BANKRUPTCY, label=0, days_to_event=None, output=out)
-        assert case.risk_probability == pytest.approx(0.1)
+        low, high = SIGNAL_BANDS[SIGNAL_HEALTHY]
+        assert low <= case.risk_probability <= high
 
     def test_risk_score_breaks_ties_the_signal_cannot(self) -> None:
         """Two severe calls at equal confidence must be rankable."""

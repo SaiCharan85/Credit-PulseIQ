@@ -31,7 +31,7 @@ from evals.backtest import (
     save_results,
     stratified_sample,
 )
-from models.hazard import AltmanBaseline, HazardBaseline
+from models.hazard import AltmanBaseline, HazardBaseline, roc_auc
 from models.panel import load_panel, split_by_date
 
 
@@ -112,7 +112,7 @@ def main(argv: list[str] | None = None) -> int:
         if not args.no_cache:
             # Cache outside the limiter: a cache hit costs no quota.
             client = CachingClient(inner=client)
-        investigator = DistressInvestigator(client)
+        investigator = DistressInvestigator(client, with_baseline=args.with_baseline)
         label = f"ReAct investigator ({client.name})"
     else:
         investigator = RuleBasedInvestigator()
@@ -180,10 +180,49 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
 
-    print("\n=== deterministic baselines on the same test split ===", file=sys.stderr)
-    print(f"  Tier 0 Altman Z'' : {AltmanBaseline().evaluate(test).summary()}", file=sys.stderr)
-    hazard = HazardBaseline().fit(train)
-    print(f"  Tier 1 hazard     : {hazard.evaluate(test).summary()}", file=sys.stderr)
+    # Score the baselines on *exactly* the rows the agent was graded on.
+    #
+    # Two ways this silently stopped being an apples-to-apples comparison:
+    #
+    # 1. The agent's AUC is computed over non-abstained cases only, because an
+    #    abstention has no probability to rank. The baselines never abstain. So
+    #    scoring them on the full split let the agent drop the cases it found
+    #    hardest and keep the easy ones -- self-selection that flatters it.
+    # 2. A run stopped by quota or outage grades a subset, while the baselines
+    #    still saw every row. Different cases, so the difference partly
+    #    measures which cases each side got.
+    #
+    # Both are fixed by matching on (cik, as_of) and reporting two arms.
+    by_key = {(r.cik, r.observation_date): r for r in test}
+    graded_cases = [c for c in results if not c.abstained]
+    graded_rows = [by_key[(c.cik, c.as_of)] for c in graded_cases]
+    completed_rows = [by_key[(c.cik, c.as_of)] for c in results]
+
+    altman, hazard = AltmanBaseline(), HazardBaseline().fit(train)
+    print(
+        f"\n=== baselines on the IDENTICAL {len(graded_rows)} graded cases ===",
+        file=sys.stderr,
+    )
+    agent_auc = f"{report.auc:.4f}" if report.auc is not None else "n/a"
+    print(f"  agent {args.agent:<11}: auc={agent_auc}", file=sys.stderr)
+    print(f"  Tier 0 Altman Z'' : {altman.evaluate(graded_rows).summary()}", file=sys.stderr)
+    print(f"  Tier 1 hazard     : {hazard.evaluate(graded_rows).summary()}", file=sys.stderr)
+
+    # Abstention must not be a free pass. Here every completed case counts, and
+    # an abstention is scored as the uninformative 0.5 it is. This is the
+    # stricter number, and the honest headline.
+    if len(completed_rows) > len(graded_rows):
+        y = [c.label for c in results]
+        agent_auc_all = roc_auc(y, [c.risk_probability for c in results])
+        print(
+            f"\n=== all {len(results)} completed cases "
+            f"(abstentions scored 0.5, not dropped) ===",
+            file=sys.stderr,
+        )
+        print(f"  agent {args.agent:<11}: auc={agent_auc_all:.4f}", file=sys.stderr)
+        print(f"  Tier 0 Altman Z'' : {altman.evaluate(completed_rows).summary()}", file=sys.stderr)
+        print(f"  Tier 1 hazard     : {hazard.evaluate(completed_rows).summary()}", file=sys.stderr)
+
     print(
         "\nAUC is comparable across rows; precision/recall are not directly "
         "comparable, because the agent may abstain and the baselines never do.",

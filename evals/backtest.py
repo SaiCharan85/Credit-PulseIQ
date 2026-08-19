@@ -46,6 +46,17 @@ from models.panel import PanelRow
 #: Confidence at or above which a benign call counts as *false confidence*.
 FALSE_CONFIDENCE_THRESHOLD = 0.7
 
+#: Probability band each ordinal signal maps into, before confidence positions
+#: the verdict within it. Preserves the ordering healthy < watch <
+#: elevated < severe, which a direction-only mapping discards.
+SIGNAL_BANDS: dict[str, tuple[float, float]] = {
+    "healthy": (0.00, 0.20),
+    "watch": (0.20, 0.45),
+    "elevated_risk": (0.45, 0.75),
+    "severe_risk": (0.75, 1.00),
+    "insufficient_evidence": (0.50, 0.50),
+}
+
 
 class Investigator(Protocol):
     def run(self, cik: int, as_of: date, facts: Sequence[Any], **kwargs: Any) -> InvestigatorOutput: ...
@@ -97,7 +108,21 @@ class CaseResult:
             return 0.5
         if self.output.risk_score is not None:
             return self.output.risk_score / 100.0
-        return self.output.confidence if self.predicted_positive else 1.0 - self.output.confidence
+        # Place the verdict inside its signal's band, then position it within
+        # that band by confidence.
+        #
+        # The previous mapping used only the *direction* of the signal --
+        # `confidence if flags_risk else 1 - confidence` -- which scored
+        # "watch at 0.9" identically to "healthy at 0.9", and "severe" the same
+        # as "elevated". Four verdicts collapsed to two numbers, and the ties
+        # cost AUC that the model had actually earned.
+        low, high = SIGNAL_BANDS[self.output.signal]
+        within = (
+            self.output.confidence
+            if self.predicted_positive
+            else 1.0 - self.output.confidence
+        )
+        return low + (high - low) * within
 
 
 @dataclass

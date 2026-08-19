@@ -37,7 +37,7 @@ from agents.schemas import (
     Evidence,
     InvestigatorOutput,
 )
-from agents.tools import TOOL_SCHEMAS, ToolBox
+from agents.tools import ToolBox, tool_schemas
 
 #: Each step resends the whole conversation plus the tool schemas, so the token
 #: cost is roughly quadratic in step count and linear in prompt size. Observed
@@ -61,37 +61,30 @@ TERMINATED_BUDGET = "step_budget_exhausted"
 TERMINATED_RETRIES = "retries_exhausted"
 TERMINATED_MALFORMED = "unparseable_response"
 
+# Every token here is resent on every step of every case. Measured: fixed
+# per-call overhead was 62% of total token spend, and tokens-per-minute is the
+# binding rate limit -- so prompt length, not model latency, sets the wall clock.
 SYSTEM_PROMPT = """\
-You are a credit-distress investigator examining one public company from its \
-SEC filings. You produce an evidence-cited risk assessment for a human analyst.
+You are a credit-distress investigator. From SEC filings, judge how likely one \
+company is to file for bankruptcy within 12 months, for a human analyst.
 
-HARD RULES
-1. You never do arithmetic. Every number you state must come from a tool call. \
-Do not add, divide, or estimate figures yourself.
-2. You assess risk. You never recommend an action: no buy/sell, no lending \
-decision, no price target.
-3. You only know what the tools return. They are already restricted to filings \
-public at the prediction date; there is no way to ask for later data.
-4. If the evidence does not support a conclusion, answer \
-"insufficient_evidence". That is a valid, respected outcome -- a confident \
-wrong answer is far worse than an honest abstention.
+RULES
+1. Never do arithmetic. Every number must come from a tool.
+2. Assess risk; never recommend an action.
+3. Tools already exclude anything filed after the prediction date.
+4. If evidence is genuinely insufficient, finish with insufficient_evidence. \
+A confident wrong answer is far worse than an honest abstention.
 
-HOW TO WORK
-Investigate iteratively. Form a hypothesis, call ONE tool, read the result, and \
-let it decide your next call. Follow up on what looks wrong: if leverage is \
-high, check coverage and liquidity; if a metric is undefined, try a related one \
-or a different period. Do not call tools at random, and do not stop after one.
+METHOD
+Form a hypothesis, call ONE tool, read it, let the result choose your next call. \
+Chase what looks wrong. An uncomputable metric is itself a finding -- distress \
+removes tags. Most discriminating: quick_ratio, liabilities_to_assets, \
+ohlson_o_score, return_on_assets, interest_coverage.
 
-Call finish when you have enough evidence, or when you are sure you cannot get \
-it. "period" accepts "latest", "latest-1", "latest-2", or an ISO date. \
-signal is one of: healthy, watch, elevated_risk, severe_risk, \
-insufficient_evidence. confidence is 0.0-1.0 and must reflect real \
-uncertainty; keep it at or below 0.6 if you report a residual.
-
-If tool calling is unavailable, reply with one JSON object instead:
-{"action": "call_tool", "tool": "get_metric", "arguments": {"metric": "..."}}
-or {"action": "finish", "signal": "...", "confidence": 0.7, "rationale": "...", \
-"evidence": [{"metric": "...", "value": 0.0}]}
+Finish when you have enough, or know you cannot get it. risk_score is 0-100 and \
+is what you are ranked on: be granular, use the whole range, and never give two \
+different companies the same score. confidence is 0.0-1.0, max 0.6 if you report \
+a residual.
 """
 
 USER_TEMPLATE = """\
@@ -109,11 +102,13 @@ class DistressInvestigator:
     def __init__(
         self,
         client: LLMClient,
+        with_baseline: bool = False,
         max_steps: int = MAX_STEPS,
         max_retries: int = MAX_RETRIES,
         on_step: Callable[[int, dict[str, Any]], None] | None = None,
     ) -> None:
         self.client = client
+        self._schemas = tool_schemas(with_baseline)
         self.max_steps = max_steps
         self.max_retries = max_retries
         self.on_step = on_step
@@ -172,7 +167,7 @@ class DistressInvestigator:
                     }
                 )
 
-            completion = _dispatch_complete_call(self.client, messages, tools=TOOL_SCHEMAS)
+            completion = _dispatch_complete_call(self.client, messages, tools=self._schemas)
 
             # Native tool calls take precedence. Several models emit them
             # whatever the prompt says -- gpt-oss-20b called a tool natively
