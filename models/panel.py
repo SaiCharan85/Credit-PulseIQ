@@ -34,7 +34,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 
-from compute.lineitems import FactIndex, annual_period_ends
+from compute.lineitems import FactIndex, annual_period_ends, resolve
 from compute.ratios import compute_metric
 from compute.scores import compute_two_period_score
 from data.distress_events import SEVERITY, TIER_DEFAULT, DistressEvent, worst_tier_within
@@ -113,6 +113,7 @@ def build_firm_rows(
     dates: list[date],
     horizon_days: int = DEFAULT_HORIZON_DAYS,
     min_history_days: int = 400,
+    min_total_assets: float = 0.0,
     features: list[str] | None = None,
     two_period: list[str] | None = None,
 ) -> list[PanelRow]:
@@ -149,6 +150,15 @@ def build_firm_rows(
         # read, and its silence is captured by the ladder instead.
         if (obs - latest).days > min_history_days + 365:
             continue
+
+        # Size floor. A credit desk does not screen shells, and the broad
+        # filer population is dominated by them by count -- going-concern
+        # language appears in 41.7% of them, which is why signals that
+        # discriminate among real companies say nothing across all filers.
+        if min_total_assets > 0:
+            ref = resolve("total_assets", view, latest)
+            if ref is None or float(ref.value) < min_total_assets:
+                continue
 
         prior = period_ends[1] if len(period_ends) > 1 else None
 

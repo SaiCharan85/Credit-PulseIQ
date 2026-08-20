@@ -103,6 +103,34 @@ _WARRANT_GUIDANCE = re.compile(
 )
 
 
+#: Language saying the restatement *reduced* previously reported results.
+#:
+#: "Restatement" otherwise lumps deliberate manipulation together with honest
+#: clerical error and neutral reclassification. Errors are close to
+#: unpredictable by construction, so they act as a noise floor no model can
+#: beat. A restatement that cuts reported earnings is the one that is both an
+#: accounting-quality failure and a credit event.
+_INCOME_DECREASING = re.compile(
+    r"overstat"
+    r"|understat\w*\s+(?:its\s+)?(?:net\s+)?loss"
+    r"|(?:decreas|reduc|lower)\w*[^.]{0,80}?"
+    r"(?:net\s+income|revenue|earnings|retained\s+earnings)"
+    r"|(?:net\s+income|revenue|earnings)[^.]{0,80}?(?:decreas|reduc|lower)\w*"
+    r"|increas\w*[^.]{0,60}?(?:net\s+loss|accumulated\s+deficit)",
+    re.I,
+)
+
+
+def is_income_decreasing(text: str) -> bool:
+    """Whether the filing says results were overstated or will be reduced.
+
+    Deliberately conservative: absence of the language is treated as unknown
+    rather than as "increased", because many 8-Ks state only that statements
+    cannot be relied upon and leave the direction to the amended filing.
+    """
+    return bool(_INCOME_DECREASING.search(text))
+
+
 @dataclass(frozen=True)
 class RestatementCandidate:
     """One 8-K item 4.02 event, classified but not yet promoted to a label."""

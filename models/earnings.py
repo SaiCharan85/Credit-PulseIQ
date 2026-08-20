@@ -121,6 +121,7 @@ def build_eq_rows(
     events: list[DistressEvent],
     dates: list[date],
     horizon_days: int = 365,
+    min_total_assets: float = 0.0,
 ) -> list[PanelRow]:
     """Rows for one filer, labelled by whether a restatement follows.
 
@@ -134,6 +135,7 @@ def build_eq_rows(
     if not mine:
         return build_firm_rows(
             facts, cik, [], dates, horizon_days,
+            min_total_assets=min_total_assets,
             features=list(EQ_FEATURES), two_period=list(EQ_TWO_PERIOD),
         )
 
@@ -147,6 +149,7 @@ def build_eq_rows(
         ]
         for r in build_firm_rows(
             facts, cik, [event], window, horizon_days,
+            min_total_assets=min_total_assets,
             features=list(EQ_FEATURES), two_period=list(EQ_TWO_PERIOD),
         ):
             if r.observation_date not in seen:
@@ -158,6 +161,7 @@ def build_eq_rows(
     rows.extend(
         build_firm_rows(
             facts, cik, [], rest, horizon_days,
+            min_total_assets=min_total_assets,
             features=list(EQ_FEATURES), two_period=list(EQ_TWO_PERIOD),
         )
     )

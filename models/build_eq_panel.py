@@ -64,6 +64,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--index-cache", type=Path, default=Path("data/cache/fullindex"))
     ap.add_argument("--out", type=Path, default=Path("data/cache/eq_panel_wide.csv"))
     ap.add_argument("--negatives", type=int, default=1500, help="negative filers to sample")
+    ap.add_argument(
+        "--min-total-assets",
+        type=float,
+        default=0.0,
+        help="size floor at the observation date, e.g. 100e6",
+    )
     ap.add_argument("--start", type=date.fromisoformat, default=date(2019, 1, 1))
     ap.add_argument("--end", type=date.fromisoformat, default=date(2025, 7, 1))
     args = ap.parse_args(argv)
@@ -97,7 +103,7 @@ def main(argv: list[str] | None = None) -> int:
         except Exception:  # noqa: BLE001 - an unavailable filer is skipped, not fatal
             missing += 1
             continue
-        rows.extend(build_eq_rows(facts, cik, events, dates))
+        rows.extend(build_eq_rows(facts, cik, events, dates, min_total_assets=args.min_total_assets))
         if n % 100 == 0:
             pos = sum(r.label for r in rows)
             print(f"  {n}/{len(ciks)} filers  rows={len(rows)}  pos={pos}", file=sys.stderr)
