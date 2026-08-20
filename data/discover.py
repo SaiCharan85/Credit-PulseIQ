@@ -167,10 +167,17 @@ def _quarters(start: date, end: date) -> Iterator[tuple[date, date]]:
         cur = nxt
 
 
-def _fts_page(user_agent: str, start: date, end: date, offset: int, timeout: int = 45) -> dict:
+def _fts_page(
+    user_agent: str,
+    start: date,
+    end: date,
+    offset: int,
+    timeout: int = 45,
+    q: str = FTS_QUERY,
+) -> dict:
     query = urllib.parse.urlencode(
         {
-            "q": FTS_QUERY,
+            "q": q,
             "forms": "8-K",
             "startdt": start.isoformat(),
             "enddt": end.isoformat(),
@@ -183,15 +190,25 @@ def _fts_page(user_agent: str, start: date, end: date, offset: int, timeout: int
 
 
 def sweep_full_text(
-    start: date, end: date, user_agent: str, pause: float = 0.12, verbose: bool = True
+    start: date,
+    end: date,
+    user_agent: str,
+    pause: float = 0.12,
+    verbose: bool = True,
+    q: str = FTS_QUERY,
 ) -> dict[int, dict[str, str]]:
-    """Earliest bankruptcy-language 8-K per filer in the window."""
+    """Earliest 8-K per filer matching ``q`` in the window.
+
+    ``q`` is a parameter so the earnings-quality leg can sweep for
+    non-reliance language with the same paging, quarter-chunking and
+    result-cap handling, rather than growing a second copy that drifts.
+    """
     earliest: dict[int, dict[str, str]] = {}
     for window_start, window_end in _quarters(start, end):
         offset = 0
         total = 0
         while True:
-            payload = _fts_page(user_agent, window_start, window_end, offset)
+            payload = _fts_page(user_agent, window_start, window_end, offset, q=q)
             hits = payload["hits"]["hits"]
             total = payload["hits"]["total"]["value"]
             if not hits:
