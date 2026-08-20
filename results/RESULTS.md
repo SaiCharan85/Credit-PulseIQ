@@ -1,3 +1,69 @@
+# Results
+
+Two backtests over the **same** 200 test cases (100 Chapter 11 filings, 100
+survivors), prediction dates from 2024-07-01, temporal cutoff 2024-06-01,
+`gemma-4-31b-it` in a ReAct loop. The only difference between them is which
+tools the agent could call, so any change is attributable to the tools and not
+to the sample.
+
+## Headline
+
+| arm | AUC | false-confidence | ECE | F1 |
+| --- | --- | --- | --- | --- |
+| Backtest 1 — agent, financial ratios only | 0.881 | 0.250 | 0.135 | 0.753 |
+| **Backtest 2 — agent, + filing-text tools** | **0.965** | **0.080** | **0.081** | **0.883** |
+| Tier 0 — Altman Z'' | 0.885 | - | 0.141 | - |
+| Tier 1 — discrete-time hazard | 0.966 | - | 0.101 | - |
+
+Paired bootstrap, 8,000 resamples, 200 identical cases:
+
+```
+tools effect    : +0.0841   95% CI [+0.0484, +0.1246]   -> REAL
+agent vs hazard : -0.0017   95% CI [-0.0262, +0.0225]   -> tie
+```
+
+**Giving the agent evidence a ratio model cannot read is worth +0.084 AUC.**
+That closed a clear loss to the hazard baseline into a statistical tie, and cut
+the catastrophic-error rate by a factor of three.
+
+**It does not beat the baseline.** The point estimate is fractionally below and
+the interval spans zero. Parity with an auditable explanation is the claim the
+evidence supports; superiority is not.
+
+## Why it improved — the mechanism
+
+| | count |
+| --- | --- |
+| bankruptcies missed in backtest 1, caught in backtest 2 | 27 |
+| bankruptcies caught in backtest 1, missed in backtest 2 | 0 |
+| of the 27 rescued, carrying a text/event signal | 26 (96%) |
+
+No trade-off: 27 misses became catches and nothing regressed. The agent's
+failure mode was never subtle reasoning error, it was *blindness* -- it spent
+~12 steps investigating a set of inputs that did not contain the answer for a
+quarter of the bankruptcies. You cannot reason your way to a covenant breach
+from a current ratio.
+
+The control matters as much as the effect. CIK 1498710 moved 0.42 -> 0.48 with
+no signals found: where there was nothing new to read, the verdict barely
+changed. Had the tools merely made the model more alarmist, every score would
+have risen and precision would have collapsed. Instead precision *rose*, 0.795
+-> 0.870. Scores moved where evidence existed and nowhere else.
+
+Representative rescues:
+
+| company | before | after | what it found |
+| --- | --- | --- | --- |
+| CIK 1584754 | 0.05 | 0.95 | delisting notice, going-concern doubt |
+| CIK 867773 | 0.27 | 0.98 | late filing, covenant breach, delisting, restatement, going concern, material weakness |
+| CIK 1391127 | 0.38 | 0.98 | six signals |
+
+CIK 867773 is the case worth pointing at: the hazard model scored it **0.47, a
+pass**, while six separate alarms sat in filings public before the prediction
+date.
+
+---
+
 # Backtest 1 — the agent's own reasoning, measured
 
 200 test cases (100 Chapter 11 filings, 100 survivors), prediction dates from
@@ -83,6 +149,7 @@ rather than the data.
 
 | file | contents |
 | --- | --- |
-| `backtest1_agent_200cases.csv` | per-case verdicts, scores, tool sequences |
-| `backtest1_run.log` | full harness output including reliability curve |
+| `backtest1_agent_200cases.csv` | ratios only: per-case verdicts, scores, tool sequences |
+| `backtest2_agent_200cases.csv` | + filing-text tools: same, plus rationale and cited evidence |
+| `backtest1_run.log`, `backtest2_run.log` | full harness output including reliability curves |
 | `signal_probe_200cases.csv` | the eight text/event signals per case |

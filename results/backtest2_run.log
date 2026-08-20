@@ -1,0 +1,41 @@
+=== old-tools arm finished 13:12; starting signals arm ===
+stratified: 100 positives + 100/1117 negatives (fraction 0.090); precision is base-rate corrected
+L3 backtest: ReAct investigator (cached:ratelimited:openai-compatibl  25/200
+  50/200
+  75/200
+  100/200
+  125/200
+  150/200
+  175/200
+  200/200
+per-case results -> data\cache\l3_signals.csv
+
+=== L3: ReAct investigator (cached:ratelimited:openai-compatible:gemma-4-31b-it) ===
+cases                 200  (positives 100)
+abstained             3  (1.5%)  honest 0 / protocol-failure 3
+precision / recall    0.870 / 0.897   F1 0.883  [base-rate corrected 0.375]
+median lead time      155 days
+FALSE-CONFIDENCE RATE 0.080  (8/100)
+calibration (ECE)     0.081    AUC 0.967
+mean steps / calls    10.7 / 10.6
+verification failures 0
+signals               {'elevated_risk': 21, 'healthy': 78, 'insufficient_evidence': 3, 'severe_risk': 79, 'watch': 19}
+
+  reliability curve (confidence -> observed failure rate):
+    [0.0-0.2)  n=   78  stated=0.06  observed=0.01
+    [0.2-0.4)  n=   19  stated=0.26  observed=0.47
+    [0.4-0.6)  n=   14  stated=0.51  observed=0.43
+    [0.6-0.8)  n=   14  stated=0.75  observed=0.79
+    [0.8-1.0)  n=   72  stated=0.90  observed=0.97
+
+=== baselines on the IDENTICAL 197 graded cases ===
+  agent react      : auc=0.9668
+  Tier 0 Altman Z'' : n=197  positives=97  base_rate=0.4924  AUC=0.887  Brier=0.1435  ECE=0.1462  P@10=1.000  P@25=0.960  P@50=0.940  P@100=0.820
+  Tier 1 hazard     : n=197  positives=97  base_rate=0.4924  AUC=0.966  Brier=0.0861  ECE=0.1002  P@10=1.000  P@25=1.000  P@50=1.000  P@100=0.870
+
+=== all 200 completed cases (abstentions scored 0.5, not dropped) ===
+  agent react      : auc=0.9647
+  Tier 0 Altman Z'' : n=200  positives=100  base_rate=0.5000  AUC=0.885  Brier=0.1433  ECE=0.1410  P@10=1.000  P@25=0.960  P@50=0.960  P@100=0.840
+  Tier 1 hazard     : n=200  positives=100  base_rate=0.5000  AUC=0.966  Brier=0.0855  ECE=0.1014  P@10=1.000  P@25=1.000  P@50=1.000  P@100=0.870
+
+AUC is comparable across rows; precision/recall are not directly comparable, because the agent may abstain and the baselines never do.
