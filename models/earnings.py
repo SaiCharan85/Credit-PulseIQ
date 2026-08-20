@@ -33,6 +33,7 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
+from compute.scores import BENEISH_COMPONENTS
 from data.distress_events import DistressEvent
 from data.restatements import RestatementCandidate
 from models.panel import (
@@ -50,8 +51,18 @@ EQ_FEATURES: tuple[str, ...] = FEATURES + (
     "cash_conversion_cycle",
 )
 
-#: Beneish M needs two periods, like Ohlson and Piotroski.
-EQ_TWO_PERIOD: tuple[str, ...] = TWO_PERIOD_FEATURES + ("beneish_m_score",)
+#: Beneish M needs two periods, like Ohlson and Piotroski -- and so do its
+#: components, which are carried individually.
+#:
+#: The composite alone was computable on 17% of wide-panel rows: it returns
+#: nothing unless all eight terms resolve, so one untagged line item discards
+#: the other seven signals. Each term needs only its own inputs, and the
+#: panel's missingness indicators let a model use whatever a filer did tag.
+#: TATA is absent because it is arithmetically identical to
+#: ``accruals_to_assets``, already carried at 93% coverage.
+EQ_TWO_PERIOD: tuple[str, ...] = (
+    TWO_PERIOD_FEATURES + ("beneish_m_score",) + BENEISH_COMPONENTS
+)
 
 #: Beneish (1999): above this, the model classes a filer a likely manipulator.
 BENEISH_THRESHOLD = -1.78

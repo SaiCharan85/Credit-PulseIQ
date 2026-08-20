@@ -26,6 +26,7 @@ from math import log
 from compute import lineitems
 from compute.provenance import (
     UNIT_DAYS,
+    UNIT_RATIO,
     UNIT_SCORE,
     ComputedValue,
     FactRef,
@@ -387,6 +388,143 @@ def _ohlson(
 
 
 # --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+# Beneish components, individually
+# --------------------------------------------------------------------------
+#
+# The composite returns None if *any* of its eight terms is undefined, and on
+# the wide panel that is 83% of rows -- one untagged line item discards the
+# other seven signals. Exposed separately, each term needs only its own inputs
+# and the panel's missingness indicators let a model use whatever exists.
+#
+# TATA is deliberately absent: it is arithmetically identical to
+# ``accruals_to_assets``, which already exists and is computable on 93% of
+# rows. Registering it twice would double-count Beneish's heaviest term.
+
+
+@formula(
+    "beneish_dsri",
+    inputs=("receivables", "revenue", "receivables_prior", "revenue_prior"),
+    unit=UNIT_RATIO,
+    expression="(receivables/revenue) / (receivables_prior/revenue_prior)",
+)
+def _beneish_dsri(
+    receivables: float, revenue: float, receivables_prior: float, revenue_prior: float
+) -> float | None:
+    """Days Sales in Receivables Index. Receivables outrunning sales is the
+    classic revenue-recognition flag: revenue booked that has not been collected."""
+    a = safe_div(receivables, revenue)
+    b = safe_div(receivables_prior, revenue_prior)
+    return safe_div(a, b) if None not in (a, b) else None
+
+
+@formula(
+    "beneish_sgi",
+    inputs=("revenue", "revenue_prior"),
+    unit=UNIT_RATIO,
+    expression="revenue / revenue_prior",
+)
+def _beneish_sgi(revenue: float, revenue_prior: float) -> float | None:
+    """Sales Growth Index. Growth is not manipulation, but Beneish found high
+    growth creates the pressure and the cover for it."""
+    return safe_div(revenue, revenue_prior)
+
+
+@formula(
+    "beneish_gmi",
+    inputs=("revenue", "cost_of_revenue", "revenue_prior", "cost_of_revenue_prior"),
+    unit=UNIT_RATIO,
+    expression="gross_margin_prior / gross_margin",
+)
+def _beneish_gmi(
+    revenue: float, cost_of_revenue: float, revenue_prior: float, cost_of_revenue_prior: float
+) -> float | None:
+    """Gross Margin Index. Above 1 means margins deteriorated -- a negative
+    signal about prospects, and a motive."""
+    gm = safe_div(revenue - cost_of_revenue, revenue)
+    gmp = safe_div(revenue_prior - cost_of_revenue_prior, revenue_prior)
+    return safe_div(gmp, gm) if None not in (gm, gmp) else None
+
+
+@formula(
+    "beneish_aqi",
+    inputs=(
+        "total_assets", "current_assets", "ppe_net",
+        "total_assets_prior", "current_assets_prior", "ppe_net_prior",
+    ),
+    unit=UNIT_RATIO,
+    expression="soft_asset_share / soft_asset_share_prior",
+)
+def _beneish_aqi(
+    total_assets: float, current_assets: float, ppe_net: float,
+    total_assets_prior: float, current_assets_prior: float, ppe_net_prior: float,
+) -> float | None:
+    """Asset Quality Index. A rising share of assets that are neither current
+    nor PP&E suggests costs being capitalised rather than expensed."""
+    a = safe_div(total_assets - current_assets - ppe_net, total_assets)
+    b = safe_div(total_assets_prior - current_assets_prior - ppe_net_prior, total_assets_prior)
+    return safe_div(a, b) if None not in (a, b) else None
+
+
+@formula(
+    "beneish_depi",
+    inputs=(
+        "depreciation_amortization", "ppe_net",
+        "depreciation_amortization_prior", "ppe_net_prior",
+    ),
+    unit=UNIT_RATIO,
+    expression="depreciation_rate_prior / depreciation_rate",
+)
+def _beneish_depi(
+    depreciation_amortization: float, ppe_net: float,
+    depreciation_amortization_prior: float, ppe_net_prior: float,
+) -> float | None:
+    """Depreciation Index. Above 1 means the rate slowed -- useful lives
+    extended, which flatters earnings without touching cash."""
+    a = safe_div(depreciation_amortization, depreciation_amortization + ppe_net)
+    b = safe_div(
+        depreciation_amortization_prior, depreciation_amortization_prior + ppe_net_prior
+    )
+    return safe_div(b, a) if None not in (a, b) else None
+
+
+@formula(
+    "beneish_sgai",
+    inputs=("sga_expense", "revenue", "sga_expense_prior", "revenue_prior"),
+    unit=UNIT_RATIO,
+    expression="(sga/revenue) / (sga_prior/revenue_prior)",
+)
+def _beneish_sgai(
+    sga_expense: float, revenue: float, sga_expense_prior: float, revenue_prior: float
+) -> float | None:
+    """SG&A Index. Overhead rising faster than sales is a negative signal."""
+    a = safe_div(sga_expense, revenue)
+    b = safe_div(sga_expense_prior, revenue_prior)
+    return safe_div(a, b) if None not in (a, b) else None
+
+
+@formula(
+    "beneish_lvgi",
+    inputs=(
+        "long_term_debt", "current_liabilities", "total_assets",
+        "long_term_debt_prior", "current_liabilities_prior", "total_assets_prior",
+    ),
+    unit=UNIT_RATIO,
+    expression="leverage / leverage_prior",
+)
+def _beneish_lvgi(
+    long_term_debt: float, current_liabilities: float, total_assets: float,
+    long_term_debt_prior: float, current_liabilities_prior: float, total_assets_prior: float,
+) -> float | None:
+    """Leverage Index. Rising leverage tightens covenants, which is motive."""
+    a = safe_div(long_term_debt + current_liabilities, total_assets)
+    b = safe_div(
+        long_term_debt_prior + current_liabilities_prior, total_assets_prior
+    )
+    return safe_div(a, b) if None not in (a, b) else None
+
+
+# --------------------------------------------------------------------------
 # Builders
 # --------------------------------------------------------------------------
 
@@ -398,11 +536,22 @@ SINGLE_PERIOD_SCORES: tuple[str, ...] = (
     "cash_conversion_cycle",
 )
 
+#: Beneish's terms, usable individually where the composite is not.
+BENEISH_COMPONENTS: tuple[str, ...] = (
+    "beneish_dsri",
+    "beneish_sgi",
+    "beneish_gmi",
+    "beneish_aqi",
+    "beneish_depi",
+    "beneish_sgai",
+    "beneish_lvgi",
+)
+
 TWO_PERIOD_SCORES: tuple[str, ...] = (
     "piotroski_f_score",
     "beneish_m_score",
     "ohlson_o_score",
-)
+) + BENEISH_COMPONENTS
 
 ALL_SCORES: tuple[str, ...] = SINGLE_PERIOD_SCORES + TWO_PERIOD_SCORES
 
