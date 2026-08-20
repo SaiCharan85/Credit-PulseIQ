@@ -24,13 +24,23 @@ Three checks, because the item code alone is not trustworthy:
    over- and under-applied.
 2. **Filing text must describe this filer's own non-reliance** -- not a
    subsidiary's, not a boilerplate item header with no content.
-3. **Regulatory-reclassification restatements are excluded.** In April 2021 the
-   SEC ruled that SPAC warrants must be classified as liabilities, and
-   essentially every SPAC restated at once. Measured here: 38 of 177 events in
-   the universe fall in 2021, and 5 of 12 sampled were warrant reclassifications
-   clustered in April-July. Keeping them would teach a model to recognise "was a
-   SPAC in 2021" and call it earnings quality. They are a market-wide accounting
-   rule change, not a company-specific failure.
+3. **Regulatory-reclassification restatements are excluded** -- and there were
+   *two* waves, which is why this check is two rules rather than one.
+
+   In April 2021 the SEC ruled SPAC warrants must be classified as liabilities
+   and essentially every SPAC restated at once. Market-wide that is 598 of 2,008
+   events, 30%.
+
+   The second wave is the trap. In late 2021 SPACs were pressed to reclassify
+   Class A shares subject to possible redemption into temporary equity. It uses
+   no warrant language at all, so a warrant filter passes it through untouched:
+   after the first rule, 2021 still held 299 events against a 2019-2020 baseline
+   near 65, and 6 of 14 sampled survivors from 2021Q4-2022Q1 were this
+   reclassification, against 0 of 14 in a 2019-2020 control.
+
+   Both are market-wide accounting rule changes, not company-specific failures.
+   Keeping either would teach a model to recognise "was a SPAC in 2021" and
+   report it as earnings quality.
 
 Deterministic plain code -- no LLM (PROMPT hard rule 3).
 """
@@ -52,6 +62,7 @@ KEEP = "keep"
 REJECT_NO_TEXT = "no_filing_text"
 REJECT_NOT_OWN = "not_this_filer"
 REJECT_SPAC_WARRANT = "spac_warrant_reclassification"
+REJECT_SPAC_SHARES = "spac_share_reclassification"
 
 _NON_RELIANCE = re.compile(
     r"(should\s+no\s+longer\s+be\s+relied\s+upon"
@@ -63,10 +74,25 @@ _NON_RELIANCE = re.compile(
 )
 
 _WARRANT = re.compile(r"warrant", re.I)
+
+#: The *second* SPAC wave, and the one a warrant filter sails straight past.
+#: In late 2021 the SEC pressed SPACs to reclassify Class A shares subject to
+#: possible redemption out of permanent equity and into temporary equity.
+#: Measured: 6 of 14 sampled 2021Q4-2022Q1 events that survived the warrant
+#: check are this, against 0 of 14 in a 2019-2020 control.
+_REDEMPTION = re.compile(
+    r"subject\s+to\s+possible\s+redemption"
+    r"|temporary\s+equity"
+    r"|shares?\s+subject\s+to\s+redemption",
+    re.I,
+)
 _SPAC = re.compile(
     r"blank\s+check|special\s+purpose\s+acquisition|SPAC\b|initial\s+business\s+combination",
     re.I,
 )
+#: A trust account holding IPO proceeds is a SPAC structure and little else.
+_TRUST = re.compile(r"trust\s+account", re.I)
+
 #: The SEC statement that triggered the wave.
 _WARRANT_GUIDANCE = re.compile(
     r"(?:Staff\s+Statement|SEC\s+Statement)[^.]{0,120}?Warrant"
@@ -134,6 +160,18 @@ def is_spac_warrant_restatement(text: str) -> bool:
     return bool(_SPAC.search(text) or _WARRANT_GUIDANCE.search(text))
 
 
+def is_spac_share_reclassification(text: str) -> bool:
+    """Whether this is the late-2021 Class A share redemption reclassification.
+
+    Needs redemption-accounting language *and* SPAC framing. An operating
+    company with redeemable preferred stock also uses "temporary equity", and
+    restating that is a genuine accounting failure.
+    """
+    if not _REDEMPTION.search(text):
+        return False
+    return bool(_SPAC.search(text) or _TRUST.search(text))
+
+
 def classify(text: str) -> tuple[str, str]:
     """Judge one filing's text. Returns ``(verdict, supporting detail)``."""
     if not text or not text.strip():
@@ -144,6 +182,8 @@ def classify(text: str) -> tuple[str, str]:
         return REJECT_NOT_OWN, ""
     if is_spac_warrant_restatement(text):
         return REJECT_SPAC_WARRANT, "warrant reclassification per the 2021 SEC statement"
+    if is_spac_share_reclassification(text):
+        return REJECT_SPAC_SHARES, "Class A shares reclassified to temporary equity"
     lo = max(0, found.start() - 100)
     return KEEP, text[lo : found.end() + 200].strip()[:300]
 

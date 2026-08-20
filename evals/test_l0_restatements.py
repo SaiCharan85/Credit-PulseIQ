@@ -14,11 +14,13 @@ from data.restatements import (
     KEEP,
     REJECT_NO_TEXT,
     REJECT_NOT_OWN,
+    REJECT_SPAC_SHARES,
     REJECT_SPAC_WARRANT,
     classify,
     discover,
     find_non_reliance_filings,
     first_event_per_company,
+    is_spac_share_reclassification,
     is_spac_warrant_restatement,
 )
 
@@ -106,6 +108,43 @@ class TestClassification:
     def test_spac_detector_needs_more_than_the_word_warrant(self) -> None:
         assert is_spac_warrant_restatement("The Company issued warrants to a lender.") is False
         assert is_spac_warrant_restatement(SPAC) is True
+
+
+SPAC_SHARES = (
+    "The Company concluded its previously issued financial statements should no "
+    "longer be relied upon. All Class A ordinary shares subject to possible "
+    "redemption are reclassified to temporary equity. The Trust Account holds "
+    "the proceeds of the initial public offering."
+)
+REDEEMABLE_PREFERRED = (
+    "Previously issued financial statements should no longer be relied upon: the "
+    "Company misclassified its redeemable preferred stock within temporary equity "
+    "as a result of an error in analysing the redemption feature."
+)
+
+
+class TestSecondSpacWave:
+    """Late 2021: Class A shares reclassified to temporary equity.
+
+    Uses no warrant language, so the warrant rule passes it straight through.
+    After that rule alone, 2021 still held 299 events against a 2019-2020
+    baseline near 65.
+    """
+
+    def test_the_share_reclassification_wave_is_excluded(self) -> None:
+        assert classify(SPAC_SHARES)[0] == REJECT_SPAC_SHARES
+
+    def test_the_warrant_rule_alone_would_have_missed_it(self) -> None:
+        assert is_spac_warrant_restatement(SPAC_SHARES) is False
+        assert is_spac_share_reclassification(SPAC_SHARES) is True
+
+    def test_an_operating_company_temporary_equity_error_is_kept(self) -> None:
+        """Redeemable preferred also lives in temporary equity, and restating
+        it is a genuine accounting failure."""
+        assert classify(REDEEMABLE_PREFERRED)[0] == KEEP
+
+    def test_redemption_language_alone_is_not_enough(self) -> None:
+        assert is_spac_share_reclassification("shares subject to possible redemption") is False
 
 
 class TestDiscovery:
