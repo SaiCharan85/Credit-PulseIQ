@@ -113,12 +113,21 @@ def build_firm_rows(
     dates: list[date],
     horizon_days: int = DEFAULT_HORIZON_DAYS,
     min_history_days: int = 400,
+    features: list[str] | None = None,
+    two_period: list[str] | None = None,
 ) -> list[PanelRow]:
     """Rows for one firm across the observation grid.
 
     ``facts`` is the firm's full fact set; each row re-filters it to its own
     as-of view rather than trusting a pre-filtered input.
+
+    ``features``/``two_period`` default to the distress covariates. The
+    earnings-quality leg passes its own set -- notably Beneish M -- rather than
+    widening these, because adding a covariate here would silently change the
+    fitted hazard baseline the distress leg has already been measured against.
     """
+    features = FEATURES if features is None else features
+    two_period = TWO_PERIOD_FEATURES if two_period is None else two_period
     terminal = [e for e in events if e.cik == cik and e.tier == TIER_DEFAULT]
     event_date = min((e.event_date for e in terminal), default=None)
 
@@ -144,7 +153,7 @@ def build_firm_rows(
         prior = period_ends[1] if len(period_ends) > 1 else None
 
         row = PanelRow(cik=cik, observation_date=obs, latest_period_end=latest)
-        for name in FEATURES:
+        for name in features:
             cv = compute_metric(name, view, latest)
             if cv.is_defined:
                 row.features[name] = _clip(float(cv.value))
@@ -154,7 +163,7 @@ def build_firm_rows(
                 row.missing[name] = True
             row.features[f"{name}{MISSING_SUFFIX}"] = 1.0 if row.missing[name] else 0.0
 
-        for name in TWO_PERIOD_FEATURES:
+        for name in two_period:
             cv = (
                 compute_two_period_score(name, view, latest, prior)
                 if prior is not None
@@ -183,10 +192,14 @@ def build_firm_rows(
     return rows
 
 
-def feature_names() -> list[str]:
+def feature_names(
+    features: list[str] | None = None, two_period: list[str] | None = None
+) -> list[str]:
     """Covariate order: every metric followed by its missingness indicator."""
+    features = FEATURES if features is None else features
+    two_period = TWO_PERIOD_FEATURES if two_period is None else two_period
     names: list[str] = []
-    for base in FEATURES + TWO_PERIOD_FEATURES:
+    for base in features + two_period:
         names.append(base)
         names.append(f"{base}{MISSING_SUFFIX}")
     return names
@@ -214,14 +227,19 @@ def build_panel(
     return rows
 
 
-def save_panel(rows: list[PanelRow], path) -> None:
-    """Persist the panel so evaluation can iterate without refetching."""
+def save_panel(rows: list[PanelRow], path, names: list[str] | None = None) -> None:
+    """Persist the panel so evaluation can iterate without refetching.
+
+    ``names`` must match the feature set the rows were built with. Defaulting
+    to the distress covariates silently dropped the earnings-quality columns
+    on write -- the file loaded back clean, with Beneish M simply absent.
+    """
     import csv
     from pathlib import Path
 
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    names = feature_names()
+    names = feature_names() if names is None else list(names)
     with path.open("w", encoding="utf8", newline="") as fh:
         writer = csv.writer(fh)
         writer.writerow(["cik", "observation_date", "label", "days_to_event", "latest_period_end"] + names)
@@ -238,14 +256,14 @@ def save_panel(rows: list[PanelRow], path) -> None:
             )
 
 
-def load_panel(path) -> list[PanelRow]:
+def load_panel(path, names: list[str] | None = None) -> list[PanelRow]:
     import csv
     from pathlib import Path
 
     path = Path(path)
     if not path.exists():
         return []
-    names = feature_names()
+    names = feature_names() if names is None else list(names)
     rows: list[PanelRow] = []
     with path.open(encoding="utf8", newline="") as fh:
         for rec in csv.DictReader(fh):

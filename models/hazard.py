@@ -152,11 +152,19 @@ def evaluate(y_true: list[int], y_prob: list[float]) -> Metrics:
 class HazardBaseline:
     """Discrete-time hazard: penalised logistic regression over firm-periods."""
 
-    def __init__(self, c: float = 1.0, seed: int = 0, class_weight: str | None = "balanced"):
+    def __init__(
+        self,
+        c: float = 1.0,
+        seed: int = 0,
+        class_weight: str | None = "balanced",
+        names: list[str] | None = None,
+    ):
         self.c = c
         self.seed = seed
         self.class_weight = class_weight
-        self.names = feature_names()
+        #: Covariate order. Overridden by the earnings-quality leg, which fits
+        #: the same estimator over a different feature set.
+        self.names = feature_names() if names is None else list(names)
         self._model = None
         self._mean: list[float] = []
         self._scale: list[float] = []
