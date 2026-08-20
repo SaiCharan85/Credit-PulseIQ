@@ -1,0 +1,46 @@
+verified restatement events: 887 companies
+point-in-time universe: 12570 annual filers
+sampling 2387 filers (all positives + 1500 negatives; fraction 0.1297)
+  100/2387 filers  rows=2176  pos=69
+  200/2387 filers  rows=4468  pos=166
+  300/2387 filers  rows=6698  pos=267
+  400/2387 filers  rows=9026  pos=377
+  500/2387 filers  rows=11283  pos=470
+  600/2387 filers  rows=13219  pos=606
+  800/2387 filers  rows=17268  pos=827
+  900/2387 filers  rows=19179  pos=955
+  1000/2387 filers  rows=21017  pos=1074
+  1100/2387 filers  rows=22921  pos=1168
+  1200/2387 filers  rows=24608  pos=1263
+  1300/2387 filers  rows=26314  pos=1360
+  1400/2387 filers  rows=28043  pos=1450
+  1700/2387 filers  rows=32893  pos=1760
+  1800/2387 filers  rows=34254  pos=1886
+  1900/2387 filers  rows=35307  pos=1965
+  2000/2387 filers  rows=36456  pos=2054
+  2100/2387 filers  rows=37353  pos=2100
+  2200/2387 filers  rows=38144  pos=2221
+
+EQ panel: 38737 rows, 2290 positive (5.91%), 2069 filers (218 unavailable)
+-> data\cache\eq_panel_wide.csv
+negative_fraction=0.129658
+panel 38737 rows | train 24544 (1399 pos) | test 14193 (891 pos, 6.28%)
+
+=== earnings-quality baselines ===
+  Tier 0 Beneish M : n=14193  positives=891  base_rate=0.0628  AUC=0.512  Brier=0.2357  ECE=0.4092  P@10=0.000  P@25=0.000  P@50=0.000  P@100=0.090
+  Tier 1 logistic  : n=14193  positives=891  base_rate=0.0628  AUC=0.579  Brier=0.2495  ECE=0.4232  P@10=0.000  P@25=0.000  P@50=0.020  P@100=0.080
+  leak canary      : AUC 0.4969 on shuffled labels -- ok
+
+  strongest covariates:
+    current_ratio                      +0.567
+    quick_ratio                        -0.495
+    liabilities_to_assets__missing     -0.367
+    current_ratio__missing             -0.347
+    quick_ratio__missing               -0.347
+    piotroski_f_score                  -0.326
+    piotroski_f_score__missing         -0.322
+    accruals_to_assets__missing        -0.278
+
+  Beneish M computable on 2355/14193 test rows (17%). It needs eight ratios across two periods; the rest score a neutral 0.5, which caps its discrimination.
+
+  precision is inflated by choice-based sampling (fraction 0.1297); ranking and recall are not.
