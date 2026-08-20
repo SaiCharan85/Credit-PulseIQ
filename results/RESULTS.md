@@ -153,3 +153,77 @@ rather than the data.
 | `backtest2_agent_200cases.csv` | + filing-text tools: same, plus rationale and cited evidence |
 | `backtest1_run.log`, `backtest2_run.log` | full harness output including reliability curves |
 | `signal_probe_200cases.csv` | the eight text/event signals per case |
+
+---
+
+# Phase 4 — earnings quality: a measured negative
+
+The second leg does not work, and that is the finding. Four independent
+approaches were tried against 891 test positives with a clean leak canary, and
+none beats coin-flipping by a useful margin.
+
+| approach | out-of-sample AUC |
+| --- | --- |
+| Tier 0 — Beneish M (published, fitted to nothing) | 0.512 |
+| Tier 1 — fitted logistic on financial ratios | 0.579 |
+| Tier 1 — plus Beneish decomposed into its terms | 0.585 |
+| filing-text and 8-K event signals | 0.579 |
+| **leak canary (shuffled labels)** | **0.526 — clean** |
+
+## Labels
+
+8-K item 4.02, "non-reliance on previously issued financial statements", rather
+than AAER. An AAER names an individual as often as an issuer, has no CIK, and
+states its misstatement window only as prose inside a PDF. Item 4.02 is filed by
+the company with a structured item code. The trade is stated rather than hidden:
+this detects *accounting problems*, including honest error, not fraud.
+
+**887 verified companies** from 2,008 raw events. The exclusions matter more than
+the inclusions: 810 events were SPAC regulatory reclassifications, in two waves.
+The April 2021 warrant reclassification (598) is well known. The second -- Class
+A shares moved to temporary equity in late 2021 (212) -- uses no warrant language
+and passes a warrant filter untouched. After the first rule alone, 2021 still
+held 299 events against a 2019-2020 baseline near 65; after both, 141 against
+145 and 152 in 2022-2023. A spike is contamination, a sustained level shift is
+plausibly real, so the filtering stopped there rather than tuning until the
+years matched.
+
+## Two results that were wrong before the universe was widened
+
+Both came from the 354-company distress watchlist, and both looked good:
+
+| | narrow (28 test positives) | wide (891) |
+| --- | --- | --- |
+| fitted ratios | 0.714 | **0.579** |
+| filing-text signals | 0.867 (in-sample) | **0.579** |
+
+The text collapse is the more instructive one. In the watchlist, going-concern
+doubt appeared in 15.8% of non-restaters; across all annual filers it appears in
+**41.7%**. The market by filer count is dominated by micro-caps where that
+language is routine, so a signal that discriminated sharply against healthy
+large-cap peers says almost nothing in the real population.
+
+## Why the missing-data explanation is ruled out
+
+Beneish M is computable on 17% of wide-panel rows: it returns nothing unless all
+eight terms resolve, so one untagged line item discards the other seven. The
+terms were therefore registered individually, lifting coverage to 35-69% each.
+AUC moved 0.579 to 0.585 and not one component reached the strongest covariates.
+The signal is not hidden behind absent tags. It is absent.
+
+## Scope
+
+Under the honest-scoping rule this leg is **demo-grade, not a backtested
+predictor**. It is not fused into the graded signal. Knowing where the system
+does not work is part of the deliverable, and the published literature agrees the
+ceiling here is low -- restatement prediction lands near 0.65-0.75 at best,
+because a large share of restatements are errors rather than patterns.
+
+No investigator was built for this leg. The eval-first order meant the baselines
+were measured first, so nothing was spent on an agent for a leg with no signal
+to find.
+
+| file | contents |
+| --- | --- |
+| `eq_baselines.log` | full baseline output including the leak canary |
+| `eq_signal_probe.csv` | per-row filing-text signals, train and test folds |

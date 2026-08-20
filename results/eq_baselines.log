@@ -1,0 +1,20 @@
+panel 38737 rows | train 24544 (1399 pos) | test 14193 (891 pos, 6.28%)
+
+=== earnings-quality baselines ===
+  Tier 0 Beneish M : n=14193  positives=891  base_rate=0.0628  AUC=0.512  Brier=0.2357  ECE=0.4092  P@10=0.000  P@25=0.000  P@50=0.000  P@100=0.090
+  Tier 1 logistic  : n=14193  positives=891  base_rate=0.0628  AUC=0.585  Brier=0.2459  ECE=0.4183  P@10=0.000  P@25=0.000  P@50=0.000  P@100=0.050
+  leak canary      : AUC 0.5258 on shuffled labels -- ok
+
+  strongest covariates:
+    current_ratio                      +0.588
+    quick_ratio                        -0.519
+    current_ratio__missing             -0.359
+    quick_ratio__missing               -0.359
+    liabilities_to_assets__missing     -0.336
+    piotroski_f_score__missing         -0.332
+    piotroski_f_score                  -0.309
+    ocf_to_debt__missing               +0.299
+
+  Beneish M computable on 2355/14193 test rows (17%). It needs eight ratios across two periods; the rest score a neutral 0.5, which caps its discrimination.
+
+  precision is inflated by choice-based sampling (fraction 0.1297); ranking and recall are not.
