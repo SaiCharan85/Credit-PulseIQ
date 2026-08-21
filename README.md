@@ -47,41 +47,49 @@ Most "agentic finance" projects demo well on three hand-picked tickers and were 
 
 ## Headline results
 
-L3 backtest, distress leg. 200 firm-period cases (100 Chapter 11 positives + 100 sampled negatives), strict as-of cutoffs, temporal hold-out from 2024-06-01. Agent is `gemma-4-31b-it` driving the ReAct loop.
+L3 backtest, distress leg. 200 firm-period cases (100 Chapter 11 positives + 100 sampled negatives), strict as-of cutoffs, temporal hold-out from 2024-06-01, `gemma-4-31b-it` driving the ReAct loop. Two arms over the **same 200 cases**, differing only in which tools the agent could call.
 
-| Metric | **Agent** | Altman Z'' | Hazard (Shumway) |
-|---|---|---|---|
-| AUC | 0.892 | 0.885 | **0.966** |
-| **Calibration (ECE)** | **0.078** | 0.141 | 0.101 |
-| Precision / recall | 0.781 / 0.899 | — | — |
-| Precision, base-rate corrected | 0.242 | — | — |
-| **Median lead time** | **164 days** | — | — |
-| **False-confidence rate** | **0.060** (6/100) | — | — |
-| Verification failures | **0** / ~2,900 calls | — | — |
-| Abstentions | 2 (1.0%), both honest | — | — |
+| Metric | Agent, ratios only | **Agent, + filing-text tools** | Altman Z'' | Hazard (Shumway) |
+|---|---|---|---|---|
+| AUC | 0.881 | **0.965** | 0.885 | 0.966 |
+| Calibration (ECE) | 0.135 | **0.081** | 0.141 | 0.101 |
+| Precision / recall | 0.795 / 0.714 | **0.870 / 0.897** | — | — |
+| Median lead time | 161 days | **155 days** | — | — |
+| **False-confidence rate** | 0.250 (25/100) | **0.080 (8/100)** | — | — |
+| Verification failures | 0 | **0** | — | — |
 
-**The agent does not beat the hazard baseline.** AUC 0.892 against 0.966 — it roughly ties a 1968 discriminant model and loses clearly to a 2001 penalised logit on the same as-of features. An LLM making ~12 tool calls per company does not justify its inference cost on discrimination alone. That is the finding, and it is why the baselines were built first.
+Paired bootstrap, 8,000 resamples, identical cases:
 
-**It is, however, the best calibrated of the three**, and by a clear margin. Its reliability curve tracks the diagonal — states 0.85 and observes 0.83; states 0.13 and observes 0.05 — where the fitted models are systematically overconfident. It knows what it does not know better than they do.
+```
+tools effect    : +0.0841   95% CI [+0.0484, +0.1246]   -> REAL
+agent vs hazard : -0.0017   95% CI [-0.0262, +0.0225]   -> tie
+```
 
-**Zero verification failures.** Across ~2,900 model calls, not one fabricated figure reached the output. Every cited number was independently recomputed from its provenance.
+**The finding: giving the agent evidence a ratio model cannot read is worth +0.084 AUC.** That is the largest measured effect in the project and its interval is nowhere near zero. It converted a clear loss against the hazard baseline into a statistical tie, and cut catastrophic errors threefold.
 
-**The false-confidence rate is 6%** — six of the hundred companies that failed were called healthy or watch at ≥0.7 confidence. This is the designated kill-signal metric (SPEC §10) and it is not zero. An earlier run reported 0.000, but only because the agent was abstaining on three-quarters of cases; that number was an artefact, not a result.
+**The agent does not beat the baseline.** The point estimate is fractionally below and the interval spans zero. Parity plus an auditable explanation is the claim the evidence supports; superiority is not.
 
-Reproduce with `python -m evals.run_l3 --agent react --max-negatives 100`. Methodology, including as-of enforcement, is in [`SPEC.md`](SPEC.md) §7.
+**Where the gain came from.** 27 bankruptcies missed in the first arm are caught in the second, **none regressed**, and 26 of the 27 carried a filing-text signal. The agent's failure mode was never faulty reasoning -- it was blindness. It spent ~12 steps investigating a feature set that did not contain the answer for a quarter of the failures. You cannot reason your way to a covenant breach from a current ratio.
 
-<details>
-<summary>Reliability curve</summary>
+The control matters as much as the effect: where no signal was found the verdict barely moved (CIK 1498710, 0.42 -> 0.48), and precision *rose* 0.795 -> 0.870. Had the tools merely made the model more alarmist, every score would have risen and precision would have collapsed.
 
-| Stated | Observed | n |
-|---|---|---|
-| 0.13 | 0.05 | 60 |
-| 0.30 | 0.25 | 12 |
-| 0.42 | 0.38 | 13 |
-| 0.69 | 0.63 | 27 |
-| 0.85 | 0.83 | 86 |
+**Zero verification failures** across both arms. Not one fabricated figure reached an output; every cited number was independently recomputed from its provenance.
 
-</details>
+Reproduce with `python -m evals.run_l3 --agent react --max-negatives 100`. Full numbers and limits in [`results/RESULTS.md`](results/RESULTS.md); methodology in [`SPEC.md`](SPEC.md) §7.
+
+### The second leg does not work, and that is reported
+
+The earnings-quality leg was built to the same standard and **failed**. Four independent approaches against 891 test positives with a clean leak canary:
+
+| approach | out-of-sample AUC |
+|---|---|
+| Beneish M (published) | 0.512 |
+| fitted logistic on ratios | 0.579 |
+| plus Beneish decomposed into its terms | 0.585 |
+| filing-text and 8-K event signals | 0.579 |
+| leak canary (shuffled labels) | 0.526 — clean |
+
+Two earlier numbers looked promising and were wrong: ratios at 0.714 and text at 0.867, both artefacts of a distress-enriched universe and in-sample fitting. Widening to a 12,570-filer point-in-time universe killed both. The leg is **demo-grade, excluded from the graded signal**, and no investigator was built for it — the eval-first order meant the baselines were measured before anything was spent on an agent with nothing to find.
 
 ### Does giving the agent the baseline help? No.
 
@@ -99,10 +107,11 @@ On the same 143 cases: **baseline alone AUC 0.980, agent alone 0.972, the two
 averaged 0.979.** The agent reproduces the baseline slightly worse than the
 baseline reproduces itself, and blending them beats neither. Where the two
 disagree by more than 0.2 (7 cases), the agent is closer to the truth 3 times
-and the baseline 4 — indistinguishable from chance.
+and the baseline 4 -- indistinguishable from chance.
 
-So the apparent parity with the hazard model in that arm was an artefact of
-copying, not reasoning. The uncontaminated number remains **0.892**.
+The tool is now absent from the schema list rather than merely discouraged, and
+the fusion arm refuses to run on any prediction with `baseline_seen=1`, because
+fusing the agent with a model it already read is circular.
 
 This only became visible because per-case results record whether the tool was
 called and what the agent scored. The aggregate metrics were identical either
@@ -111,24 +120,52 @@ there produce the same summary table.
 
 ### A result that only appeared because abstention was instrumented
 
-The first full run reported AUC 0.965 — apparently matching the hazard model. It was wrong. 151 of 200 cases (75.5%) had abstained, **every one a step-budget exhaustion and not a single honest judgment**: the model averaged 13.3 of 14 steps, investigating thoroughly and getting cut off before it could conclude. The metrics rested on the 49 cases that happened to finish, a self-selected quarter.
+The first full run reported AUC 0.965 -- apparently matching the hazard model. It was wrong. 151 of 200 cases (75.5%) had abstained, **every one a step-budget exhaustion and not a single honest judgment**: the model averaged 13.3 of 14 steps, investigating thoroughly and getting cut off before it could conclude. The metrics rested on the 49 cases that happened to finish, a self-selected quarter.
 
 Splitting abstentions into *honest* versus *protocol failure* is what surfaced it. Without that split it would have read as admirable caution and shipped as a headline number.
+
+### Three grading bugs that flattered the agent
+
+Found and fixed before the final numbers, each documented in the commit history:
+
+- **Baselines were scored on the full split** while the agent's AUC covered only its non-abstained cases -- letting it drop the hardest cases while the baselines, which never abstain, got no such filter. Baselines are now matched on `(cik, as_of)`.
+- **The signal-to-probability mapping used direction only**, scoring "watch at 0.9" identically to "healthy at 0.9". Four ordinal verdicts collapsed to two numbers.
+- **The LLM cache keyed on model and conversation but not the tool list**, so toggling a tool while leaving the prompt untouched would have replayed answers generated with the other tool set.
 
 ---
 
 ## What exists today
 
-Phases 1–2 are complete (data plane, deterministic spine, severity ladder, baselines, L0–L2), and Phase 3 — the ReAct investigator and the L3 backtest harness — is built and running. **397 tests pass, all offline: the L3 loop is tested against a scripted model, so agentic behaviour is verified without an endpoint.**
+All five build phases are complete. **526 tests pass, all offline** -- the ReAct loop is tested against a scripted model, so agentic behaviour, the guard gate and memo assembly are all verified without an endpoint or a network.
+
+| phase | status |
+|---|---|
+| 1. Ground truth + scaffold | complete |
+| 2. Deterministic spine + L0 | complete |
+| 3. Distress investigator, fully backtested | complete — **the deliverable** |
+| 4. Earnings-quality leg | complete **as a measured negative**; demo-grade |
+| 5. Orchestrator, guardrails, cited memo | complete, honestly scoped to one green leg |
+
+The eval ladder is populated end to end:
+
+| | covers | files |
+|---|---|---|
+| L0 | deterministic ratio, score, trend and peer arithmetic | 15 |
+| L1 | XBRL extraction from real filings | 1 |
+| L2 | peer construction and trends at the tool boundary, incl. peer as-of leakage | 1 |
+| L3 | investigator vs real Chapter 11 and restatement outcomes | 3 |
+| L4 | end-to-end, filer facts in -> cited memo out | 1 |
+| L5 | guardrails and adversarial: decision framing, fabricated figures, abstention | 1 |
 
 | | |
 |---|---|
-| Monitored universe | **369 CIK-pinned filers** — 156 Chapter 11, 213 still filing |
+| Distress universe | **369 CIK-pinned filers** — 156 Chapter 11, 213 still filing |
 | Chapter 11 labels | **156**, every one verified by four independent checks |
 | Graded distress events | **3,005** across four severity tiers |
-| Filings behind the universe | ~89k for the original 50 alone; 4,109 10-K/10-Q |
-| Deterministic metrics | 29, each with a hand-computed L0 assertion |
-| Tests | **397** (L0 arithmetic, L1 extraction, L2 peers/trends, L3 loop/critic/harness, resilience) |
+| Earnings-quality universe | **12,570** point-in-time annual filers, no survivorship bias |
+| Restatement labels | **887** verified, after excluding 810 SPAC regulatory reclassifications |
+| Deterministic metrics | 36, each with a hand-computed L0 assertion |
+| Tests | **526** |
 
 Labels by cohort, and the ladder by tier:
 
@@ -378,13 +415,21 @@ Other sources evaluated and their trade-offs are recorded in [`data/labels/READM
 
 1. ✅ Ground truth + scaffold; EDGAR data plane; label sets with as-of dating.
 2. ✅ Deterministic spine + L0 tests gating in CI. No LLM yet.
-3. **Distress investigator as a real ReAct loop + its L3 backtest.** Do not proceed until it produces a real calibration curve. ← next
-4. Earnings-quality investigator vs AAER, reusing the harness.
-5. Assemble: orchestrator, guardrails, covenant (demo), context leg (context-only), memo, feedback layer.
+3. ✅ **Distress investigator as a real ReAct loop + its L3 backtest.** Produced a real calibration curve; filing-text tools measured at +0.084 AUC.
+4. ✅ Earnings-quality leg vs restatement labels, reusing the harness — **measured, failed, reported**. Demo-grade, excluded from the graded signal.
+5. ✅ Assemble: orchestrator, guardrails, memo, L4 and L5. Scoped to one green leg rather than faking a fusion. Feedback layer not built.
 
 ## Status
 
-Phases 1–2 complete. Deterministic spine and eval ladder L0–L2 green in CI on Python 3.10–3.12. No agent yet, by design.
+**Complete as an eval-first study.** One backtested leg at parity with a strong statistical baseline, one leg measured and honestly declared unusable, the full L0–L5 ladder, and every number reproducible from the committed harness.
+
+Known gaps, stated rather than hidden:
+
+- **The feedback layer is not built** (SPEC §9) — no online judge, no drift monitoring. It was always the last item and it needs production traffic to mean anything.
+- **The covenant leg does not exist.** It was demo-grade by design and nothing was built.
+- **Absolute probabilities do not transfer.** The universe is enriched with distressed filers far above the population base rate (Zmijewski 1984); ranking transfers, calibrated probabilities do not.
+- **The agent has never chosen to abstain.** All abstentions across 200 cases were protocol failures. "It will tell you when it does not know" is an unexercised claim.
+- **One model, one window.** Validated on `gemma-4-31b-it` over 2024–2025. Any swap needs re-measuring — which the harness makes cheap, and which is the point of having built it first.
 
 ## License
 
