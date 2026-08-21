@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CreditPulse IQ</title>
+<style>
+  :root {
+    --bg:#0d1117; --panel:#161b22; --line:#272e38; --ink:#e6edf3; --dim:#8b949e;
+    --accent:#3b82f6; --ok:#3fb950; --warn:#d29922; --bad:#f85149; --severe:#da3633;
+    --mono:'SF Mono',ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:15px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  header{border-bottom:1px solid var(--line);padding:18px 28px;display:flex;
+         align-items:baseline;gap:16px;flex-wrap:wrap;background:var(--panel)}
+  header h1{margin:0;font-size:17px;font-weight:600;letter-spacing:-.2px}
+  header .sub{color:var(--dim);font-size:13px}
+  main{max-width:1100px;margin:0 auto;padding:26px 28px 70px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;
+        padding:20px;margin-bottom:18px}
+  .controls{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+  label{display:block;font-size:12px;color:var(--dim);margin-bottom:5px;
+        text-transform:uppercase;letter-spacing:.5px}
+  input,select{background:var(--bg);color:var(--ink);border:1px solid var(--line);
+               border-radius:6px;padding:9px 11px;font-size:14px;font-family:inherit}
+  input:focus,select:focus{outline:none;border-color:var(--accent)}
+  button{background:var(--accent);color:#fff;border:0;border-radius:6px;
+         padding:10px 22px;font-size:14px;font-weight:600;cursor:pointer}
+  button:disabled{opacity:.5;cursor:default}
+  .hint{color:var(--dim);font-size:12px;margin-top:10px}
+  .hint code{background:var(--bg);padding:1px 5px;border-radius:3px;cursor:pointer}
+  .hint code:hover{color:var(--accent)}
+
+  .verdict{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+  .badge{font-size:13px;font-weight:700;letter-spacing:.8px;padding:9px 16px;
+         border-radius:6px;text-transform:uppercase}
+  .healthy{background:rgba(63,185,80,.15);color:var(--ok);border:1px solid var(--ok)}
+  .watch{background:rgba(210,153,34,.15);color:var(--warn);border:1px solid var(--warn)}
+  .elevated_risk{background:rgba(248,81,73,.13);color:var(--bad);border:1px solid var(--bad)}
+  .severe_risk{background:rgba(218,54,51,.2);color:#ff7b72;border:1px solid var(--severe)}
+  .insufficient_evidence{background:rgba(139,148,158,.15);color:var(--dim);border:1px solid var(--dim)}
+  .metric{display:flex;flex-direction:column;gap:2px}
+  .metric .v{font-size:24px;font-weight:600;font-variant-numeric:tabular-nums}
+  .metric .k{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);
+     margin:0 0 12px;font-weight:600}
+  .tier{font-size:10px;padding:2px 8px;border-radius:10px;margin-left:8px;
+        text-transform:uppercase;letter-spacing:.5px;vertical-align:middle}
+  .backtested{background:rgba(59,130,246,.16);color:#79b8ff;border:1px solid #2f5da8}
+  .context-only{background:rgba(139,148,158,.14);color:var(--dim);border:1px solid var(--line)}
+  .demo-grade{background:rgba(210,153,34,.14);color:var(--warn);border:1px solid #6b5410}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{text-align:left;color:var(--dim);font-weight:500;font-size:11px;
+     text-transform:uppercase;letter-spacing:.5px;padding:6px 10px;border-bottom:1px solid var(--line)}
+  td{padding:7px 10px;border-bottom:1px solid rgba(39,46,56,.5)}
+  td.num{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+  tr:last-child td{border-bottom:0}
+  .sev{color:var(--bad);font-weight:600}
+  .flg{color:var(--warn)}
+
+  ul.plain{margin:0;padding-left:18px}
+  ul.plain li{margin:5px 0}
+  .limit li{color:var(--warn)}
+  .route li{color:var(--dim);font-family:var(--mono);font-size:12.5px}
+  pre{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:15px;
+      overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.5;margin:0}
+  details summary{cursor:pointer;color:var(--dim);font-size:13px;padding:4px 0}
+  details summary:hover{color:var(--ink)}
+  .blocked{border-color:var(--severe)}
+  .blocked h2{color:#ff7b72}
+  .err{color:var(--bad)}
+  .note{color:var(--dim);font-size:12.5px;border-left:2px solid var(--line);
+        padding-left:12px;margin-top:14px}
+  .spin{color:var(--dim);font-size:14px}
+</style>
+</head>
+<body>
+<header>
+  <h1>CreditPulse IQ</h1>
+  <span class="sub">Credit-distress assessment from SEC filings &mdash; evidence-cited, as-of dated</span>
+</header>
+
+<main>
+  <div class="card">
+    <div class="controls">
+      <div><label for="cik">CIK</label><input id="cik" value="867773" size="12"></div>
+      <div><label for="asof">Prediction date</label><input id="asof" type="date" value="2024-07-01"></div>
+      <div><label for="agent">Investigator</label>
+        <select id="agent">
+          <option value="rules">Rule-based control (offline)</option>
+          <option value="react">ReAct agent (needs endpoint)</option>
+        </select>
+      </div>
+      <button id="go">Assess</button>
+    </div>
+    <div class="hint">
+      Try <code data-cik="867773" data-d="2024-07-01">867773</code> (filed Ch.11; hazard model scored it 0.47 &mdash; a pass) &middot;
+      <code data-cik="1584754" data-d="2024-07-01">1584754</code> (agent moved 0.05&rarr;0.95 once it could read filings) &middot;
+      <code data-cik="320193" data-d="2024-06-01">320193</code> (Apple &mdash; the control false-positives here)
+    </div>
+  </div>
+
+  <div id="out"></div>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const num = v => v === null || v === undefined ? 'n/a'
+  : (Math.abs(v) >= 1000 || (Math.abs(v) < 0.01 && v !== 0)) ? v.toExponential(3) : (+v).toFixed(4).replace(/\.?0+$/,'');
+
+document.querySelectorAll('.hint code').forEach(c => c.onclick = () => {
+  $('#cik').value = c.dataset.cik; $('#asof').value = c.dataset.d; $('#go').click();
+});
+
+$('#go').onclick = async () => {
+  const btn = $('#go'), out = $('#out');
+  btn.disabled = true;
+  out.innerHTML = '<div class="card"><span class="spin">Loading filings and running the investigation&hellip;</span></div>';
+  try {
+    const r = await fetch('/api/assess', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({cik: +$('#cik').value, as_of: $('#asof').value, agent: $('#agent').value})
+    });
+    render(await r.json());
+  } catch (e) {
+    out.innerHTML = `<div class="card blocked"><h2>Request failed</h2><p class="err">${esc(e)}</p></div>`;
+  }
+  btn.disabled = false;
+};
+
+function render(d) {
+  const out = $('#out');
+  if (d.error) {
+    out.innerHTML = `<div class="card blocked"><h2>Could not assess</h2><p class="err">${esc(d.error)}</p></div>`;
+    return;
+  }
+  let h = '';
+
+  h += `<div class="card"><h2>Routing</h2><ul class="plain route">
+    <li>${esc(d.triage.depth)} pass &mdash; ${d.triage.steps} step budget</li>
+    ${d.triage.reasons.map(r => `<li>${esc(r)}</li>`).join('')}
+    <li>${d.n_facts.toLocaleString()} XBRL facts visible as of ${esc(d.as_of)}</li>
+  </ul></div>`;
+
+  if (!d.shipped) {
+    h += `<div class="card blocked"><h2>No memo issued &mdash; guard blocked</h2>
+      <p class="err">${esc(d.blocked_reason)}</p>
+      <p class="note">A blocked memo is the guard working. A figure could not be
+      reproduced from its source, or the output stated an action rather than a risk.
+      The memo is withheld rather than annotated.</p></div>`;
+    out.innerHTML = h; return;
+  }
+
+  const m = d.memo;
+  h += `<div class="card"><div class="verdict">
+      <span class="badge ${esc(m.signal)}">${esc(m.signal.replace(/_/g,' '))}</span>
+      ${m.risk_score !== null ? `<div class="metric"><span class="v">${m.risk_score.toFixed(0)}</span><span class="k">risk score / 100</span></div>` : ''}
+      <div class="metric"><span class="v">${m.confidence.toFixed(2)}</span><span class="k">confidence</span></div>
+      <div class="metric"><span class="v">${m.tool_calls}</span><span class="k">tool calls</span></div>
+    </div>
+    ${m.summary ? `<p style="margin:16px 0 0">${esc(m.summary)}</p>` : ''}
+    <p class="note">Arm: ${esc(d.agent)} (AUC ${d.arm_auc}) vs hazard baseline ${d.hazard_baseline_auc}
+    on the 200-case backtest. Absolute probabilities do not transfer to population base rates.</p>
+  </div>`;
+
+  for (const s of m.sections) {
+    h += `<div class="card"><h2>${esc(s.title)}<span class="tier ${esc(s.tier)}">${esc(s.tier)}</span></h2>`;
+    if (!s.moves_the_signal)
+      h += `<p class="note">Context only &mdash; does not affect the graded signal.</p>`;
+    if (s.body) h += `<p>${esc(s.body)}</p>`;
+    if (s.evidence.length) {
+      h += `<table><tr><th>Metric</th><th style="text-align:right">Value</th><th>Period end</th><th>Note</th></tr>`;
+      for (const e of s.evidence) {
+        const cls = e.note === 'severe' ? 'sev' : e.note === 'flag' ? 'flg' : '';
+        h += `<tr><td>${esc(e.metric)}</td><td class="num">${num(e.value)}</td>
+              <td>${esc(e.period_end || '—')}</td><td class="${cls}">${esc(e.note)}</td></tr>`;
+      }
+      h += `</table>`;
+    }
+    h += `</div>`;
+  }
+
+  if (m.residual)
+    h += `<div class="card"><h2>Residual uncertainty</h2><p>${esc(m.residual)}</p></div>`;
+
+  if (m.limitations.length)
+    h += `<div class="card"><h2>Data limitations</h2><ul class="plain limit">
+      ${m.limitations.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
+      <p class="note">Surfaced rather than swallowed. Reasoning on incomplete data
+      without saying so is the failure mode this system is built to prevent.</p></div>`;
+
+  h += `<div class="card"><details><summary>Audit trail &mdash; ${m.audit_trail.length} tool call(s)</summary>
+    <table style="margin-top:10px"><tr><th>#</th><th>Tool</th><th>Result</th></tr>
+    ${m.audit_trail.map((c,i) => `<tr><td class="num">${i+1}</td><td>${esc(c.tool)}</td>
+      <td class="${c.ok ? '' : 'err'}">${esc(c.summary || c.error || '')}</td></tr>`).join('')}
+    </table></details></div>`;
+
+  h += `<div class="card"><details><summary>Plain-text memo</summary>
+    <pre style="margin-top:10px">${esc(m.text)}</pre></details>
+    <p class="note">Advisory only. This states risk for a human reviewer and never
+    recommends an action; the scope guard blocks decision framing before rendering.</p></div>`;
+
+  out.innerHTML = h;
+}
+
+$('#go').click();
+</script>
+</body>
+</html>
