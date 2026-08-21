@@ -5,208 +5,410 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CreditPulse IQ</title>
 <style>
-  :root {
-    --bg:#0d1117; --panel:#161b22; --line:#272e38; --ink:#e6edf3; --dim:#8b949e;
-    --accent:#3b82f6; --ok:#3fb950; --warn:#d29922; --bad:#f85149; --severe:#da3633;
-    --mono:'SF Mono',ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;
+  :root{
+    --bg:#0b0e14; --panel:#141922; --panel2:#1a212c; --line:#242c38; --ink:#e6edf3;
+    --dim:#8b98a9; --accent:#4c8dff; --ok:#3fb950; --warn:#d29922; --bad:#f85149;
+    --severe:#da3633; --mono:'SF Mono',ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-       font:15px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
-  header{border-bottom:1px solid var(--line);padding:18px 28px;display:flex;
-         align-items:baseline;gap:16px;flex-wrap:wrap;background:var(--panel)}
-  header h1{margin:0;font-size:17px;font-weight:600;letter-spacing:-.2px}
-  header .sub{color:var(--dim);font-size:13px}
-  main{max-width:1100px;margin:0 auto;padding:26px 28px 70px}
+  body{margin:0;background:var(--bg);color:var(--ink);display:flex;min-height:100vh;
+       font:14.5px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+
+  aside{width:210px;flex:0 0 210px;background:var(--panel);border-right:1px solid var(--line);
+        padding:20px 0;display:flex;flex-direction:column}
+  .brand{padding:0 20px 18px;border-bottom:1px solid var(--line);margin-bottom:14px}
+  .brand h1{margin:0;font-size:15px;font-weight:650;letter-spacing:-.2px}
+  .brand p{margin:4px 0 0;font-size:11px;color:var(--dim);line-height:1.4}
+  nav a{display:block;padding:9px 20px;color:var(--dim);text-decoration:none;font-size:13.5px;
+        border-left:2px solid transparent;cursor:pointer}
+  nav a:hover{color:var(--ink);background:var(--panel2)}
+  nav a.on{color:var(--ink);border-left-color:var(--accent);background:var(--panel2);font-weight:550}
+  .foot{margin-top:auto;padding:14px 20px 0;border-top:1px solid var(--line);
+        font-size:11px;color:var(--dim);line-height:1.5}
+  .foot b{color:var(--ink);font-weight:600}
+
+  main{flex:1;min-width:0;overflow-y:auto;max-height:100vh}
+  .head{border-bottom:1px solid var(--line);padding:16px 30px;background:var(--panel)}
+  .head h2{margin:0;font-size:16px;font-weight:600}
+  .head p{margin:4px 0 0;font-size:12.5px;color:var(--dim)}
+  .body{padding:24px 30px 70px;max-width:1080px}
+  .view{display:none} .view.on{display:block}
+
   .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;
-        padding:20px;margin-bottom:18px}
-  .controls{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
-  label{display:block;font-size:12px;color:var(--dim);margin-bottom:5px;
+        padding:18px;margin-bottom:16px}
+  .row{display:flex;gap:13px;align-items:flex-end;flex-wrap:wrap}
+  label{display:block;font-size:11px;color:var(--dim);margin-bottom:5px;
         text-transform:uppercase;letter-spacing:.5px}
-  input,select{background:var(--bg);color:var(--ink);border:1px solid var(--line);
-               border-radius:6px;padding:9px 11px;font-size:14px;font-family:inherit}
-  input:focus,select:focus{outline:none;border-color:var(--accent)}
-  button{background:var(--accent);color:#fff;border:0;border-radius:6px;
-         padding:10px 22px;font-size:14px;font-weight:600;cursor:pointer}
-  button:disabled{opacity:.5;cursor:default}
-  .hint{color:var(--dim);font-size:12px;margin-top:10px}
-  .hint code{background:var(--bg);padding:1px 5px;border-radius:3px;cursor:pointer}
+  input,select,textarea{background:var(--bg);color:var(--ink);border:1px solid var(--line);
+    border-radius:6px;padding:9px 11px;font-size:14px;font-family:inherit;width:100%}
+  textarea{resize:vertical;min-height:66px;line-height:1.5}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  button{background:var(--accent);color:#fff;border:0;border-radius:6px;padding:10px 20px;
+         font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+  button.ghost{background:transparent;border:1px solid var(--line);color:var(--dim)}
+  button:disabled{opacity:.45;cursor:default}
+  .hint{color:var(--dim);font-size:12px;margin-top:11px}
+  .hint code{background:var(--bg);padding:1px 6px;border-radius:3px;cursor:pointer}
   .hint code:hover{color:var(--accent)}
 
-  .verdict{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
-  .badge{font-size:13px;font-weight:700;letter-spacing:.8px;padding:9px 16px;
+  .verdict{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+  .badge{font-size:12.5px;font-weight:700;letter-spacing:.7px;padding:8px 15px;
          border-radius:6px;text-transform:uppercase}
-  .healthy{background:rgba(63,185,80,.15);color:var(--ok);border:1px solid var(--ok)}
-  .watch{background:rgba(210,153,34,.15);color:var(--warn);border:1px solid var(--warn)}
-  .elevated_risk{background:rgba(248,81,73,.13);color:var(--bad);border:1px solid var(--bad)}
+  .healthy{background:rgba(63,185,80,.14);color:var(--ok);border:1px solid var(--ok)}
+  .watch{background:rgba(210,153,34,.14);color:var(--warn);border:1px solid var(--warn)}
+  .elevated_risk{background:rgba(248,81,73,.12);color:var(--bad);border:1px solid var(--bad)}
   .severe_risk{background:rgba(218,54,51,.2);color:#ff7b72;border:1px solid var(--severe)}
-  .insufficient_evidence{background:rgba(139,148,158,.15);color:var(--dim);border:1px solid var(--dim)}
-  .metric{display:flex;flex-direction:column;gap:2px}
-  .metric .v{font-size:24px;font-weight:600;font-variant-numeric:tabular-nums}
-  .metric .k{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+  .insufficient_evidence{background:rgba(139,152,169,.14);color:var(--dim);border:1px solid var(--dim)}
+  .metric{display:flex;flex-direction:column;gap:1px}
+  .metric .v{font-size:23px;font-weight:600;font-variant-numeric:tabular-nums}
+  .metric .k{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
 
-  h2{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);
-     margin:0 0 12px;font-weight:600}
-  .tier{font-size:10px;padding:2px 8px;border-radius:10px;margin-left:8px;
+  h3{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);
+     margin:0 0 11px;font-weight:600}
+  .tier{font-size:9.5px;padding:2px 8px;border-radius:10px;margin-left:8px;
         text-transform:uppercase;letter-spacing:.5px;vertical-align:middle}
-  .backtested{background:rgba(59,130,246,.16);color:#79b8ff;border:1px solid #2f5da8}
-  .context-only{background:rgba(139,148,158,.14);color:var(--dim);border:1px solid var(--line)}
-  .demo-grade{background:rgba(210,153,34,.14);color:var(--warn);border:1px solid #6b5410}
+  .backtested{background:rgba(76,141,255,.16);color:#8ab4ff;border:1px solid #2f5da8}
+  .context-only{background:rgba(139,152,169,.12);color:var(--dim);border:1px solid var(--line)}
 
   table{width:100%;border-collapse:collapse;font-size:13.5px}
-  th{text-align:left;color:var(--dim);font-weight:500;font-size:11px;
-     text-transform:uppercase;letter-spacing:.5px;padding:6px 10px;border-bottom:1px solid var(--line)}
-  td{padding:7px 10px;border-bottom:1px solid rgba(39,46,56,.5)}
+  th{text-align:left;color:var(--dim);font-weight:500;font-size:10.5px;text-transform:uppercase;
+     letter-spacing:.5px;padding:6px 10px;border-bottom:1px solid var(--line)}
+  td{padding:7px 10px;border-bottom:1px solid rgba(36,44,56,.55)}
   td.num{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums}
   tr:last-child td{border-bottom:0}
-  .sev{color:var(--bad);font-weight:600}
-  .flg{color:var(--warn)}
+  tr.clickable{cursor:pointer} tr.clickable:hover td{background:var(--panel2)}
+  .sev{color:var(--bad);font-weight:600} .flg{color:var(--warn)}
+  .pill{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
 
-  ul.plain{margin:0;padding-left:18px}
-  ul.plain li{margin:5px 0}
-  .limit li{color:var(--warn)}
-  .route li{color:var(--dim);font-family:var(--mono);font-size:12.5px}
-  pre{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:15px;
-      overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.5;margin:0}
-  details summary{cursor:pointer;color:var(--dim);font-size:13px;padding:4px 0}
+  ul.plain{margin:0;padding-left:18px} ul.plain li{margin:5px 0}
+  .limit li{color:var(--warn)} .route li{color:var(--dim);font-family:var(--mono);font-size:12.5px}
+  pre{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:14px;
+      overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.5;margin:0;
+      white-space:pre-wrap}
+  details summary{cursor:pointer;color:var(--dim);font-size:13px;padding:3px 0}
   details summary:hover{color:var(--ink)}
-  .blocked{border-color:var(--severe)}
-  .blocked h2{color:#ff7b72}
+  .blocked{border-color:var(--severe)} .blocked h3{color:#ff7b72}
   .err{color:var(--bad)}
   .note{color:var(--dim);font-size:12.5px;border-left:2px solid var(--line);
-        padding-left:12px;margin-top:14px}
+        padding-left:12px;margin-top:13px;line-height:1.55}
   .spin{color:var(--dim);font-size:14px}
+  .drop{border:1.5px dashed var(--line);border-radius:8px;padding:26px;text-align:center;
+        color:var(--dim);font-size:13.5px;cursor:pointer}
+  .drop:hover,.drop.over{border-color:var(--accent);color:var(--ink)}
+  .qa{margin-bottom:14px}
+  .qa .q{color:var(--accent);font-weight:600;font-size:13.5px;margin-bottom:5px}
+  .qa .a{white-space:pre-wrap}
+  .qa .blocked-ans{color:var(--warn);font-size:13px;border-left:2px solid var(--warn);padding-left:11px}
 </style>
 </head>
 <body>
-<header>
-  <h1>CreditPulse IQ</h1>
-  <span class="sub">Credit-distress assessment from SEC filings &mdash; evidence-cited, as-of dated</span>
-</header>
+<aside>
+  <div class="brand">
+    <h1>CreditPulse IQ</h1>
+    <p>Credit-distress assessment<br>from SEC filings</p>
+  </div>
+  <nav>
+    <a data-v="assess" class="on">Assess a filer</a>
+    <a data-v="portfolio">Portfolio</a>
+    <a data-v="document">Document scan</a>
+    <a data-v="ask">Ask</a>
+    <a data-v="about">Model card</a>
+  </nav>
+  <div class="foot">
+    ReAct agent <b>0.965</b> AUC<br>
+    Hazard baseline <b>0.966</b><br>
+    200-case backtest
+  </div>
+</aside>
 
 <main>
-  <div class="card">
-    <div class="controls">
-      <div><label for="cik">CIK</label><input id="cik" value="867773" size="12"></div>
-      <div><label for="asof">Prediction date</label><input id="asof" type="date" value="2024-07-01"></div>
-      <div><label for="agent">Investigator</label>
-        <select id="agent">
-          <option value="rules">Rule-based control (offline)</option>
-          <option value="react">ReAct agent (needs endpoint)</option>
-        </select>
-      </div>
-      <button id="go">Assess</button>
-    </div>
-    <div class="hint">
-      Try <code data-cik="867773" data-d="2024-07-01">867773</code> (filed Ch.11; hazard model scored it 0.47 &mdash; a pass) &middot;
-      <code data-cik="1584754" data-d="2024-07-01">1584754</code> (agent moved 0.05&rarr;0.95 once it could read filings) &middot;
-      <code data-cik="320193" data-d="2024-06-01">320193</code> (Apple &mdash; the control false-positives here)
-    </div>
+  <div class="head">
+    <h2 id="ht">Assess a filer</h2>
+    <p id="hs">One company, one prediction date. Every figure recomputed from the filed source.</p>
   </div>
+  <div class="body">
 
-  <div id="out"></div>
+    <!-- ASSESS -->
+    <section class="view on" id="v-assess">
+      <div class="card">
+        <div class="row">
+          <div style="width:130px"><label>CIK</label><input id="cik" value="867773"></div>
+          <div style="width:170px"><label>Prediction date</label><input id="asof" type="date" value="2024-07-01"></div>
+          <div style="width:250px"><label>Investigator</label>
+            <select id="agent">
+              <option value="rules">Rule-based control &mdash; offline</option>
+              <option value="react">ReAct agent &mdash; needs endpoint</option>
+            </select></div>
+          <button id="go">Assess</button>
+        </div>
+        <div class="hint">
+          <code data-cik="867773" data-d="2024-07-01">867773</code> filed Ch.11; hazard scored it 0.47 &middot;
+          <code data-cik="1584754" data-d="2024-07-01">1584754</code> agent moved 0.05&rarr;0.95 with filing text &middot;
+          <code data-cik="320193" data-d="2024-06-01">320193</code> Apple &mdash; control false-positives
+        </div>
+      </div>
+      <div id="out"></div>
+    </section>
+
+    <!-- PORTFOLIO -->
+    <section class="view" id="v-portfolio">
+      <div class="card">
+        <div class="row" style="margin-bottom:14px">
+          <div style="width:170px"><label>Prediction date</label><input id="basof" type="date" value="2024-07-01"></div>
+          <button id="brun">Assess portfolio</button>
+          <button class="ghost" id="bdemo">Load sample</button>
+        </div>
+        <label>CIKs &mdash; paste, or drop a CSV below</label>
+        <textarea id="bciks" placeholder="867773, 1584754, 1101680"></textarea>
+        <div class="drop" id="bdrop" style="margin-top:12px">Drop a CSV or text file, or click to choose</div>
+        <input type="file" id="bfile" accept=".csv,.txt,.tsv" hidden>
+        <div class="hint">Runs the deterministic control only &mdash; the ReAct arm costs a model call and
+          roughly two minutes per name. Capped at 40 filers.</div>
+      </div>
+      <div id="bout"></div>
+    </section>
+
+    <!-- DOCUMENT -->
+    <section class="view" id="v-document">
+      <div class="card">
+        <div class="drop" id="sdrop">Drop a 10-K, 10-Q or 8-K (HTML or text), or click to choose</div>
+        <input type="file" id="sfile" accept=".htm,.html,.txt" hidden>
+        <div class="hint">Deterministic phrase matching over the filing text &mdash; the same code the
+          agent's <code>check_going_concern</code> tool runs. No model is involved, so this returns the
+          same answer every time.</div>
+      </div>
+      <div id="sout"></div>
+    </section>
+
+    <!-- ASK -->
+    <section class="view" id="v-ask">
+      <div class="card">
+        <div id="askstate" class="note" style="margin:0 0 14px">
+          Run an assessment first &mdash; questions are answered from that memo and nothing else.
+        </div>
+        <label>Question</label>
+        <textarea id="q" placeholder="Why is this company rated severe risk?"></textarea>
+        <div class="row" style="margin-top:12px">
+          <button id="qgo">Ask</button>
+          <button class="ghost" id="qclear">Clear</button>
+        </div>
+        <div class="hint">
+          <code data-q="Why is this rated the way it is?">Why this rating?</code> &middot;
+          <code data-q="What is the single strongest piece of evidence here?">Strongest evidence?</code> &middot;
+          <code data-q="What does this assessment not cover?">What is missing?</code> &middot;
+          <code data-q="What is the debt-to-EBITDA ratio?">Debt/EBITDA? (should refuse)</code>
+        </div>
+        <p class="note">Answers come only from the verified memo. Any number that is not already in it
+          blocks the answer, and advice is refused &mdash; the same scope guard the memo passes.</p>
+      </div>
+      <div id="qout"></div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="view" id="v-about">
+      <div class="card">
+        <h3>What this measures</h3>
+        <table>
+          <tr><th>Arm</th><th style="text-align:right">AUC</th><th style="text-align:right">False-confidence</th><th>Standing</th></tr>
+          <tr><td>ReAct agent + filing-text tools</td><td class="num">0.965</td><td class="num">0.080</td><td>backtested</td></tr>
+          <tr><td>ReAct agent, ratios only</td><td class="num">0.881</td><td class="num">0.250</td><td>backtested</td></tr>
+          <tr><td>Hazard baseline (Shumway)</td><td class="num">0.966</td><td class="num">&mdash;</td><td>reference</td></tr>
+          <tr><td>Altman Z''</td><td class="num">0.885</td><td class="num">&mdash;</td><td>reference</td></tr>
+          <tr><td>Rule-based control</td><td class="num">0.885</td><td class="num">&mdash;</td><td>floor</td></tr>
+        </table>
+        <p class="note">200 firm-period cases, 100 Chapter 11 positives, strict as-of cutoffs, temporal
+        hold-out from 2024-06-01. Filing-text tools worth <b>+0.084 AUC</b>, 95% CI [+0.048, +0.125].
+        The agent <b>ties</b> the hazard baseline; it does not beat it.</p>
+      </div>
+      <div class="card">
+        <h3>What it does not do</h3>
+        <ul class="plain">
+          <li><b>No decisions.</b> It states risk. It never recommends lending, investing or pricing.</li>
+          <li><b>Absolute probabilities do not transfer.</b> The test universe is enriched with distressed
+            filers far above the population base rate. Ranking transfers; calibrated probabilities do not.</li>
+          <li><b>Earnings quality is demo-grade.</b> Four approaches measured 0.51&ndash;0.61 AUC with a clean
+            leak canary, so those observations are context only and never move the graded signal.</li>
+          <li><b>US SEC filers only</b>, and one model over one time window.</li>
+          <li><b>It has never chosen to abstain.</b> Every abstention in 200 cases was a protocol failure,
+            so "it will tell you when it doesn't know" is unexercised.</li>
+        </ul>
+      </div>
+    </section>
+
+  </div>
 </main>
 
 <script>
-const $ = s => document.querySelector(s);
-const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-const num = v => v === null || v === undefined ? 'n/a'
-  : (Math.abs(v) >= 1000 || (Math.abs(v) < 0.01 && v !== 0)) ? v.toExponential(3) : (+v).toFixed(4).replace(/\.?0+$/,'');
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const num=v=>v==null?'n/a':(Math.abs(v)>=1000||(Math.abs(v)<0.01&&v!==0))?v.toExponential(3)
+  :(+v).toFixed(4).replace(/\.?0+$/,'');
+const TITLES={assess:['Assess a filer','One company, one prediction date. Every figure recomputed from the filed source.'],
+  portfolio:['Portfolio','Screen many filers at once with the deterministic control.'],
+  document:['Document scan','Deterministic distress-language detection over an uploaded filing.'],
+  ask:['Ask','Grounded questions about the assessment you just ran.'],
+  about:['Model card','What was measured, and what it does not support.']};
+let CURRENT=null;
 
-document.querySelectorAll('.hint code').forEach(c => c.onclick = () => {
-  $('#cik').value = c.dataset.cik; $('#asof').value = c.dataset.d; $('#go').click();
+$$('nav a').forEach(a=>a.onclick=()=>{
+  $$('nav a').forEach(x=>x.classList.toggle('on',x===a));
+  $$('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+a.dataset.v));
+  $('#ht').textContent=TITLES[a.dataset.v][0]; $('#hs').textContent=TITLES[a.dataset.v][1];
 });
 
-$('#go').onclick = async () => {
-  const btn = $('#go'), out = $('#out');
-  btn.disabled = true;
-  out.innerHTML = '<div class="card"><span class="spin">Loading filings and running the investigation&hellip;</span></div>';
-  try {
-    const r = await fetch('/api/assess', {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({cik: +$('#cik').value, as_of: $('#asof').value, agent: $('#agent').value})
-    });
-    render(await r.json());
-  } catch (e) {
-    out.innerHTML = `<div class="card blocked"><h2>Request failed</h2><p class="err">${esc(e)}</p></div>`;
-  }
-  btn.disabled = false;
+/* ---------- assess ---------- */
+$$('#v-assess .hint code').forEach(c=>c.onclick=()=>{
+  $('#cik').value=c.dataset.cik; $('#asof').value=c.dataset.d; $('#go').click();});
+
+$('#go').onclick=async()=>{
+  const b=$('#go'); b.disabled=true;
+  $('#out').innerHTML='<div class="card"><span class="spin">Loading filings and investigating&hellip;</span></div>';
+  try{
+    const r=await fetch('/api/assess',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({cik:+$('#cik').value,as_of:$('#asof').value,agent:$('#agent').value})});
+    const d=await r.json(); CURRENT=d.shipped?d:null; renderAssess(d); updateAsk();
+  }catch(e){$('#out').innerHTML=`<div class="card blocked"><h3>Request failed</h3><p class="err">${esc(e)}</p></div>`;}
+  b.disabled=false;
 };
 
-function render(d) {
-  const out = $('#out');
-  if (d.error) {
-    out.innerHTML = `<div class="card blocked"><h2>Could not assess</h2><p class="err">${esc(d.error)}</p></div>`;
-    return;
-  }
-  let h = '';
-
-  h += `<div class="card"><h2>Routing</h2><ul class="plain route">
+function renderAssess(d){
+  const out=$('#out');
+  if(d.error){out.innerHTML=`<div class="card blocked"><h3>Could not assess</h3><p class="err">${esc(d.error)}</p></div>`;return;}
+  let h=`<div class="card"><h3>Routing</h3><ul class="plain route">
     <li>${esc(d.triage.depth)} pass &mdash; ${d.triage.steps} step budget</li>
-    ${d.triage.reasons.map(r => `<li>${esc(r)}</li>`).join('')}
-    <li>${d.n_facts.toLocaleString()} XBRL facts visible as of ${esc(d.as_of)}</li>
-  </ul></div>`;
-
-  if (!d.shipped) {
-    h += `<div class="card blocked"><h2>No memo issued &mdash; guard blocked</h2>
+    ${d.triage.reasons.map(r=>`<li>${esc(r)}</li>`).join('')}
+    <li>${d.n_facts.toLocaleString()} XBRL facts visible as of ${esc(d.as_of)}</li></ul></div>`;
+  if(!d.shipped){
+    out.innerHTML=h+`<div class="card blocked"><h3>No memo issued &mdash; guard blocked</h3>
       <p class="err">${esc(d.blocked_reason)}</p>
-      <p class="note">A blocked memo is the guard working. A figure could not be
-      reproduced from its source, or the output stated an action rather than a risk.
-      The memo is withheld rather than annotated.</p></div>`;
-    out.innerHTML = h; return;
-  }
-
-  const m = d.memo;
-  h += `<div class="card"><div class="verdict">
+      <p class="note">A blocked memo is the guard working: a figure could not be reproduced from source,
+      or the output stated an action. The memo is withheld rather than annotated.</p></div>`;return;}
+  const m=d.memo;
+  h+=`<div class="card"><div class="verdict">
       <span class="badge ${esc(m.signal)}">${esc(m.signal.replace(/_/g,' '))}</span>
-      ${m.risk_score !== null ? `<div class="metric"><span class="v">${m.risk_score.toFixed(0)}</span><span class="k">risk score / 100</span></div>` : ''}
+      ${m.risk_score!=null?`<div class="metric"><span class="v">${m.risk_score.toFixed(0)}</span><span class="k">risk score / 100</span></div>`:''}
       <div class="metric"><span class="v">${m.confidence.toFixed(2)}</span><span class="k">confidence</span></div>
-      <div class="metric"><span class="v">${m.tool_calls}</span><span class="k">tool calls</span></div>
-    </div>
-    ${m.summary ? `<p style="margin:16px 0 0">${esc(m.summary)}</p>` : ''}
-    <p class="note">Arm: ${esc(d.agent)} (AUC ${d.arm_auc}) vs hazard baseline ${d.hazard_baseline_auc}
-    on the 200-case backtest. Absolute probabilities do not transfer to population base rates.</p>
-  </div>`;
-
-  for (const s of m.sections) {
-    h += `<div class="card"><h2>${esc(s.title)}<span class="tier ${esc(s.tier)}">${esc(s.tier)}</span></h2>`;
-    if (!s.moves_the_signal)
-      h += `<p class="note">Context only &mdash; does not affect the graded signal.</p>`;
-    if (s.body) h += `<p>${esc(s.body)}</p>`;
-    if (s.evidence.length) {
-      h += `<table><tr><th>Metric</th><th style="text-align:right">Value</th><th>Period end</th><th>Note</th></tr>`;
-      for (const e of s.evidence) {
-        const cls = e.note === 'severe' ? 'sev' : e.note === 'flag' ? 'flg' : '';
-        h += `<tr><td>${esc(e.metric)}</td><td class="num">${num(e.value)}</td>
-              <td>${esc(e.period_end || '—')}</td><td class="${cls}">${esc(e.note)}</td></tr>`;
-      }
-      h += `</table>`;
-    }
-    h += `</div>`;
-  }
-
-  if (m.residual)
-    h += `<div class="card"><h2>Residual uncertainty</h2><p>${esc(m.residual)}</p></div>`;
-
-  if (m.limitations.length)
-    h += `<div class="card"><h2>Data limitations</h2><ul class="plain limit">
-      ${m.limitations.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
-      <p class="note">Surfaced rather than swallowed. Reasoning on incomplete data
-      without saying so is the failure mode this system is built to prevent.</p></div>`;
-
-  h += `<div class="card"><details><summary>Audit trail &mdash; ${m.audit_trail.length} tool call(s)</summary>
+      <div class="metric"><span class="v">${m.tool_calls}</span><span class="k">tool calls</span></div></div>
+      ${m.summary?`<p style="margin:15px 0 0">${esc(m.summary)}</p>`:''}
+      <p class="note">Arm: ${esc(d.agent)} (AUC ${d.arm_auc}) vs hazard baseline ${d.hazard_baseline_auc}.
+      Absolute probabilities do not transfer to population base rates.</p></div>`;
+  for(const s of m.sections){
+    h+=`<div class="card"><h3>${esc(s.title)}<span class="tier ${esc(s.tier)}">${esc(s.tier)}</span></h3>`;
+    if(!s.moves_the_signal)h+=`<p class="note">Context only &mdash; does not affect the graded signal.</p>`;
+    if(s.body)h+=`<p>${esc(s.body)}</p>`;
+    if(s.evidence.length){
+      h+=`<table><tr><th>Metric</th><th style="text-align:right">Value</th><th>Period end</th><th>Note</th></tr>`;
+      for(const e of s.evidence){const c=e.note==='severe'?'sev':e.note==='flag'?'flg':'';
+        h+=`<tr><td>${esc(e.metric)}</td><td class="num">${num(e.value)}</td><td>${esc(e.period_end||'—')}</td><td class="${c}">${esc(e.note)}</td></tr>`;}
+      h+=`</table>`;}
+    h+=`</div>`;}
+  if(m.residual)h+=`<div class="card"><h3>Residual uncertainty</h3><p>${esc(m.residual)}</p></div>`;
+  if(m.limitations.length)h+=`<div class="card"><h3>Data limitations</h3><ul class="plain limit">
+    ${m.limitations.map(l=>`<li>${esc(l)}</li>`).join('')}</ul>
+    <p class="note">Surfaced rather than swallowed. Reasoning on incomplete data without saying so is
+    the failure this system is built to prevent.</p></div>`;
+  h+=`<div class="card"><details><summary>Audit trail &mdash; ${m.audit_trail.length} tool call(s)</summary>
     <table style="margin-top:10px"><tr><th>#</th><th>Tool</th><th>Result</th></tr>
-    ${m.audit_trail.map((c,i) => `<tr><td class="num">${i+1}</td><td>${esc(c.tool)}</td>
-      <td class="${c.ok ? '' : 'err'}">${esc(c.summary || c.error || '')}</td></tr>`).join('')}
-    </table></details></div>`;
-
-  h += `<div class="card"><details><summary>Plain-text memo</summary>
-    <pre style="margin-top:10px">${esc(m.text)}</pre></details>
-    <p class="note">Advisory only. This states risk for a human reviewer and never
-    recommends an action; the scope guard blocks decision framing before rendering.</p></div>`;
-
-  out.innerHTML = h;
+    ${m.audit_trail.map((c,i)=>`<tr><td class="num">${i+1}</td><td>${esc(c.tool)}</td>
+      <td class="${c.ok?'':'err'}">${esc(c.summary||c.error||'')}</td></tr>`).join('')}</table></details></div>`;
+  h+=`<div class="card"><details><summary>Plain-text memo</summary><pre style="margin-top:10px">${esc(m.text)}</pre></details>
+    <p class="note">Advisory only. States risk for a human reviewer; the scope guard blocks decision framing.</p></div>`;
+  out.innerHTML=h;
 }
+
+/* ---------- portfolio ---------- */
+$('#bdemo').onclick=()=>{$('#bciks').value='867773, 1584754, 1101680, 320193, 1391127, 1223389';};
+function wireDrop(dropId,fileId,handler){
+  const d=$(dropId),f=$(fileId);
+  d.onclick=()=>f.click();
+  d.ondragover=e=>{e.preventDefault();d.classList.add('over');};
+  d.ondragleave=()=>d.classList.remove('over');
+  d.ondrop=e=>{e.preventDefault();d.classList.remove('over');if(e.dataTransfer.files[0])handler(e.dataTransfer.files[0]);};
+  f.onchange=()=>{if(f.files[0])handler(f.files[0]);};
+}
+wireDrop('#bdrop','#bfile',async file=>{
+  const fd=new FormData(); fd.append('file',file);
+  $('#bdrop').textContent='Reading '+file.name+'…';
+  const r=await fetch('/api/upload',{method:'POST',body:fd}); const d=await r.json();
+  $('#bciks').value=d.ciks.join(', ');
+  $('#bdrop').textContent=`${d.found} CIK(s) found in ${d.filename}${d.truncated?' (capped at 40)':''} — click to choose another`;
+});
+$('#brun').onclick=async()=>{
+  const ciks=($('#bciks').value.match(/\d+/g)||[]).map(Number);
+  if(!ciks.length){$('#bout').innerHTML='<div class="card"><p class="err">No CIKs given.</p></div>';return;}
+  const b=$('#brun'); b.disabled=true;
+  $('#bout').innerHTML=`<div class="card"><span class="spin">Assessing ${ciks.length} filer(s)&hellip;</span></div>`;
+  const r=await fetch('/api/batch',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({ciks,as_of:$('#basof').value,agent:'rules'})});
+  const d=await r.json(); b.disabled=false;
+  if(d.error){$('#bout').innerHTML=`<div class="card blocked"><p class="err">${esc(d.error)}</p></div>`;return;}
+  let h=`<div class="card"><h3>Portfolio &mdash; ${d.assessed}/${d.requested} assessed, ranked by risk</h3>
+    <table><tr><th>CIK</th><th>Signal</th><th style="text-align:right">Risk</th>
+    <th style="text-align:right">Conf.</th><th>Depth</th><th style="text-align:right">Limits</th><th>Status</th></tr>`;
+  for(const r0 of d.rows){
+    if(r0.status!=='ok'){h+=`<tr><td>${r0.cik}</td><td colspan="5" class="err">${esc(r0.detail||'')}</td>
+      <td><span class="pill" style="background:rgba(248,81,73,.15);color:var(--bad)">${esc(r0.status)}</span></td></tr>`;continue;}
+    h+=`<tr class="clickable" data-cik="${r0.cik}"><td>${r0.cik}</td>
+      <td><span class="badge ${esc(r0.signal)}" style="font-size:10px;padding:3px 8px">${esc(r0.signal.replace(/_/g,' '))}</span></td>
+      <td class="num">${r0.risk_score!=null?r0.risk_score.toFixed(0):'—'}</td>
+      <td class="num">${r0.confidence.toFixed(2)}</td><td>${esc(r0.depth)}</td>
+      <td class="num">${r0.limitations}</td><td><span class="pill" style="background:rgba(63,185,80,.14);color:var(--ok)">ok</span></td></tr>`;}
+  h+=`</table><p class="note">Rule-based control (0.885 AUC) &mdash; a threshold model, not the agent.
+    Click a row to open it in Assess. Filers that could not be read are listed rather than dropped.</p></div>`;
+  $('#bout').innerHTML=h;
+  $$('#bout tr.clickable').forEach(tr=>tr.onclick=()=>{
+    $('#cik').value=tr.dataset.cik; $('#asof').value=$('#basof').value;
+    $$('nav a')[0].click(); $('#go').click();});
+};
+
+/* ---------- document scan ---------- */
+wireDrop('#sdrop','#sfile',async file=>{
+  $('#sdrop').textContent='Scanning '+file.name+'…';
+  const fd=new FormData(); fd.append('file',file);
+  const r=await fetch('/api/scan',{method:'POST',body:fd}); const d=await r.json();
+  $('#sdrop').textContent='Drop another filing, or click to choose';
+  if(d.error){$('#sout').innerHTML=`<div class="card blocked"><p class="err">${esc(d.error)}</p></div>`;return;}
+  const yn=v=>v?'<span class="pill" style="background:rgba(248,81,73,.15);color:var(--bad)">DETECTED</span>'
+               :'<span class="pill" style="background:rgba(63,185,80,.14);color:var(--ok)">not found</span>';
+  $('#sout').innerHTML=`<div class="card"><h3>${esc(d.filename)} &mdash; ${d.characters.toLocaleString()} characters</h3>
+    <table><tr><th>Signal</th><th>Result</th></tr>
+      <tr><td>Going-concern doubt</td><td>${yn(d.going_concern_doubt)}</td></tr>
+      <tr><td>Material weakness in internal control</td><td>${yn(d.material_weakness)}</td></tr></table>
+    ${d.going_concern_quote?`<h3 style="margin-top:18px">Going-concern passage</h3><pre>${esc(d.going_concern_quote)}</pre>`:''}
+    ${d.material_weakness_quote?`<h3 style="margin-top:18px">Material-weakness passage</h3><pre>${esc(d.material_weakness_quote)}</pre>`:''}
+    <p class="note">${esc(d.note)}. Going-concern doubt appeared in 54% of bankrupt filers against 2% of
+    survivors in the backtest universe &mdash; but in 41.7% of all annual filers, where it is routine.
+    Read it as one input, not a verdict.</p></div>`;
+});
+
+/* ---------- ask ---------- */
+function updateAsk(){
+  $('#askstate').innerHTML = CURRENT
+    ? `Answering about <b>CIK ${CURRENT.cik}</b> as of ${esc(CURRENT.as_of)} &mdash; signal
+       <b>${esc(CURRENT.memo.signal.replace(/_/g,' '))}</b>. Only this memo is in scope.`
+    : 'Run an assessment first &mdash; questions are answered from that memo and nothing else.';
+}
+$$('#v-ask .hint code').forEach(c=>c.onclick=()=>{$('#q').value=c.dataset.q;$('#qgo').click();});
+$('#qclear').onclick=()=>{$('#qout').innerHTML='';$('#q').value='';};
+$('#qgo').onclick=async()=>{
+  const q=$('#q').value.trim(); if(!q)return;
+  if(!CURRENT){$('#qout').innerHTML='<div class="card blocked"><p class="err">Run an assessment first.</p></div>';return;}
+  const b=$('#qgo'); b.disabled=true;
+  const prev=$('#qout').innerHTML;
+  $('#qout').innerHTML='<div class="card"><span class="spin">Thinking&hellip;</span></div>'+prev;
+  const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({assessment:CURRENT,question:q})});
+  const d=await r.json(); b.disabled=false;
+  let block;
+  if(d.error) block=`<div class="card blocked"><p class="err">${esc(d.error)}</p></div>`;
+  else if(!d.allowed) block=`<div class="card"><div class="qa"><div class="q">${esc(q)}</div>
+      <div class="blocked-ans"><b>Answer withheld.</b> ${esc(d.reason)}
+      ${d.ungrounded_numbers.length?`<br>Ungrounded figure(s): <code>${esc(d.ungrounded_numbers.join(', '))}</code>`:''}
+      </div></div><p class="note">The guard fired. Answers may only restate figures already verified in the
+      memo, and may never recommend an action.</p></div>`;
+  else block=`<div class="card"><div class="qa"><div class="q">${esc(q)}</div><div class="a">${esc(d.answer)}</div></div></div>`;
+  $('#qout').innerHTML=block+prev;
+};
 
 $('#go').click();
 </script>

@@ -159,7 +159,7 @@ def build_memo(
             MemoSection(
                 title="Earnings-quality observations",
                 tier=TIER_CONTEXT,
-                body=" ".join(context_notes),
+                body="\n".join(context_notes),
             )
         )
 

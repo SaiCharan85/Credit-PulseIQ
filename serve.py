@@ -21,16 +21,20 @@ next to the result -- a reader should not mistake the floor for the system.
 
 from __future__ import annotations
 
+import re
 import sys
 from datetime import date
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile
+from fastapi import File as _File
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 
+from agents.earnings_notes import earnings_notes
 from agents.llm import load_env_file
 from agents.orchestrator import Orchestrator
+from agents.schemas import SIGNAL_ORDER
 from data.edgar import EdgarClient
 
 app = FastAPI(title="CreditPulse IQ", docs_url="/api/docs")
@@ -41,11 +45,29 @@ INDEX = Path(__file__).parent / "web" / "index.html"
 ARM_AUC = {"rules": 0.885, "react": 0.965}
 HAZARD_AUC = 0.966
 
+#: Portfolio cap. Each name is a real EDGAR fetch against a rate-limited API.
+MAX_BATCH = 40
+
+#: Module-level singleton so the dependency is not constructed in a default
+#: argument (ruff B008).
+UPLOAD = _File(...)
+
 
 class AssessRequest(BaseModel):
     cik: int
     as_of: date
     agent: str = "rules"
+
+
+class BatchRequest(BaseModel):
+    ciks: list[int]
+    as_of: date
+    agent: str = "rules"
+
+
+class AskRequest(BaseModel):
+    assessment: dict
+    question: str
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -96,7 +118,12 @@ def assess(req: AssessRequest) -> JSONResponse:
 
         investigator = RuleBasedInvestigator()
 
-    result = Orchestrator(investigator).run(req.cik, req.as_of, facts, **extra)
+    # Earnings-quality observations ride along as context. Measured at
+    # 0.51-0.61 AUC over six approaches, so they never move the graded signal.
+    notes = earnings_notes(facts, req.as_of)
+    result = Orchestrator(investigator, context_notes=notes).run(
+        req.cik, req.as_of, facts, **extra
+    )
 
     payload: dict = {
         "cik": req.cik,
@@ -151,6 +178,154 @@ def assess(req: AssessRequest) -> JSONResponse:
         "text": memo.render(),
     }
     return JSONResponse(payload)
+
+
+def _assess_one(edgar: EdgarClient, investigator, cik: int, as_of: date) -> dict:
+    """One row of a portfolio run. A filer that cannot be loaded is reported
+    as such rather than dropped -- a portfolio view that silently omits the
+    names it could not read is worse than one that says so."""
+    try:
+        facts = edgar.facts(cik)
+    except Exception as exc:  # noqa: BLE001
+        return {"cik": cik, "status": "unavailable", "detail": str(exc)[:120]}
+    if not facts:
+        return {"cik": cik, "status": "unavailable", "detail": "no XBRL facts"}
+    result = Orchestrator(investigator).run(cik, as_of, facts)
+    if not result.shipped:
+        return {"cik": cik, "status": "blocked", "detail": result.blocked_reason[:160]}
+    return {
+        "cik": cik,
+        "status": "ok",
+        "signal": result.memo.signal,
+        "risk_score": result.memo.risk_score,
+        "confidence": result.memo.confidence,
+        "depth": result.triage.depth,
+        "limitations": len(result.memo.limitations),
+        "tool_calls": result.memo.tool_calls,
+    }
+
+
+@app.post("/api/batch")
+def batch(req: BatchRequest) -> JSONResponse:
+    """Assess a portfolio. Capped, because each name is a real EDGAR fetch."""
+    from agents.rulebased import RuleBasedInvestigator
+
+    if req.agent == "react":
+        return JSONResponse(
+            {"error": "batch runs the deterministic control only; "
+                      "the ReAct arm costs ~2 minutes and a model call per name"},
+            status_code=400,
+        )
+    load_env_file()
+    ciks = req.ciks[:MAX_BATCH]
+    edgar = EdgarClient()
+    investigator = RuleBasedInvestigator()
+    rows = [_assess_one(edgar, investigator, c, req.as_of) for c in ciks]
+
+    def rank_key(row: dict) -> tuple:
+        """Order by risk, falling back to the ordinal signal.
+
+        The rule-based control emits no risk_score, so ranking on it alone put
+        every row at the same value and the table claimed an order it did not
+        have. The signal is always present and is itself ordered, so it carries
+        the ranking when the score is absent.
+        """
+        if row.get("status") != "ok":
+            return (-1, -1.0, 0.0)
+        severity = SIGNAL_ORDER.index(row["signal"]) if row["signal"] in SIGNAL_ORDER else -1
+        score = row.get("risk_score")
+        return (severity, score if score is not None else -1.0, row.get("confidence", 0.0))
+
+    ranked = sorted(rows, key=rank_key, reverse=True)
+    return JSONResponse(
+        {
+            "as_of": req.as_of.isoformat(),
+            "requested": len(req.ciks),
+            "assessed": sum(1 for r in rows if r["status"] == "ok"),
+            "truncated": len(req.ciks) > MAX_BATCH,
+            "rows": ranked,
+        }
+    )
+
+
+@app.post("/api/upload")
+async def upload(file: UploadFile = UPLOAD) -> JSONResponse:
+    """Read CIKs out of an uploaded CSV or text file.
+
+    Parsing only -- it returns the identifiers it found so the caller can
+    review them before spending fetches. Uploading a list and having it
+    silently run is how a typo becomes two hundred EDGAR requests.
+    """
+    raw = (await file.read()).decode("utf8", errors="replace")
+    found: list[int] = []
+    seen: set[int] = set()
+    for line in raw.splitlines():
+        for token in re.split(r"[,;	|]", line):
+            token = token.strip().strip('"').lstrip("0")
+            if token.isdigit() and 1 <= len(token) <= 10:
+                value = int(token)
+                if value not in seen:
+                    seen.add(value)
+                    found.append(value)
+    return JSONResponse(
+        {
+            "filename": file.filename,
+            "ciks": found[:MAX_BATCH],
+            "found": len(found),
+            "truncated": len(found) > MAX_BATCH,
+        }
+    )
+
+
+@app.post("/api/scan")
+async def scan(file: UploadFile = UPLOAD) -> JSONResponse:
+    """Scan an uploaded filing for going-concern and material-weakness language.
+
+    Deterministic -- regex over the stripped text, no model. The same code the
+    agent's check_going_concern tool uses, so what a user sees here is what the
+    investigator would see.
+    """
+    from data.signals import scan_report_text
+
+    raw = (await file.read()).decode("utf8", errors="replace")
+    if not raw.strip():
+        return JSONResponse({"error": "empty file"}, status_code=400)
+    found = scan_report_text(raw)
+    return JSONResponse(
+        {
+            "filename": file.filename,
+            "characters": len(raw),
+            **found,
+            "note": "deterministic phrase match over the filing text; no model involved",
+        }
+    )
+
+
+@app.post("/api/ask")
+def ask_question(req: AskRequest) -> JSONResponse:
+    """Grounded Q&A over one finished assessment."""
+    from agents.llm import CachingClient, RateLimitedClient, default_client, preflight
+    from agents.qa import ask
+
+    load_env_file()
+    try:
+        client = RateLimitedClient(inner=default_client())
+        ok, detail = preflight(client)
+    except Exception as exc:  # noqa: BLE001
+        ok, detail = False, str(exc)
+    if not ok:
+        return JSONResponse({"error": f"no model endpoint configured: {detail}"}, status_code=503)
+
+    answer = ask(CachingClient(inner=client), req.assessment, req.question)
+    return JSONResponse(
+        {
+            "question": req.question,
+            "answer": answer.text if answer.allowed else "",
+            "allowed": answer.allowed,
+            "reason": answer.reason,
+            "ungrounded_numbers": answer.ungrounded_numbers,
+        }
+    )
 
 
 if __name__ == "__main__":

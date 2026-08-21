@@ -102,7 +102,11 @@ class Memo(BaseModel):
         for section in self.sections:
             lines.append(f"-- {section.title}  [{section.tier}: {TIER_NOTE[section.tier]}]")
             if section.body:
-                lines.append(f"   {section.body.strip()}")
+                # Indent every line: a multi-line body (the earnings
+                # observations are one per line) otherwise loses its
+                # alignment after the first.
+                for para in section.body.strip().splitlines():
+                    lines.append(f"   {para.strip()}")
             for e in section.evidence:
                 period = f" @ {e.period_end}" if e.period_end else ""
                 value = "n/a" if e.value is None else f"{e.value:,.4g}"

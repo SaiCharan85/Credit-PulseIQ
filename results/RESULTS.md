@@ -211,6 +211,41 @@ terms were therefore registered individually, lifting coverage to 35-69% each.
 AUC moved 0.579 to 0.585 and not one component reached the strongest covariates.
 The signal is not hidden behind absent tags. It is absent.
 
+## Attempt six: engineered features. No effect.
+
+Resampling was not tried, and should not be: AUC is a ranking metric and is
+essentially invariant to class balance, `class_weight="balanced"` is already
+applied, and resampling redistributes information rather than creating it.
+
+Feature engineering was tried, because all five earlier attempts used
+point-in-time *levels*. Three families were added -- industry-adjusted
+percentiles within (observation date, 2-digit SIC), year-over-year change per
+firm, and trailing volatility -- 27 features in total.
+
+The comparison is *paired* rather than absolute, because five approaches had
+already been scored on this fold and there is no untouched slice to retreat to:
+everything after 2023-07-01 was inside the test fold of all five, and the panel
+cannot be extended forward because a 12-month label window needs outcomes that
+have not happened yet. Both arms therefore fit on the same window and score the
+same rows, differing only in the feature set. Fold reuse moves them together
+and cannot manufacture a difference.
+
+| arm | AUC |
+| --- | --- |
+| base covariates | 0.5852 |
+| base + 27 engineered features | 0.5843 |
+| **difference** | **-0.0008, 95% CI [-0.0116, +0.0097]** |
+
+The interval is tight around zero, so this is a clear null rather than an
+underpowered one. Industry adjustment was the strongest prior hypothesis --
+raw accruals are structurally different across sectors and the accounting
+literature adjusts for it as a matter of course -- and it moved the number by
+less than one part in a thousand.
+
+Six approaches, one conclusion. No seventh was attempted; each further cut of
+the same data buys a multiple-comparisons problem that costs more credibility
+than any number it could produce.
+
 ## Scope
 
 Under the honest-scoping rule this leg is **demo-grade, not a backtested
@@ -227,3 +262,4 @@ to find.
 | --- | --- |
 | `eq_baselines.log` | full baseline output including the leak canary |
 | `eq_signal_probe.csv` | per-row filing-text signals, train and test folds |
+| `eq_engineered.log` | the paired engineered-feature comparison |

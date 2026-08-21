@@ -1,0 +1,17 @@
+panel 38737 rows, 50 base covariates
+  sic 400/2069
+  sic 800/2069
+  sic 1200/2069
+  sic 1600/2069
+  sic 2000/2069
+SIC resolved for 2046/2069 filers
+engineered 27 features (+ missingness flags)
+train 24544 (1399 pos) | test 14193 (891 pos)
+
+=== paired on identical rows ===
+  base features            : AUC 0.5852
+  base + engineered        : AUC 0.5843
+  difference               : -0.0008  95% CI [-0.0116, +0.0097]
+  verdict                  : NO EFFECT -- the leg is closed
+
+Paired by construction: both arms fit on the same window and score the same rows, so reuse of this fold moves them together and cannot manufacture a difference.

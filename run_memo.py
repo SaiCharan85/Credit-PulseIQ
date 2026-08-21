@@ -20,6 +20,7 @@ import argparse
 import sys
 from datetime import date
 
+from agents.earnings_notes import earnings_notes
 from agents.guards import GUARD_NUMERIC, GUARD_SCOPE
 from agents.llm import load_env_file
 from agents.orchestrator import Orchestrator
@@ -72,7 +73,7 @@ def main(argv: list[str] | None = None) -> int:
         except Exception:  # noqa: BLE001
             print("filing index unavailable; text tools will report an error", file=sys.stderr)
 
-    result = Orchestrator(investigator).run(
+    result = Orchestrator(investigator, context_notes=earnings_notes(facts, args.as_of)).run(
         args.cik,
         args.as_of,
         facts,
