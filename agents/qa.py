@@ -80,6 +80,82 @@ sentence and then say what it does show.
 happening to the business.
 """
 
+#: Questions that ask what to *do* rather than what is *true*.
+#:
+#: Blocking these after the fact returns nothing useful. SPEC 8 says refuse
+#: *or redirect*, and only the refusal was built: a reader who asks "should I
+#: lend to this" got a guard message and no evidence, which is a safe answer
+#: and a bad one. Detected on the way in, the turn is steered instead --
+#: decline the decision, give the evidence bearing on it, and say what the
+#: system cannot see. That last part is the most useful thing in the reply and
+#: is still not advice.
+_ADVICE_SOUGHT = re.compile(
+    r"\bshould (?:i|we|they|he|she|you)\b"
+    r"|\b(?:do|would) you recommend\b"
+    r"|\bwhat (?:should|would) (?:i|we|you) do\b"
+    r"|\b(?:is|are) (?:it|this|they) a (?:good|bad|safe|smart) (?:idea|investment|bet|buy)\b"
+    r"|\b(?:buy|sell|short|invest in|lend to|avoid|exit|hold)\b[^?]{0,25}\?"
+    r"|\bworth (?:buying|investing|lending|the risk)\b"
+    r"|\bhow much should\b"
+    r"|\btell me what to do\b"
+    r"|\bwhat would you do\b",
+    re.I,
+)
+
+#: Instruction-shaped text in the *question*. ``data/sanitize.py`` guards
+#: filing text, which is attacker-controlled; the question is too, and it
+#: reaches the model by a different path that guard never covered.
+#:
+#: The output scope guard is a backstop, not a substitute. It catches
+#: "deny the loan" and misses "your position would be better served by" --
+#: same advice, no banned phrase. Detecting the attempt on the way in also
+#: lets the reply say what happened rather than silently complying.
+_QUESTION_INJECTION = re.compile(
+    r"ignore (?:all |any |the )?(?:previous|prior|above|earlier|your) "
+    r"(?:instruction|prompt|rule|guideline)"
+    r"|disregard (?:all |any |the )?(?:previous|prior|above|your)"
+    r"|you are (?:now |no longer )"
+    r"|new instructions?:"
+    r"|(?:^|\n)\s*(?:system|assistant|developer)\s*:"
+    r"|</?(?:system|assistant|instruction)\s*>"
+    r"|pretend (?:you are|to be)"
+    r"|(?:forget|drop|bypass|override) (?:your |the )?(?:rules|guardrails|restrictions|scope)",
+    re.I,
+)
+
+REDIRECT_DIRECTIVE = """
+The reader has asked what to DO. Do not answer that, and do not lecture \
+them about it. Structure the reply exactly so:
+
+First sentence: say plainly that you set out evidence rather than decisions.
+Then: the two or three findings that bear most on their question, in plain \
+language.
+Last: what this assessment CANNOT tell them that matters for the decision \
+-- their exposure, security or recovery position, pricing, the company's \
+private financing, or anything after the prediction date. Be specific \
+about the gaps.
+
+Still no bullet points, still prose, still no recommendation.
+"""
+
+INJECTION_NOTICE = (
+    "That question contained text shaped like an instruction to the "
+    "assistant rather than a question about the company. It was not acted "
+    "on. Ask about the assessment and it will be answered from the "
+    "verified findings."
+)
+
+
+def question_is_injection(question: str) -> bool:
+    """Whether the question is trying to reprogram the assistant."""
+    return bool(_QUESTION_INJECTION.search(question))
+
+
+def asks_for_advice(question: str) -> bool:
+    """Whether the question wants a decision rather than a fact."""
+    return bool(_ADVICE_SOUGHT.search(question))
+
+
 #: What each metric means, in the terms a credit analyst would use.
 #:
 #: Without this the model has nothing to explain *with*: a context of bare
@@ -241,9 +317,23 @@ def ask(client: Any, payload: dict[str, Any], question: str) -> Answer:
             text="No memo was produced for this assessment, so there is nothing to explain.",
             allowed=True,
         )
+    # Refused before the model sees it. Letting an injection through and
+    # relying on the output guard covers only the phrasings that guard knows,
+    # and leaves the reader with a blocked answer and no idea why. The model
+    # happens to resist these prompts today, which is robustness rather than a
+    # control -- a control does not depend on the model's mood.
+    if question_is_injection(question):
+        return Answer(text=INJECTION_NOTICE, allowed=True, reason="question_injection")
+
     context = memo_context(payload)
+    system = SYSTEM_PROMPT
+    if asks_for_advice(question):
+        # Redirect rather than refuse (SPEC 8). Only the refusal half was
+        # built, so a reader asking "should I lend to this" got a guard
+        # message and no evidence -- safe, and useless.
+        system = SYSTEM_PROMPT + REDIRECT_DIRECTIVE
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": system},
         {"role": "user", "content": f"ASSESSMENT\n{context}\n\nQUESTION\n{question}"},
     ]
     reply = strip_reasoning(client.complete(messages))
