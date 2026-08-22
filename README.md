@@ -67,7 +67,25 @@ agent vs hazard : -0.0017   95% CI [-0.0262, +0.0225]   -> tie
 
 **The finding: giving the agent evidence a ratio model cannot read is worth +0.084 AUC.** That is the largest measured effect in the project and its interval is nowhere near zero. It converted a clear loss against the hazard baseline into a statistical tie, and cut catastrophic errors threefold.
 
-**The agent does not beat the baseline.** The point estimate is fractionally below and the interval spans zero. Parity plus an auditable explanation is the claim the evidence supports; superiority is not.
+**The agent does not beat the baseline, and against a properly specified one it loses.** This is a correction to an earlier version of this README, which reported a tie and stopped there.
+
+Every model in this project was `LogisticRegression(C=1.0)` -- the sklearn default, never tuned, never a different family. A baseline nobody tried to make strong is not a baseline. Tuning a gradient-boosted model on an inner validation split carved from the training window, and scoring the test fold once:
+
+| arm, identical 169 cases | AUC |
+|---|---|
+| Altman Z'' | 0.8801 |
+| **Agent (ReAct + filing-text tools)** | **0.9634** |
+| hazard, logistic C=1.0 *(the originally published baseline)* | 0.9748 |
+| **hazard, tuned LightGBM** | **0.9884** |
+
+```
+agent - logistic : -0.0113  95% CI [-0.0377, +0.0120]  tie
+agent - GBM      : -0.0249  95% CI [-0.0520, -0.0036]  agent is worse
+```
+
+So the honest sentence is: **the agent ties an untuned logistic hazard model and is beaten by a tuned gradient-boosted one.** For producing a ranked score, the statistical model wins, and it wins by more than we first reported.
+
+What this does *not* touch is the tools result above. That is an agent-against-itself paired comparison on identical cases, so a stronger baseline cannot move it: giving the agent evidence a ratio model cannot read is still worth +0.084, and false-confidence still falls threefold.
 
 **Where the gain came from.** 27 bankruptcies missed in the first arm are caught in the second, **none regressed**, and 26 of the 27 carried a filing-text signal. The agent's failure mode was never faulty reasoning -- it was blindness. It spent ~12 steps investigating a feature set that did not contain the answer for a quarter of the failures. You cannot reason your way to a covenant breach from a current ratio.
 
