@@ -123,9 +123,17 @@ def build(
         f"As of {as_of}, on filings public at that date, these are the "
         f"{direction}-scoring of the {len(ranked)} filers assessed."
     ]
+    # The rule-based control emits no risk_score, so printing "no score" beside
+    # every row reads as a fault rather than as the arm's design. The signal
+    # already carries the ranking in that case; the score is shown only when
+    # there is one.
     for r in answer.rows:
-        score = f"{r['risk_score']:.0f}/100" if r.get("risk_score") is not None else "no score"
-        lines.append(f"  CIK {r['cik']}  {r['signal'].replace('_', ' ')}  {score}")
+        score = f"  {r['risk_score']:.0f}/100" if r.get("risk_score") is not None else ""
+        lines.append(f"  CIK {r['cik']}  {r['signal'].replace('_', ' ')}{score}")
+    if all(r.get("risk_score") is None for r in answer.rows):
+        lines.append(
+            "  (ranked by signal; the deterministic control emits no 0-100 score)"
+        )
     answer.text = "\n".join(lines)
 
     answer.caveats.append(NOT_A_FORECAST)
