@@ -641,7 +641,21 @@ $('#qgo').onclick=async()=>{
       ${d.ungrounded_numbers.length?`<br>Ungrounded figure(s): <code>${esc(d.ungrounded_numbers.join(', '))}</code>`:''}
       </div></div><p class="note">The guard fired. Answers may only restate figures already verified in the
       memo, and may never recommend an action.</p></div>`;
-  else block=`<div class="card"><div class="qa"><div class="q">${esc(q)}</div><div class="a">${esc(d.answer)}</div></div></div>`;
+  else {
+    const cid='c'+Date.now();
+    block=`<div class="card"><div class="qa"><div class="q">${esc(q)}</div>`
+      +`<div class="a">${esc(d.answer)}</div></div>`
+      +(d.chart?`<div id="${cid}" class="chartbox" style="margin-top:14px"></div>`:'')
+      +(d.caveats?d.caveats.map(c=>`<p class="note">${esc(c)}</p>`).join(''):'')+`</div>`;
+    if(d.chart){
+      setTimeout(async()=>{
+        const t=await (await fetch(`/api/trend?cik=${d.chart.cik}&as_of=${d.chart.as_of}`
+          +`&metric=${d.chart.metric}`)).json();
+        const host=document.getElementById(cid);
+        if(host && !t.error) trendLine(host, t);
+      },0);
+    }
+  }
   $('#qout').innerHTML=block+prev;
 };
 

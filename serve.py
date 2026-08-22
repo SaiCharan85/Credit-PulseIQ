@@ -537,6 +537,17 @@ def ask_question(req: AskRequest) -> JSONResponse:
         })
 
     answer = ask(CachingClient(inner=client), req.assessment, req.question)
+
+    # A reader who asks to see a trend gets the trend, not a paragraph about
+    # it. The UI renders whatever metric is named here.
+    chart = None
+    if cik and as_of:
+        from agents.qa import wants_chart
+
+        metric = wants_chart(req.question)
+        if metric:
+            chart = {"cik": int(cik), "as_of": as_of.isoformat(), "metric": metric}
+
     return JSONResponse(
         {
             "question": req.question,
@@ -544,6 +555,7 @@ def ask_question(req: AskRequest) -> JSONResponse:
             "allowed": answer.allowed,
             "reason": answer.reason,
             "ungrounded_numbers": answer.ungrounded_numbers,
+            "chart": chart,
         }
     )
 

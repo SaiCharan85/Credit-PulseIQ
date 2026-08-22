@@ -98,6 +98,89 @@ then say what it does show. Do not pad with unrelated findings.
 4. Never open with the signal name or the confidence number.
 """
 
+#: The reader asking for structure. Prose is the default because the model
+#: dumped metric lists when nobody asked, but banning lists outright was an
+#: over-correction: someone who asks for point-wise wants points, and giving
+#: them prose is the same failure in the other direction. Format follows the
+#: request.
+_WANTS_POINTS = re.compile(
+    r"\bpoint[\s-]?wise\b|\bbullet|\bin points\b|\blist (?:them|out|the)\b"
+    r"|\bitemi[sz]e|\bbreak (?:it|this) down\b|\bstep[\s-]?by[\s-]?step\b"
+    r"|\bone by one\b|\benumerate\b",
+    re.I,
+)
+
+#: A request to see the shape of something over time, not to read about it.
+_WANTS_CHART = re.compile(
+    r"\b(?:chart|graph|plot|visuali[sz]e|show me the trend|trend line)\b"
+    r"|\bover time\b.{0,20}\b(?:show|see|view)\b"
+    r"|\b(?:show|draw|display)\b.{0,24}\b(?:trend|history|over time)\b",
+    re.I,
+)
+
+#: This prompt was rewritten three times. Rules did not work: the model read
+#: them as a checklist, verified each in turn, and filled its whole budget with
+#: deliberation -- twelve thousand characters of self-checking, the tag closed,
+#: and no answer after it. What works is the same shape as the prose prompt: a
+#: worked question-and-answer pair, and almost no rules.
+POINTS_PROMPT = """\
+You are a credit analyst writing for a company executive who does not read \
+financial statements.
+
+Q: Give me the risk parameters point wise where it is going wrong.
+A: This business cannot fund itself from what it earns, and several measures
+   say so at once.
+
+   It is deep inside the danger zone for insolvency (-1.93)
+   Its obligations are larger than everything it owns (1.45)
+   It is not earning enough to pay the interest on its debt (-1.06)
+   It is losing money on what it sells (-0.17)
+   It is burning cash rather than generating it (-0.15)
+
+   Together these describe a company servicing its debt from something other
+   than trading.
+
+Answer in exactly that shape, using the assessment below. Write the answer \
+straight out with no working. Use only figures already in the assessment, \
+rounded to two decimals, and never recommend an action.
+"""
+
+#: Metric names a reader might ask to see plotted, mapped to the series the
+#: trend endpoint serves.
+CHARTABLE = {
+    "current ratio": "current_ratio",
+    "quick ratio": "quick_ratio",
+    "liabilities": "liabilities_to_assets",
+    "leverage": "liabilities_to_assets",
+    "interest coverage": "interest_coverage",
+    "coverage": "interest_coverage",
+    "margin": "net_margin",
+    "net margin": "net_margin",
+    "return on assets": "return_on_assets",
+    "cash flow": "ocf_to_debt",
+    "altman": "altman_z_double_prime",
+    "distress score": "altman_z_double_prime",
+}
+
+
+def wants_points(question: str) -> bool:
+    """Whether the reader asked for a structured answer rather than prose."""
+    return bool(_WANTS_POINTS.search(question))
+
+
+def wants_chart(question: str) -> str | None:
+    """The metric the reader asked to see plotted, if any."""
+    if not _WANTS_CHART.search(question):
+        return None
+    low = question.lower()
+    for phrase, metric in sorted(CHARTABLE.items(), key=lambda kv: -len(kv[0])):
+        if phrase in low:
+            return metric
+    # A chart was asked for without naming a metric; the caller picks a default
+    # rather than guessing at one here.
+    return "current_ratio"
+
+
 #: Questions that ask what to *do* rather than what is *true*.
 #:
 #: Blocking these after the fact returns nothing useful. SPEC 8 says refuse
@@ -224,12 +307,27 @@ _THOUGHT = re.compile(
 _THOUGHT_OPEN = re.compile(r"<(?:thought|think|reasoning|scratchpad)>", re.I)
 
 
+def _dedent(text: str) -> str:
+    """Drop the leading indentation the worked example carries into replies."""
+    return "\n".join(ln.strip() for ln in text.splitlines()).strip()
+
+
 def strip_reasoning(text: str) -> str:
     """Remove inline scratchpad blocks and leading bullet-form deliberation."""
+    had_block = bool(_THOUGHT.search(text)) or bool(_THOUGHT_OPEN.search(text))
     cleaned = _THOUGHT.sub("", text).strip()
+    if had_block and not cleaned:
+        # A scratchpad and nothing else: the model ran out of room before
+        # writing an answer. Falling back to the original text here is what
+        # published a sixty-line reasoning trace to a reader.
+        return ""
+    cleaned = _dedent(cleaned)
     if _THOUGHT_OPEN.search(cleaned):
-        # Opener with no closer: keep only what follows the last tag.
-        cleaned = _THOUGHT_OPEN.split(cleaned)[-1].strip()
+        # An opener with no closer means the model ran out of room while still
+        # deliberating. Everything after the tag is scratchpad, so keeping it
+        # publishes the deliberation as the answer -- which is how a 60-line
+        # trace reached a reader. Nothing usable was produced.
+        return ""
     return cleaned or text.strip()
 
 REFUSAL_UNGROUNDED = (
@@ -344,15 +442,46 @@ def ask(client: Any, payload: dict[str, Any], question: str) -> Answer:
         return Answer(text=INJECTION_NOTICE, allowed=True, reason="question_injection")
 
     context = memo_context(payload)
-    system = SYSTEM_PROMPT
-    if asks_for_advice(question):
+    # Chosen, not layered. An earlier version appended a "give points"
+    # directive to a prompt whose rules forbade lists, and the model spent its
+    # entire budget litigating the contradiction -- the reply was a 60-line
+    # reasoning trace that never reached an answer.
+    if wants_points(question):
+        system = POINTS_PROMPT
+    elif asks_for_advice(question):
         # Redirect rather than refuse (SPEC 8). Only the refusal half was
         # built, so a reader asking "should I lend to this" got a guard
         # message and no evidence -- safe, and useless.
         system = SYSTEM_PROMPT + REDIRECT_DIRECTIVE
+    else:
+        system = SYSTEM_PROMPT
     messages = [
         {"role": "system", "content": system},
         {"role": "user", "content": f"ASSESSMENT\n{context}\n\nQUESTION\n{question}"},
     ]
-    reply = strip_reasoning(client.complete(messages))
+    # This model emits its scratchpad inline and those tokens count against
+    # the budget. The default 1600 is comfortable for a prose answer and not
+    # for a point-wise one, where ordering seven findings produced a long
+    # deliberation that consumed the whole allowance before the answer began.
+    # The same failure is documented for preflight in agents/llm.py.
+    reply = strip_reasoning(client.complete(messages, max_tokens=4000))
+    if not reply:
+        # The model produced only a scratchpad. One retry, told plainly not to
+        # deliberate -- the failure is over-thinking rather than difficulty,
+        # and a second pass with that said usually lands.
+        retry = list(messages)
+        retry.append({
+            "role": "user",
+            "content": "Write the answer only. No working, no checking, no preamble.",
+        })
+        reply = strip_reasoning(client.complete(retry, max_tokens=4000))
+    if not reply:
+        return Answer(
+            text=(
+                "The model did not finish composing an answer to that. Try asking "
+                "it more narrowly -- one finding at a time rather than all of them."
+            ),
+            allowed=True,
+            reason="truncated",
+        )
     return check_answer(reply, context)

@@ -22,6 +22,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import time
 from collections.abc import Sequence
 from dataclasses import dataclass, field
@@ -249,7 +250,39 @@ class TransformersClient:
         )
 
 
+#: A model that emits its scratchpad inline can run out of budget mid-thought.
+#: What comes back is a reasoning trace with no answer attached.
+_SCRATCHPAD_OPEN = re.compile(r"<(?:thought|think|reasoning|scratchpad)>", re.I)
+_SCRATCHPAD_CLOSE = re.compile(r"</(?:thought|think|reasoning|scratchpad)>", re.I)
+_SCRATCHPAD_CLOSED = re.compile(
+    r"<thought>.*?</thought>"
+    r"|<think>.*?</think>"
+    r"|<reasoning>.*?</reasoning>"
+    r"|<scratchpad>.*?</scratchpad>",
+    re.I | re.S,
+)
+
+
+def _is_truncated(reply: str) -> bool:
+    """Whether a reply is scratchpad with no answer after it.
+
+    Caching one of these makes the failure permanent: the cache key does not
+    include ``max_tokens``, so raising the budget replays the same broken
+    response forever. Three such entries were found and removed.
+    """
+    if not _SCRATCHPAD_OPEN.search(reply):
+        return False
+    if not _SCRATCHPAD_CLOSE.search(reply):
+        # Opened and never closed: the budget ran out mid-thought. This is the
+        # case the closed-pair pattern cannot see, and it is why three such
+        # entries survived an earlier cache sweep.
+        return True
+    return not _SCRATCHPAD_CLOSED.sub("", reply).strip()
+
+
 @dataclass
+
+
 class CachingClient:
     """Caches completions on disk, keyed by model and exact conversation.
 
@@ -311,8 +344,13 @@ class CachingClient:
             self.misses += 1
             raise CacheMiss("offline replay: conversation not in cache")
         reply = self.inner.complete(messages, **kwargs)
-        path.write_text(reply, encoding="utf8")
         self.misses += 1
+        # A reply that is scratchpad and nothing else is a truncation, not an
+        # answer, and caching it makes the failure permanent: the key does not
+        # include max_tokens, so raising the budget replays the same broken
+        # response forever. Learned the hard way.
+        if not _is_truncated(reply):
+            path.write_text(reply, encoding="utf8")
         return reply
 
 
