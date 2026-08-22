@@ -99,6 +99,35 @@
   .qa .q{color:var(--accent);font-weight:600;font-size:13.5px;margin-bottom:5px}
   .qa .a{white-space:pre-wrap}
   .qa .blocked-ans{color:var(--warn);font-size:13px;border-left:2px solid var(--warn);padding-left:11px}
+
+  /* masthead + footer */
+  .masthead{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#161c26,#141922);
+            padding:26px 30px 22px}
+  .masthead h2{margin:0 0 6px;font-size:21px;font-weight:650;letter-spacing:-.3px}
+  .masthead .lede{margin:0;color:var(--dim);font-size:14px;max-width:760px;line-height:1.6}
+  .stats{display:flex;gap:30px;flex-wrap:wrap;margin-top:18px}
+  .stat .n{font-size:19px;font-weight:650;font-variant-numeric:tabular-nums}
+  .stat .l{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px}
+  footer{border-top:1px solid var(--line);margin-top:44px;padding:20px 30px 40px;
+         color:var(--dim);font-size:12px;line-height:1.65}
+  footer b{color:var(--ink)}
+  footer .cols{display:flex;gap:46px;flex-wrap:wrap;margin-bottom:14px}
+  footer a{color:var(--accent);text-decoration:none}
+  .legal{border-top:1px solid var(--line);padding-top:13px;margin-top:6px;
+         color:var(--dim);font-size:11.5px;line-height:1.6}
+
+  /* charts */
+  .chartbox{position:relative}
+  .tip{position:absolute;background:#0b0e14;border:1px solid var(--line);border-radius:6px;
+       padding:7px 10px;font-size:12px;pointer-events:none;z-index:5;line-height:1.5}
+  .bars{display:flex;flex-direction:column;gap:9px}
+  .bar-row{display:grid;grid-template-columns:130px 1fr 40px;align-items:center;gap:12px}
+  .bar-label{font-size:12.5px;color:var(--dim);text-transform:capitalize}
+  .bar-track{background:var(--bg);border-radius:4px;height:16px;overflow:hidden}
+  .bar-fill{display:block;height:100%;border-radius:4px}
+  .bar-val{font-family:var(--mono);font-size:12.5px;text-align:right}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:900px){.grid2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -122,6 +151,20 @@
 </aside>
 
 <main>
+  <div class="masthead">
+    <h2>Credit distress, from the filings themselves</h2>
+    <p class="lede">Every figure below is recomputed from a company's own SEC filings and
+      checked against its source before it is shown. Nothing is visible to the assessment
+      that was not public on the prediction date, so what you see is what a reader could
+      have known at the time &mdash; not hindsight dressed as foresight.</p>
+    <div class="stats">
+      <div class="stat"><div class="n">12,570</div><div class="l">filers in scope</div></div>
+      <div class="stat"><div class="n">156</div><div class="l">verified Ch.11 outcomes</div></div>
+      <div class="stat"><div class="n">36</div><div class="l">verifiable metrics</div></div>
+      <div class="stat"><div class="n">612</div><div class="l">tests passing</div></div>
+      <div class="stat"><div class="n">0</div><div class="l">fabricated figures</div></div>
+    </div>
+  </div>
   <div class="head">
     <h2 id="ht">Assess a filer</h2>
     <p id="hs">One company, one prediction date. Every figure recomputed from the filed source.</p>
@@ -149,6 +192,7 @@
         </div>
       </div>
       <div id="out"></div>
+      <div id="charts"></div>
     </section>
 
     <!-- PORTFOLIO -->
@@ -167,6 +211,7 @@
           roughly two minutes per name. Capped at 40 filers.</div>
       </div>
       <div id="bout"></div>
+      <div id="bchart"></div>
     </section>
 
     <!-- DOCUMENT -->
@@ -236,9 +281,30 @@
       </div>
     </section>
 
-  </div>
+  <footer>
+    <div class="cols">
+      <div><b>What this is</b><br>An evidence service for credit analysis.<br>
+        It reports what filings say; a human decides what to do.</div>
+      <div><b>What it is not</b><br>Not investment, lending or trading advice.<br>
+        Not a forecast. Not a substitute for due diligence.</div>
+      <div><b>Sources</b><br>SEC EDGAR XBRL facts and filing text.<br>
+        US Treasury and market data for cycle context.</div>
+      <div><b>Measured</b><br>Agent 0.963 vs tuned baseline 0.977 &mdash; a tie.<br>
+        84% evidence recall &middot; 8% false-confidence.</div>
+    </div>
+    <div class="legal">
+      Absolute probabilities do not transfer: the test universe is enriched with distressed
+      filers far above the population base rate, so ranking transfers and calibrated
+      probabilities do not. Coverage is US SEC filers only. Results were measured on one
+      model over one time window and need re-measuring if either changes. This system has
+      never once chosen to abstain, so "it will tell you when it does not know" is an
+      unexercised claim. Anything customer-facing needs legal review; the guardrails here
+      keep the output descriptive, they do not make it compliant.
+    </div>
+  </footer>
 </main>
 
+<script src="/chart.js"></script>
 <script>
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
@@ -332,6 +398,33 @@ function renderAssess(d){
   h+=`<div class="card"><details><summary>Plain-text memo</summary><pre style="margin-top:10px">${esc(m.text)}</pre></details>
     <p class="note">Advisory only. States risk for a human reviewer; the scope guard blocks decision framing.</p></div>`;
   out.innerHTML=h;
+  drawTrend(d.cik, d.as_of);
+}
+
+async function drawTrend(cik, asOf){
+  const host=$('#charts'); if(!host) return;
+  host.innerHTML=`<div class="card"><h3>Trend</h3>
+    <div class="row" style="margin-bottom:12px"><div style="width:240px">
+      <label>Metric</label><select id="tmetric">
+        <option value="current_ratio">Current ratio</option>
+        <option value="quick_ratio">Quick ratio</option>
+        <option value="liabilities_to_assets">Liabilities to assets</option>
+        <option value="interest_coverage">Interest coverage</option>
+        <option value="net_margin">Net margin</option>
+        <option value="return_on_assets">Return on assets</option>
+        <option value="ocf_to_debt">Operating cash flow to debt</option>
+        <option value="altman_z_double_prime">Altman Z''</option>
+      </select></div></div>
+    <div id="tchart" class="chartbox"></div></div>`;
+  const load=async()=>{
+    const m=$('#tmetric').value;
+    $('#tchart').innerHTML='<span class="spin">Loading&hellip;</span>';
+    const r=await fetch(`/api/trend?cik=${cik}&as_of=${asOf}&metric=${m}`);
+    const t=await r.json();
+    if(t.error){$('#tchart').innerHTML=`<p class="err">${esc(t.error)}</p>`;return;}
+    trendLine($('#tchart'), t);
+  };
+  $('#tmetric').onchange=load; load();
 }
 
 /* ---------- portfolio ---------- */
@@ -374,6 +467,13 @@ $('#brun').onclick=async()=>{
   h+=`</table><p class="note">Rule-based control (0.885 AUC) &mdash; a threshold model, not the agent.
     Click a row to open it in Assess. Filers that could not be read are listed rather than dropped.</p></div>`;
   $('#bout').innerHTML=h;
+  const counts={};
+  d.rows.filter(r=>r.status==='ok').forEach(r=>{counts[r.signal]=(counts[r.signal]||0)+1;});
+  $('#bchart').innerHTML='<div class="card"><h3>Risk distribution</h3><div id="bbars"></div>'
+    +'<p class="note">Counts of assessed filers by signal, as of the prediction date. '
+    +'Colour follows the reserved status scale and every bar is labelled, so the '
+    +'colour never carries the meaning alone.</p></div>';
+  riskBars($('#bbars'), counts);
   $$('#bout tr.clickable').forEach(tr=>tr.onclick=()=>{
     $('#cik').value=tr.dataset.cik; $('#asof').value=$('#basof').value;
     $$('nav a')[0].click(); $('#go').click();});

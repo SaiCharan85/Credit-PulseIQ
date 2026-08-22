@@ -35,8 +35,11 @@ from datetime import date
 
 #: Questions asking across companies rather than about one.
 _SCREENING = re.compile(
-    r"\b(?:list|rank|ranking|screen|compare|which|what) .{0,40}\bcompan(?:y|ies)\b"
-    r"|\bcompan(?:y|ies)\b.{0,30}\b(?:list|rank|ranked|safest|riskiest|best|worst)\b"
+    # Plural, or an explicit multi-filer word. "What is the current ratio of
+    # this company" contains "what ... company" and is emphatically not a
+    # screen; requiring plurality is what separates the two.
+    r"\b(?:list|rank|ranking|screen|compare|which|what) .{0,40}\b(?:companies|filers|names|issuers)\b"
+    r"|\b(?:companies|filers|issuers)\b.{0,30}\b(?:list|rank|ranked|safest|riskiest|best|worst)\b"
     r"|\b(?:best|worst|safest|riskiest|top|bottom|least risky|most risky)\b"
     r".{0,30}\b(?:compan|filer|name|issuer|stock)"
     r"|\bgive me .{0,20}(?:names|list)\b"

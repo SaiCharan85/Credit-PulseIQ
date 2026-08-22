@@ -32,6 +32,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 
 from agents.earnings_notes import earnings_notes
+from agents.explain import explain, is_conceptual
 from agents.llm import load_env_file
 from agents.orchestrator import Orchestrator
 from agents.outcomes_lookup import load_outcomes, survived_note
@@ -101,6 +102,16 @@ def index() -> str:
     return INDEX.read_text(encoding="utf8")
 
 
+@app.get("/chart.js")
+def chartjs():
+    from fastapi.responses import Response
+
+    return Response(
+        (Path(__file__).parent / "web" / "chart.js").read_text(encoding="utf8"),
+        media_type="application/javascript",
+    )
+
+
 @app.get("/api/search")
 def company_search(q: str) -> JSONResponse:
     """Name or ticker to CIK. Ambiguity is returned, never resolved silently."""
@@ -120,6 +131,54 @@ def company_search(q: str) -> JSONResponse:
             ],
         }
     )
+
+
+#: Metrics offered as trend lines. Each is a single series, so the chart
+#: needs no legend -- its title names it.
+TREND_METRICS = (
+    "current_ratio", "quick_ratio", "liabilities_to_assets", "interest_coverage",
+    "net_margin", "return_on_assets", "ocf_to_debt", "altman_z_double_prime",
+)
+
+
+@app.get("/api/trend")
+def trend(cik: int, as_of: date, metric: str = "current_ratio", periods: int = 8) -> JSONResponse:
+    """One metric across the filer's visible history, oldest first.
+
+    As-of filtered like everything else: a point exists only if the filing it
+    came from was public by the prediction date, so the line a reader sees is
+    the line that existed then.
+    """
+    from compute.lineitems import FactIndex, annual_period_ends
+    from compute.trends import build_trend
+    from data.facts import as_of_view
+
+    if metric not in TREND_METRICS:
+        return JSONResponse({"error": f"unknown metric '{metric}'"}, status_code=400)
+    load_env_file()
+    try:
+        facts = EdgarClient().facts(cik)
+    except Exception as exc:  # noqa: BLE001
+        return JSONResponse({"error": str(exc)}, status_code=400)
+
+    view = FactIndex(as_of_view(facts, as_of))
+    ends = annual_period_ends(view)[:periods]
+    if not ends:
+        return JSONResponse({"cik": cik, "metric": metric, "points": [],
+                             "note": "no annual period visible at this date"})
+    built = build_trend(metric, view, sorted(ends))
+    return JSONResponse({
+        "cik": cik,
+        "metric": metric,
+        "as_of": as_of.isoformat(),
+        "direction": built.direction,
+        "points": [
+            {"period_end": p.period_end.isoformat(),
+             "value": float(p.value) if p.is_defined else None}
+            for p in built.points
+        ],
+        "note": "; ".join(built.notes),
+    })
 
 
 @app.get("/api/health")
@@ -401,6 +460,31 @@ def ask_question(req: AskRequest) -> JSONResponse:
         ok, detail = False, str(exc)
     if not ok:
         return JSONResponse({"error": f"no model endpoint configured: {detail}"}, status_code=503)
+
+    # A concept question needs no assessment. Refusing "what is a covenant
+    # breach?" because no memo covers it protects nothing and makes the tool
+    # useless; the grounding rule is about claims on a *named company*.
+    if not req.assessment.get("memo") and not is_conceptual(req.question):
+        from agents.explain import _SPECIFIC, REDIRECT_TO_ASSESSMENT
+
+        if _SPECIFIC.search(req.question):
+            return JSONResponse({
+                "question": req.question,
+                "answer": REDIRECT_TO_ASSESSMENT,
+                "allowed": True,
+                "reason": "needs_assessment",
+                "ungrounded_numbers": [],
+            })
+
+    if is_conceptual(req.question) and not req.assessment.get("memo"):
+        result = explain(CachingClient(inner=client), req.question)
+        return JSONResponse({
+            "question": req.question,
+            "answer": result.text,
+            "allowed": result.allowed,
+            "reason": result.reason,
+            "ungrounded_numbers": [],
+        })
 
     cik = req.assessment.get("cik")
     as_of_raw = req.assessment.get("as_of")
