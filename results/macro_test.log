@@ -1,0 +1,11 @@
+panel 5582 rows over 19 observation dates
+  admitted : term_spread (100%), vix (100%)
+  excluded : credit_spread (42%), ig_spread (42%)  (below 95% coverage)
+
+group-aware training 802 rows (345 pos); test 1217 (100 pos)
+
+  firm ratios only        : AUC 0.8569
+  + 6 macro covariates    : AUC 0.6969
+  difference              : -0.1601  95% CI [-0.2099, -0.1099]  worse
+
+The most informative covariate is among the excluded. A high-yield credit spread covering 2019 onward would make this a stronger test; the available download starts 2023-08-22.
