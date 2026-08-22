@@ -30,10 +30,13 @@ from __future__ import annotations
 
 import csv
 import io
+import json
+import urllib.parse
 import urllib.request
 from bisect import bisect_right
+from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 FRED_CSV = "https://fred.stlouisfed.org/graph/fredgraph.csv"
@@ -152,6 +155,118 @@ def fetch_series(
         text = fetch(url)
     path.write_text(text, encoding="utf8")
     return parse_fred_csv(text)
+
+
+# ---------------------------------------------------------------------------
+# Alternate providers
+# ---------------------------------------------------------------------------
+#
+# FRED became unreachable mid-project -- every endpoint, every range, 40s
+# timeouts, while EDGAR continued to serve thousands of requests. Rather than
+# park the whole leg on one host, two of the four series are available
+# elsewhere. Both replacements are market data, so the non-revised property
+# that makes point-in-time lookup safe still holds.
+#
+# The high-yield credit spread has no free non-FRED source and stays blocked.
+# It is the most informative of the four, so this is a real reduction in the
+# hypothesis being tested, not a like-for-like substitution.
+
+TREASURY_CSV = (
+    "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/"
+    "daily-treasury-rates.csv/{year}/all?type=daily_treasury_yield_curve&"
+    "field_tdr_date_value={year}&page&_format=csv"
+)
+YAHOO_CHART = "https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?range={range}&interval=1d"
+
+_BROWSER_UA = {"User-Agent": "Mozilla/5.0 (CreditPulse IQ research)"}
+
+
+def _get(url: str, timeout: int = 40) -> str:
+    request = urllib.request.Request(url, headers=_BROWSER_UA)
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return response.read().decode("utf8", errors="replace")
+
+
+def fetch_term_spread(
+    years: Sequence[int], cache_dir: Path | str = "data/cache/macro"
+) -> MacroSeries:
+    """10-year minus 3-month Treasury, from the Treasury's own daily curve."""
+    cache_dir = Path(cache_dir)
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    dates: list[date] = []
+    values: list[float] = []
+    for year in years:
+        path = cache_dir / f"treasury_{year}.csv"
+        if path.exists():
+            text = path.read_text(encoding="utf8")
+        else:
+            text = _get(TREASURY_CSV.format(year=year))
+            path.write_text(text, encoding="utf8")
+        reader = csv.DictReader(io.StringIO(text))
+        for row in reader:
+            try:
+                when = datetime.strptime(row["Date"].strip(), "%m/%d/%Y").date()
+                ten = float(row["10 Yr"])
+                three = float(row["3 Mo"])
+            except (KeyError, ValueError, TypeError):
+                continue
+            dates.append(when)
+            values.append(ten - three)
+    order = sorted(range(len(dates)), key=lambda i: dates[i])
+    return MacroSeries("term_spread", [dates[i] for i in order], [values[i] for i in order])
+
+
+def fetch_yahoo(
+    symbol: str, name: str, span: str = "10y", cache_dir: Path | str = "data/cache/macro"
+) -> MacroSeries:
+    """Daily closes for a market index. Prices are observed, never revised."""
+    cache_dir = Path(cache_dir)
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    path = cache_dir / f"yahoo_{name}_{span}.json"
+    text = path.read_text(encoding="utf8") if path.exists() else _get(
+        YAHOO_CHART.format(symbol=urllib.parse.quote(symbol), range=span)
+    )
+    if not path.exists():
+        path.write_text(text, encoding="utf8")
+    payload = json.loads(text)
+    result = payload["chart"]["result"][0]
+    stamps = result["timestamp"]
+    closes = result["indicators"]["quote"][0]["close"]
+    dates: list[date] = []
+    values: list[float] = []
+    for ts, close in zip(stamps, closes, strict=False):
+        if close is None:
+            continue
+        dates.append(datetime.utcfromtimestamp(ts).date())
+        values.append(float(close))
+    return MacroSeries(name, dates, values)
+
+
+def load_macro_available(
+    years: Sequence[int] = tuple(range(2018, 2027)),
+    cache_dir: Path | str = "data/cache/macro",
+) -> dict[str, MacroSeries]:
+    """Whatever can actually be fetched today, with failures reported."""
+    out: dict[str, MacroSeries] = {}
+    failed: list[str] = []
+    try:
+        out["term_spread"] = fetch_term_spread(years, cache_dir)
+    except Exception as exc:  # noqa: BLE001
+        failed.append(f"term_spread (Treasury): {exc}")
+    try:
+        out["vix"] = fetch_yahoo("^VIX", "vix", cache_dir=cache_dir)
+    except Exception as exc:  # noqa: BLE001
+        failed.append(f"vix (Yahoo): {exc}")
+    for name in ("credit_spread", "ig_spread"):
+        try:
+            out[name] = fetch_series(SERIES[name], date(2018, 1, 1), date(2026, 8, 31), cache_dir)
+        except Exception as exc:  # noqa: BLE001
+            failed.append(f"{name} (FRED): {str(exc)[:60]}")
+    if failed:
+        import sys
+
+        print("macro series unavailable: " + "; ".join(failed), file=sys.stderr)
+    return out
 
 
 def load_macro(

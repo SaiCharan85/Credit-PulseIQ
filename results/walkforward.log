@@ -1,0 +1,16 @@
+panel 5582 rows to 2025-07-01; 6 candidate folds
+
+fold start    train  pos   test  pos  logistic      GBM     diff
+2022-07-01     1899   67    664   67    0.7500   0.9082  +0.1582
+2023-01-01     2563  134    646   94    0.8846   0.9421  +0.0575
+2023-07-01     3209  228    601   93    0.9004   0.9489  +0.0485
+2024-01-01     3810  321    555   79    0.9126   0.9534  +0.0408
+2024-07-01     4365  400    510   53    0.9440   0.9812  +0.0372
+2025-01-01     4875  453    476   30    0.9788   0.9914  +0.0126
+
+  folds scored     : 6
+  GBM better in    : 6  worse in 0
+  mean difference  : +0.0591
+  worst fold       : +0.0126
+  best fold        : +0.1582
+  verdict          : CONSISTENT -- the advantage holds out of sample, not one lucky fold

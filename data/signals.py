@@ -169,13 +169,26 @@ def latest_report(
 
 
 def scan_report_text(text: str) -> dict[str, Any]:
-    """Look for going-concern doubt and material weakness in one report."""
+    """Look for going-concern doubt and material weakness in one report.
+
+    Quotes are sanitised before being returned, because they are lifted from a
+    filing written by the company under assessment and handed to the model as
+    context. Instruction-like spans are neutralised and the attempt reported --
+    see ``data/sanitize.py`` for why the output guards cannot cover this.
+    """
+    from data.sanitize import sanitize
+
     plain = strip_html(text)
-    concern = _matches(plain, GOING_CONCERN_PATTERNS)
-    weakness = _matches(plain, MATERIAL_WEAKNESS_PATTERNS)
-    return {
-        "going_concern_doubt": bool(concern),
-        "going_concern_quote": concern[:400],
-        "material_weakness": bool(weakness),
-        "material_weakness_quote": weakness[:400],
+    concern = sanitize(_matches(plain, GOING_CONCERN_PATTERNS)[:400])
+    weakness = sanitize(_matches(plain, MATERIAL_WEAKNESS_PATTERNS)[:400])
+    suspicious = concern.findings + weakness.findings
+    out: dict[str, Any] = {
+        "going_concern_doubt": bool(concern.text),
+        "going_concern_quote": concern.text,
+        "material_weakness": bool(weakness.text),
+        "material_weakness_quote": weakness.text,
     }
+    if suspicious:
+        out["injection_attempt"] = True
+        out["injection_note"] = (concern.note or weakness.note)
+    return out
