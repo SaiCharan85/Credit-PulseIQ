@@ -3,176 +3,289 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CreditPulse IQ</title>
+<title>CreditPulse IQ &mdash; credit distress from SEC filings</title>
 <style>
   :root{
-    --bg:#0b0e14; --panel:#141922; --panel2:#1a212c; --line:#242c38; --ink:#e6edf3;
-    --dim:#8b98a9; --accent:#4c8dff; --ok:#3fb950; --warn:#d29922; --bad:#f85149;
-    --severe:#da3633; --mono:'SF Mono',ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;
+    --bg:#0a0d13; --panel:#131822; --panel2:#1a2130; --line:#232b3a; --ink:#e8eef6;
+    --dim:#8794a8; --faint:#5c6779;
+    --accent:#4c8dff; --accent2:#6aa5ff;
+    --ok:#3fb950; --warn:#d29922; --bad:#f85149; --severe:#da3633;
+    --mono:'SF Mono',ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;
+    --r:10px;
   }
   *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
   body{margin:0;background:var(--bg);color:var(--ink);display:flex;min-height:100vh;
-       font:14.5px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+       font:14.5px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+       -webkit-font-smoothing:antialiased}
 
-  aside{width:210px;flex:0 0 210px;background:var(--panel);border-right:1px solid var(--line);
-        padding:20px 0;display:flex;flex-direction:column}
-  .brand{padding:0 20px 18px;border-bottom:1px solid var(--line);margin-bottom:14px}
-  .brand h1{margin:0;font-size:15px;font-weight:650;letter-spacing:-.2px}
-  .brand p{margin:4px 0 0;font-size:11px;color:var(--dim);line-height:1.4}
-  nav a{display:block;padding:9px 20px;color:var(--dim);text-decoration:none;font-size:13.5px;
-        border-left:2px solid transparent;cursor:pointer}
+  /* ---- sidebar ---- */
+  aside{width:218px;flex:0 0 218px;background:var(--panel);border-right:1px solid var(--line);
+        display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  .brand{padding:20px 20px 16px;border-bottom:1px solid var(--line)}
+  .brand h1{margin:0;font-size:15.5px;font-weight:660;letter-spacing:-.25px;
+            display:flex;align-items:center;gap:8px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);
+       box-shadow:0 0 0 3px rgba(63,185,80,.16)}
+  .brand p{margin:5px 0 0;font-size:11px;color:var(--faint);line-height:1.45}
+  nav{padding:12px 0;flex:1}
+  nav a{display:flex;align-items:center;gap:10px;padding:9px 20px;color:var(--dim);
+        text-decoration:none;font-size:13.5px;border-left:2px solid transparent;cursor:pointer;
+        transition:background .12s,color .12s}
   nav a:hover{color:var(--ink);background:var(--panel2)}
-  nav a.on{color:var(--ink);border-left-color:var(--accent);background:var(--panel2);font-weight:550}
-  .foot{margin-top:auto;padding:14px 20px 0;border-top:1px solid var(--line);
-        font-size:11px;color:var(--dim);line-height:1.5}
-  .foot b{color:var(--ink);font-weight:600}
+  nav a.on{color:var(--ink);border-left-color:var(--accent);background:var(--panel2);font-weight:560}
+  nav .sect{padding:14px 20px 6px;font-size:9.5px;letter-spacing:.9px;color:var(--faint);
+            text-transform:uppercase;font-weight:600}
+  .sidefoot{padding:14px 20px 18px;border-top:1px solid var(--line);font-size:10.5px;
+            color:var(--faint);line-height:1.6}
+  .sidefoot b{color:var(--dim);font-weight:600}
 
-  main{flex:1;min-width:0;overflow-y:auto;max-height:100vh}
-  .head{border-bottom:1px solid var(--line);padding:16px 30px;background:var(--panel)}
-  .head h2{margin:0;font-size:16px;font-weight:600}
-  .head p{margin:4px 0 0;font-size:12.5px;color:var(--dim)}
-  .body{padding:24px 30px 70px;max-width:1080px}
-  .view{display:none} .view.on{display:block}
+  /* ---- top bar ---- */
+  main{flex:1;min-width:0}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
+          padding:0 30px;height:52px;border-bottom:1px solid var(--line);
+          background:rgba(19,24,34,.86);backdrop-filter:blur(8px);
+          position:sticky;top:0;z-index:20}
+  .topbar h2{margin:0;font-size:14.5px;font-weight:600}
+  .topbar .meta{display:flex;gap:18px;font-size:11.5px;color:var(--faint)}
+  .topbar .meta b{color:var(--dim);font-weight:600}
+  .body{padding:26px 30px 20px;max-width:1120px}
+  .view{display:none} .view.on{display:block;animation:fade .18s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  /* ---- hero (overview only) ---- */
+  .hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:14px;
+        padding:38px 34px;margin-bottom:20px;
+        background:radial-gradient(1100px 340px at 12% -30%,rgba(76,141,255,.16),transparent 62%),
+                   linear-gradient(160deg,#161d2a,#111621)}
+  .hero .kicker{font-size:10.5px;letter-spacing:1.3px;text-transform:uppercase;
+                color:var(--accent2);font-weight:650;margin-bottom:12px}
+  .hero h3{margin:0 0 12px;font-size:29px;line-height:1.22;font-weight:660;
+           letter-spacing:-.7px;color:var(--ink);text-transform:none}
+  .hero p{margin:0;color:var(--dim);font-size:14.5px;max-width:660px;line-height:1.68}
+  .hero .cta{display:flex;gap:11px;margin-top:22px;flex-wrap:wrap}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;
+        margin-bottom:20px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+       padding:15px 16px;transition:border-color .15s,transform .15s}
+  .kpi:hover{border-color:#33405a;transform:translateY(-1px)}
+  .kpi .n{font-size:23px;font-weight:660;font-variant-numeric:tabular-nums;letter-spacing:-.4px}
+  .kpi .l{font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.6px;
+          margin-top:3px}
+  .kpi .s{font-size:11.5px;color:var(--dim);margin-top:6px;line-height:1.5}
+
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+  .step .num{width:25px;height:25px;border-radius:7px;background:rgba(76,141,255,.14);
+             color:var(--accent2);display:grid;place-items:center;font-size:12px;
+             font-weight:700;margin-bottom:11px}
+  .step h4{margin:0 0 6px;font-size:13.5px;font-weight:620}
+  .step p{margin:0;color:var(--dim);font-size:12.5px;line-height:1.6}
+
+  /* ---- cards & controls ---- */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
         padding:18px;margin-bottom:16px}
   .row{display:flex;gap:13px;align-items:flex-end;flex-wrap:wrap}
-  label{display:block;font-size:11px;color:var(--dim);margin-bottom:5px;
-        text-transform:uppercase;letter-spacing:.5px}
+  label{display:block;font-size:10.5px;color:var(--faint);margin-bottom:6px;
+        text-transform:uppercase;letter-spacing:.6px;font-weight:600}
   input,select,textarea{background:var(--bg);color:var(--ink);border:1px solid var(--line);
-    border-radius:6px;padding:9px 11px;font-size:14px;font-family:inherit;width:100%}
-  textarea{resize:vertical;min-height:66px;line-height:1.5}
+    border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;width:100%;
+    transition:border-color .12s}
+  textarea{resize:vertical;min-height:70px;line-height:1.55}
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
-  button{background:var(--accent);color:#fff;border:0;border-radius:6px;padding:10px 20px;
-         font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+  button{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:10px 22px;
+         font-size:14px;font-weight:620;cursor:pointer;white-space:nowrap;transition:filter .12s}
+  button:hover:not(:disabled){filter:brightness(1.1)}
   button.ghost{background:transparent;border:1px solid var(--line);color:var(--dim)}
+  button.ghost:hover{color:var(--ink);border-color:#33405a}
   button:disabled{opacity:.45;cursor:default}
-  .hint{color:var(--dim);font-size:12px;margin-top:11px}
-  .hint code{background:var(--bg);padding:1px 6px;border-radius:3px;cursor:pointer}
-  .hint code:hover{color:var(--accent)}
+  .hint{color:var(--faint);font-size:12px;margin-top:12px}
+  .hint code{background:var(--bg);border:1px solid var(--line);padding:2px 7px;border-radius:5px;
+             cursor:pointer;color:var(--dim);transition:color .12s,border-color .12s}
+  .hint code:hover{color:var(--accent2);border-color:#33405a}
 
-  .verdict{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
-  .badge{font-size:12.5px;font-weight:700;letter-spacing:.7px;padding:8px 15px;
-         border-radius:6px;text-transform:uppercase}
-  .healthy{background:rgba(63,185,80,.14);color:var(--ok);border:1px solid var(--ok)}
-  .watch{background:rgba(210,153,34,.14);color:var(--warn);border:1px solid var(--warn)}
-  .elevated_risk{background:rgba(248,81,73,.12);color:var(--bad);border:1px solid var(--bad)}
-  .severe_risk{background:rgba(218,54,51,.2);color:#ff7b72;border:1px solid var(--severe)}
-  .insufficient_evidence{background:rgba(139,152,169,.14);color:var(--dim);border:1px solid var(--dim)}
+  /* ---- verdict ---- */
+  .verdict{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+  .badge{font-size:12px;font-weight:700;letter-spacing:.8px;padding:9px 15px;border-radius:8px;
+         text-transform:uppercase}
+  .healthy{background:rgba(63,185,80,.13);color:var(--ok);border:1px solid rgba(63,185,80,.5)}
+  .watch{background:rgba(210,153,34,.13);color:var(--warn);border:1px solid rgba(210,153,34,.5)}
+  .elevated_risk{background:rgba(248,81,73,.11);color:var(--bad);border:1px solid rgba(248,81,73,.45)}
+  .severe_risk{background:rgba(218,54,51,.18);color:#ff8078;border:1px solid rgba(218,54,51,.6)}
+  .insufficient_evidence{background:rgba(135,148,168,.12);color:var(--dim);border:1px solid var(--line)}
   .metric{display:flex;flex-direction:column;gap:1px}
-  .metric .v{font-size:23px;font-weight:600;font-variant-numeric:tabular-nums}
-  .metric .k{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+  .metric .v{font-size:23px;font-weight:640;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+  .metric .k{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.6px}
 
-  h3{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);
-     margin:0 0 11px;font-weight:600}
-  .tier{font-size:9.5px;padding:2px 8px;border-radius:10px;margin-left:8px;
-        text-transform:uppercase;letter-spacing:.5px;vertical-align:middle}
-  .backtested{background:rgba(76,141,255,.16);color:#8ab4ff;border:1px solid #2f5da8}
-  .context-only{background:rgba(139,152,169,.12);color:var(--dim);border:1px solid var(--line)}
+  h3{font-size:11.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--faint);
+     margin:0 0 12px;font-weight:650}
+  .tier{font-size:9px;padding:3px 8px;border-radius:20px;margin-left:8px;text-transform:uppercase;
+        letter-spacing:.6px;vertical-align:middle;font-weight:650}
+  .backtested{background:rgba(76,141,255,.15);color:var(--accent2);border:1px solid #2f5da8}
+  .context-only{background:rgba(135,148,168,.1);color:var(--faint);border:1px solid var(--line)}
 
   table{width:100%;border-collapse:collapse;font-size:13.5px}
-  th{text-align:left;color:var(--dim);font-weight:500;font-size:10.5px;text-transform:uppercase;
-     letter-spacing:.5px;padding:6px 10px;border-bottom:1px solid var(--line)}
-  td{padding:7px 10px;border-bottom:1px solid rgba(36,44,56,.55)}
+  th{text-align:left;color:var(--faint);font-weight:600;font-size:10px;text-transform:uppercase;
+     letter-spacing:.7px;padding:7px 10px;border-bottom:1px solid var(--line)}
+  td{padding:8px 10px;border-bottom:1px solid rgba(35,43,58,.6)}
   td.num{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums}
   tr:last-child td{border-bottom:0}
-  tr.clickable{cursor:pointer} tr.clickable:hover td{background:var(--panel2)}
-  .sev{color:var(--bad);font-weight:600} .flg{color:var(--warn)}
-  .pill{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
+  tr.clickable{cursor:pointer;transition:background .1s}
+  tr.clickable:hover td{background:var(--panel2)}
+  .sev{color:var(--bad);font-weight:640} .flg{color:var(--warn)}
+  .pill{font-size:10.5px;padding:3px 9px;border-radius:20px;font-weight:650}
 
-  ul.plain{margin:0;padding-left:18px} ul.plain li{margin:5px 0}
+  ul.plain{margin:0;padding-left:18px} ul.plain li{margin:6px 0}
   .limit li{color:var(--warn)} .route li{color:var(--dim);font-family:var(--mono);font-size:12.5px}
-  pre{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:14px;
-      overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.5;margin:0;
+  pre{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:15px;
+      overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.55;margin:0;
       white-space:pre-wrap}
-  details summary{cursor:pointer;color:var(--dim);font-size:13px;padding:3px 0}
+  details summary{cursor:pointer;color:var(--dim);font-size:13px;padding:4px 0}
   details summary:hover{color:var(--ink)}
-  .blocked{border-color:var(--severe)} .blocked h3{color:#ff7b72}
+  .blocked{border-color:rgba(218,54,51,.55)} .blocked h3{color:#ff8078}
   .err{color:var(--bad)}
-  .note{color:var(--dim);font-size:12.5px;border-left:2px solid var(--line);
-        padding-left:12px;margin-top:13px;line-height:1.55}
+  .note{color:var(--faint);font-size:12.5px;border-left:2px solid var(--line);padding-left:13px;
+        margin-top:14px;line-height:1.6}
   .spin{color:var(--dim);font-size:14px}
-  .drop{border:1.5px dashed var(--line);border-radius:8px;padding:26px;text-align:center;
-        color:var(--dim);font-size:13.5px;cursor:pointer}
+  .spin::after{content:'';display:inline-block;width:9px;height:9px;margin-left:7px;
+    border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;
+    animation:sp .7s linear infinite;vertical-align:-1px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .drop{border:1.5px dashed var(--line);border-radius:var(--r);padding:28px;text-align:center;
+        color:var(--faint);font-size:13.5px;cursor:pointer;transition:border-color .15s,color .15s}
   .drop:hover,.drop.over{border-color:var(--accent);color:var(--ink)}
   .qa{margin-bottom:14px}
-  .qa .q{color:var(--accent);font-weight:600;font-size:13.5px;margin-bottom:5px}
-  .qa .a{white-space:pre-wrap}
-  .qa .blocked-ans{color:var(--warn);font-size:13px;border-left:2px solid var(--warn);padding-left:11px}
+  .qa .q{color:var(--accent2);font-weight:620;font-size:13.5px;margin-bottom:6px}
+  .qa .a{white-space:pre-wrap;line-height:1.65}
+  .qa .blocked-ans{color:var(--warn);font-size:13px;border-left:2px solid var(--warn);padding-left:12px}
 
-  /* masthead + footer */
-  .masthead{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#161c26,#141922);
-            padding:26px 30px 22px}
-  .masthead h2{margin:0 0 6px;font-size:21px;font-weight:650;letter-spacing:-.3px}
-  .masthead .lede{margin:0;color:var(--dim);font-size:14px;max-width:760px;line-height:1.6}
-  .stats{display:flex;gap:30px;flex-wrap:wrap;margin-top:18px}
-  .stat .n{font-size:19px;font-weight:650;font-variant-numeric:tabular-nums}
-  .stat .l{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px}
-  footer{border-top:1px solid var(--line);margin-top:44px;padding:20px 30px 40px;
-         color:var(--dim);font-size:12px;line-height:1.65}
-  footer b{color:var(--ink)}
-  footer .cols{display:flex;gap:46px;flex-wrap:wrap;margin-bottom:14px}
-  footer a{color:var(--accent);text-decoration:none}
-  .legal{border-top:1px solid var(--line);padding-top:13px;margin-top:6px;
-         color:var(--dim);font-size:11.5px;line-height:1.6}
-
-  /* charts */
+  /* ---- charts ---- */
   .chartbox{position:relative}
-  .tip{position:absolute;background:#0b0e14;border:1px solid var(--line);border-radius:6px;
-       padding:7px 10px;font-size:12px;pointer-events:none;z-index:5;line-height:1.5}
-  .bars{display:flex;flex-direction:column;gap:9px}
-  .bar-row{display:grid;grid-template-columns:130px 1fr 40px;align-items:center;gap:12px}
+  .tip{position:absolute;background:#080b10;border:1px solid var(--line);border-radius:7px;
+       padding:8px 11px;font-size:12px;pointer-events:none;z-index:5;line-height:1.5;
+       box-shadow:0 6px 18px rgba(0,0,0,.5)}
+  .bars{display:flex;flex-direction:column;gap:10px}
+  .bar-row{display:grid;grid-template-columns:140px 1fr 42px;align-items:center;gap:13px}
   .bar-label{font-size:12.5px;color:var(--dim);text-transform:capitalize}
-  .bar-track{background:var(--bg);border-radius:4px;height:16px;overflow:hidden}
-  .bar-fill{display:block;height:100%;border-radius:4px}
+  .bar-track{background:var(--bg);border-radius:5px;height:17px;overflow:hidden}
+  .bar-fill{display:block;height:100%;border-radius:5px;transition:width .35s ease}
   .bar-val{font-family:var(--mono);font-size:12.5px;text-align:right}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media (max-width:900px){.grid2{grid-template-columns:1fr}}
+
+  /* ---- footer ---- */
+  footer{border-top:1px solid var(--line);margin-top:40px;padding:24px 30px 42px;
+         color:var(--faint);font-size:12px;line-height:1.7}
+  footer b{color:var(--dim);display:block;margin-bottom:4px;font-size:11px;
+           text-transform:uppercase;letter-spacing:.6px}
+  footer .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+               gap:26px;margin-bottom:18px}
+  .legal{border-top:1px solid var(--line);padding-top:15px;font-size:11.5px;line-height:1.65;
+         max-width:960px}
 </style>
 </head>
 <body>
 <aside>
   <div class="brand">
-    <h1>CreditPulse IQ</h1>
-    <p>Credit-distress assessment<br>from SEC filings</p>
+    <h1><span class="dot"></span>CreditPulse IQ</h1>
+    <p>Credit-distress evidence<br>from SEC filings</p>
   </div>
   <nav>
-    <a data-v="assess" class="on">Assess a filer</a>
+    <div class="sect">Start</div>
+    <a data-v="overview" class="on">Overview</a>
+    <div class="sect">Analyse</div>
+    <a data-v="assess">Assess a filer</a>
     <a data-v="portfolio">Portfolio</a>
     <a data-v="document">Document scan</a>
+    <div class="sect">Interpret</div>
     <a data-v="ask">Ask</a>
     <a data-v="about">Model card</a>
   </nav>
-  <div class="foot">
-    ReAct agent <b>0.965</b> AUC<br>
-    Hazard baseline <b>0.966</b><br>
-    200-case backtest
+  <div class="sidefoot">
+    <b>gemma-4-31b-it</b>
+    612 tests &middot; 0 fabricated<br>
+    evidence service, not advice
   </div>
 </aside>
 
 <main>
-  <div class="masthead">
-    <h2>Credit distress, from the filings themselves</h2>
-    <p class="lede">Every figure below is recomputed from a company's own SEC filings and
-      checked against its source before it is shown. Nothing is visible to the assessment
-      that was not public on the prediction date, so what you see is what a reader could
-      have known at the time &mdash; not hindsight dressed as foresight.</p>
-    <div class="stats">
-      <div class="stat"><div class="n">12,570</div><div class="l">filers in scope</div></div>
-      <div class="stat"><div class="n">156</div><div class="l">verified Ch.11 outcomes</div></div>
-      <div class="stat"><div class="n">36</div><div class="l">verifiable metrics</div></div>
-      <div class="stat"><div class="n">612</div><div class="l">tests passing</div></div>
-      <div class="stat"><div class="n">0</div><div class="l">fabricated figures</div></div>
+  <div class="topbar">
+    <h2 id="ht">Overview</h2>
+    <div class="meta">
+      <span>agent <b>0.963</b></span>
+      <span>baseline <b>0.977</b></span>
+      <span>evidence recall <b>84%</b></span>
     </div>
-  </div>
-  <div class="head">
-    <h2 id="ht">Assess a filer</h2>
-    <p id="hs">One company, one prediction date. Every figure recomputed from the filed source.</p>
   </div>
   <div class="body">
 
-    <!-- ASSESS -->
-    <section class="view on" id="v-assess">
+    <!-- OVERVIEW -->
+    <section class="view on" id="v-overview">
+      <div class="hero">
+        <div class="kicker">Eval-first credit intelligence</div>
+        <h3>Every number traced back to the filing it came from.</h3>
+        <p>CreditPulse IQ reads a company's SEC filings and reports how much financial
+          distress the evidence shows &mdash; with each figure recomputed from its source
+          and each claim dated. Nothing after the prediction date is visible to the
+          analysis, so what you read is what a reader could have known at the time,
+          not hindsight dressed as foresight.</p>
+        <div class="cta">
+          <button data-go="assess">Assess a company</button>
+          <button class="ghost" data-go="about">See how it was measured</button>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi"><div class="n">12,570</div><div class="l">filers in scope</div>
+          <div class="s">Point-in-time universe, no survivorship bias.</div></div>
+        <div class="kpi"><div class="n">156</div><div class="l">verified outcomes</div>
+          <div class="s">Chapter 11 filings, each confirmed four ways.</div></div>
+        <div class="kpi"><div class="n">36</div><div class="l">verifiable metrics</div>
+          <div class="s">Each a registered formula with a hand-checked test.</div></div>
+        <div class="kpi"><div class="n">155<span style="font-size:14px"> days</span></div>
+          <div class="l">median lead time</div>
+          <div class="s">Between the signal and the bankruptcy filing.</div></div>
+        <div class="kpi"><div class="n">0</div><div class="l">fabricated figures</div>
+          <div class="s">Across ~5,800 model calls in the backtest.</div></div>
+      </div>
+
+      <h3 style="margin-top:26px">How an assessment is produced</h3>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><h4>Filter to the date</h4>
+          <p>Every fact filed after the prediction date is withheld &mdash; about half of a
+            company's history. The date is not a setting the model can change.</p></div>
+        <div class="step"><div class="num">2</div><h4>Investigate</h4>
+          <p>The agent picks one tool, reads the result, and chooses the next call from
+            what it found. It also reads what filings <em>say</em>: going-concern
+            language, covenant breaches, delisting notices.</p></div>
+        <div class="step"><div class="num">3</div><h4>Verify, then publish</h4>
+          <p>A deterministic critic recomputes every cited figure against source. Anything
+            it cannot reproduce blocks the memo outright rather than being flagged.</p></div>
+      </div>
+
+      <h3 style="margin-top:26px">What the backtest found</h3>
+      <div class="card">
+        <table>
+          <tr><th>Arm</th><th style="text-align:right">AUC</th>
+              <th style="text-align:right">False-confidence</th><th>Standing</th></tr>
+          <tr><td>Agent, with filing-text tools</td><td class="num">0.963</td>
+              <td class="num">0.080</td><td>backtested</td></tr>
+          <tr><td>Agent, financial ratios only</td><td class="num">0.881</td>
+              <td class="num">0.250</td><td>backtested</td></tr>
+          <tr><td>Tuned gradient-boosted baseline</td><td class="num">0.977</td>
+              <td class="num">&mdash;</td><td>reference</td></tr>
+          <tr><td>Altman Z''</td><td class="num">0.880</td>
+              <td class="num">&mdash;</td><td>reference</td></tr>
+        </table>
+        <p class="note">Reading the filings rather than only the ratios was worth
+          <b>+0.084 AUC</b> (95% CI +0.048 to +0.125) and cut catastrophic errors threefold.
+          Against the strongest baseline we could build the agent <b>ties</b>: &minus;0.013,
+          interval spanning zero. For a ranked score the statistical model is the right
+          tool; the agent's contribution is the cited evidence behind the number.</p>
+      </div>
+    </section>
+
+
+<section class="view" id="v-assess">
       <div class="card">
         <div class="row">
           <div style="width:290px"><label>Company &mdash; name, ticker or CIK</label>
@@ -195,8 +308,7 @@
       <div id="charts"></div>
     </section>
 
-    <!-- PORTFOLIO -->
-    <section class="view" id="v-portfolio">
+<section class="view" id="v-portfolio">
       <div class="card">
         <div class="row" style="margin-bottom:14px">
           <div style="width:170px"><label>Prediction date</label><input id="basof" type="date" value="2024-07-01"></div>
@@ -214,8 +326,7 @@
       <div id="bchart"></div>
     </section>
 
-    <!-- DOCUMENT -->
-    <section class="view" id="v-document">
+<section class="view" id="v-document">
       <div class="card">
         <div class="drop" id="sdrop">Drop a 10-K, 10-Q or 8-K (HTML or text), or click to choose</div>
         <input type="file" id="sfile" accept=".htm,.html,.txt" hidden>
@@ -226,8 +337,7 @@
       <div id="sout"></div>
     </section>
 
-    <!-- ASK -->
-    <section class="view" id="v-ask">
+<section class="view" id="v-ask">
       <div class="card">
         <div id="askstate" class="note" style="margin:0 0 14px">
           Run an assessment first &mdash; questions are answered from that memo and nothing else.
@@ -250,8 +360,7 @@
       <div id="qout"></div>
     </section>
 
-    <!-- ABOUT -->
-    <section class="view" id="v-about">
+<section class="view" id="v-about">
       <div class="card">
         <h3>What this measures</h3>
         <table>
@@ -280,26 +389,27 @@
         </ul>
       </div>
     </section>
+  </div>
 
   <footer>
     <div class="cols">
-      <div><b>What this is</b><br>An evidence service for credit analysis.<br>
-        It reports what filings say; a human decides what to do.</div>
-      <div><b>What it is not</b><br>Not investment, lending or trading advice.<br>
-        Not a forecast. Not a substitute for due diligence.</div>
-      <div><b>Sources</b><br>SEC EDGAR XBRL facts and filing text.<br>
-        US Treasury and market data for cycle context.</div>
-      <div><b>Measured</b><br>Agent 0.963 vs tuned baseline 0.977 &mdash; a tie.<br>
-        84% evidence recall &middot; 8% false-confidence.</div>
+      <div><b>What this is</b>An evidence service for credit analysis. It reports what
+        filings say and what the numbers are; a qualified person decides what to do.</div>
+      <div><b>What it is not</b>Not investment, lending or trading advice. Not a forecast.
+        Not a substitute for due diligence.</div>
+      <div><b>Sources</b>SEC EDGAR XBRL facts and filing text. US Treasury and market
+        data for cycle context. Outcomes from verified Chapter 11 filings.</div>
+      <div><b>Method</b>Eval-first: the harness was built before the agent, and every
+        claim here carries a confidence interval.</div>
     </div>
     <div class="legal">
-      Absolute probabilities do not transfer: the test universe is enriched with distressed
+      Absolute probabilities do not transfer. The test universe is enriched with distressed
       filers far above the population base rate, so ranking transfers and calibrated
       probabilities do not. Coverage is US SEC filers only. Results were measured on one
-      model over one time window and need re-measuring if either changes. This system has
-      never once chosen to abstain, so "it will tell you when it does not know" is an
-      unexercised claim. Anything customer-facing needs legal review; the guardrails here
-      keep the output descriptive, they do not make it compliant.
+      model over one time window and need re-measuring if either changes. The system has
+      never once chosen to abstain, so &ldquo;it will tell you when it does not know&rdquo;
+      remains an unexercised claim. Guardrails keep the output descriptive; they do not
+      make it compliant, and anything customer-facing needs legal review.
     </div>
   </footer>
 </main>
@@ -310,7 +420,8 @@ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const num=v=>v==null?'n/a':(Math.abs(v)>=1000||(Math.abs(v)<0.01&&v!==0))?v.toExponential(3)
   :(+v).toFixed(4).replace(/\.?0+$/,'');
-const TITLES={assess:['Assess a filer','One company, one prediction date. Every figure recomputed from the filed source.'],
+const TITLES={overview:['Overview','What this system does, how it works, and what it measured.'],
+  assess:['Assess a filer','One company, one prediction date. Every figure recomputed from the filed source.'],
   portfolio:['Portfolio','Screen many filers at once with the deterministic control.'],
   document:['Document scan','Deterministic distress-language detection over an uploaded filing.'],
   ask:['Ask','Grounded questions about the assessment you just ran.'],
@@ -320,7 +431,13 @@ let CURRENT=null;
 $$('nav a').forEach(a=>a.onclick=()=>{
   $$('nav a').forEach(x=>x.classList.toggle('on',x===a));
   $$('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+a.dataset.v));
-  $('#ht').textContent=TITLES[a.dataset.v][0]; $('#hs').textContent=TITLES[a.dataset.v][1];
+  $('#ht').textContent=TITLES[a.dataset.v][0];
+});
+
+// hero buttons jump to a view
+$$('[data-go]').forEach(b=>b.onclick=()=>{
+  const t=[...document.querySelectorAll('nav a')].find(a=>a.dataset.v===b.dataset.go);
+  if(t){t.click(); window.scrollTo({top:0,behavior:'smooth'});}
 });
 
 /* ---------- assess ---------- */
@@ -528,7 +645,6 @@ $('#qgo').onclick=async()=>{
   $('#qout').innerHTML=block+prev;
 };
 
-$('#go').click();
 </script>
 </body>
 </html>
