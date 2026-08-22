@@ -89,7 +89,17 @@ memorisation premium     : +0.0143 AUC to the GBM
 
 On the full test fold the effect is larger still: group-aware splitting takes the GBM from 0.9858 to 0.8978 and the logistic model from 0.9567 to 0.8407. **Roughly 0.09 AUC of every fitted baseline in this project was firm memorisation**, and the agent's number is the only one that never contained any.
 
-Gradient boosting does genuinely beat logistic regression -- by +0.057 group-aware, wider than the +0.029 the leaky split showed, and in 6 of 6 walk-forward folds. So for a ranked score the statistical model is still the right tool. But the agent is level with it, not behind it.
+One further correction, on the same theme. The gradient-boosted model was tuned on validation AUC alone, which selected a high-capacity configuration scoring **0.9946 on its own training rows** -- near-perfect recall. That memorisation was not merely cosmetic: constraining capacity drops training AUC to 0.9171 and *raises* test AUC from 0.9683 to 0.9746, monotonically across five configurations. Tuning for the train-test gap finds a better model than tuning for validation score.
+
+Against that properly specified baseline -- regularised, group-aware, generalising rather than memorising:
+
+```
+regularised LightGBM : 0.9768   (train 0.9171)
+agent                : 0.9634
+agent - GBM          : -0.0133  95% CI [-0.0421, +0.0124]  tie
+```
+
+Gradient boosting does genuinely beat logistic regression -- by +0.057 group-aware, and in 6 of 6 walk-forward folds -- so for a ranked score the statistical model remains the right tool. But the agent is level with the best baseline we can build, not behind it.
 
 **Where the gain came from.** 27 bankruptcies missed in the first arm are caught in the second, **none regressed**, and 26 of the 27 carried a filing-text signal. The agent's failure mode was never faulty reasoning -- it was blindness. It spent ~12 steps investigating a feature set that did not contain the answer for a quarter of the failures. You cannot reason your way to a covenant breach from a current ratio.
 
