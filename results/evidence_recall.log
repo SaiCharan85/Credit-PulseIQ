@@ -1,0 +1,21 @@
+scoring 169 cases present in both
+
+signal               present   found   recall  looked/missed  never looked
+going_concern             50      48     96%              2             0
+material_weakness         39      21     54%             18             0
+late_filing               31      23     74%              8             0
+covenant                   5       5    100%              0             0
+delisting                 49      46     94%              3             0
+auditor_change            16      15     94%              1             0
+restatement               16      15     94%              1             0
+impairment                11      10     91%              1             0
+
+ALL SIGNALS              217     183     84%             34             0
+
+Of the 34 signals missed, 0% were never looked for.
+Mostly a judgment failure -- the tool was called and the finding did not reach the memo, which needs a better model, not a better prompt.
+
+cases with any signal present : 83
+  surfaced every one          : 58 (70%)
+  surfaced none               : 3 (4%)
+  recall on cases that failed : 84%
