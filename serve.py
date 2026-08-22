@@ -34,7 +34,10 @@ from pydantic import BaseModel
 from agents.earnings_notes import earnings_notes
 from agents.llm import load_env_file
 from agents.orchestrator import Orchestrator
+from agents.outcomes_lookup import load_outcomes, survived_note
 from agents.schemas import SIGNAL_ORDER
+from agents.screening import build as build_screen
+from agents.screening import is_screening
 from data.edgar import EdgarClient
 
 app = FastAPI(title="CreditPulse IQ", docs_url="/api/docs")
@@ -44,6 +47,17 @@ INDEX = Path(__file__).parent / "web" / "index.html"
 #: is looking at arrives with the evidence for how much to trust it.
 ARM_AUC = {"rules": 0.885, "react": 0.965}
 HAZARD_AUC = 0.966
+
+#: Questions about what actually happened, answerable from the labels.
+ASKS_OUTCOME = re.compile(
+    r"\bdid (?:it|the |this )?\w* ?(?:survive|fail|go bankrupt|go under|make it)\b"
+    r"|\bwhat happened\b|\bdid they (?:survive|fail|file)\b"
+    r"|\bis (?:it|the company|this company) still (?:around|trading|alive|in business)\b"
+    r"|\bwas (?:the |this )?(?:assessment|model|call|prediction) (?:right|correct|wrong)\b"
+    r"|\bactual(?:ly)? (?:outcome|happen)"
+    r"|\bdid (?:it|they|the company) file\b",
+    re.I,
+)
 
 #: Portfolio cap. Each name is a real EDGAR fetch against a rate-limited API.
 MAX_BATCH = 40
@@ -68,6 +82,10 @@ class BatchRequest(BaseModel):
 class AskRequest(BaseModel):
     assessment: dict
     question: str
+    #: Optional portfolio context for screening questions. Without it a
+    #: cross-company question says what it would need rather than answering
+    #: from the model's own knowledge, which nothing could check.
+    ciks: list[int] = []
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -315,6 +333,56 @@ def ask_question(req: AskRequest) -> JSONResponse:
         ok, detail = False, str(exc)
     if not ok:
         return JSONResponse({"error": f"no model endpoint configured: {detail}"}, status_code=503)
+
+    cik = req.assessment.get("cik")
+    as_of_raw = req.assessment.get("as_of")
+    as_of = date.fromisoformat(as_of_raw) if as_of_raw else None
+
+    # "Did it survive?" is answerable from the outcome labels and was being
+    # refused because the *assessment* cannot see past its own date. That is
+    # the model's constraint, not the reader's: a 2025 bankruptcy is history
+    # to someone asking now. The investigator still never sees this.
+    if ASKS_OUTCOME.search(req.question) and cik and as_of:
+        return JSONResponse({
+            "question": req.question,
+            "answer": survived_note(int(cik), as_of, load_outcomes()),
+            "allowed": True,
+            "reason": "outcome_from_labels",
+            "ungrounded_numbers": [],
+        })
+
+    # Cross-company questions cannot be served from one memo.
+    if is_screening(req.question):
+        if not req.ciks:
+            return JSONResponse({
+                "question": req.question,
+                "answer": (
+                    "That question spans companies and this panel is scoped to one "
+                    "assessment. Load a portfolio and it will be answered from "
+                    "measured assessments of those filers, not from general "
+                    "knowledge, because nothing outside a verified assessment can "
+                    "be checked."
+                ),
+                "allowed": True,
+                "reason": "screening_needs_portfolio",
+                "ungrounded_numbers": [],
+            })
+        from agents.rulebased import RuleBasedInvestigator
+
+        rows = [
+            _assess_one(EdgarClient(), RuleBasedInvestigator(), c, as_of or date.today())
+            for c in req.ciks[:MAX_BATCH]
+        ]
+        screened = build_screen(req.question, rows, as_of or date.today())
+        return JSONResponse({
+            "question": req.question,
+            "answer": screened.text,
+            "allowed": True,
+            "reason": "screening",
+            "caveats": screened.caveats,
+            "rows": screened.rows,
+            "ungrounded_numbers": [],
+        })
 
     answer = ask(CachingClient(inner=client), req.assessment, req.question)
     return JSONResponse(
