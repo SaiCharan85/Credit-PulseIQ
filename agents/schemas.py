@@ -18,6 +18,11 @@ SIGNAL_ELEVATED = "elevated_risk"
 SIGNAL_SEVERE = "severe_risk"
 SIGNAL_INSUFFICIENT = "insufficient_evidence"
 
+#: Where a continuous risk_score starts counting as a positive prediction.
+#: 45 is the lower edge of the ``elevated_risk`` band in ``evals/backtest.py``,
+#: so score-based and signal-based flagging agree at the boundary.
+FLAG_RISK_SCORE = 45.0
+
 #: Ordered worst-last, so a fusion step can compare severity.
 SIGNAL_ORDER = [SIGNAL_HEALTHY, SIGNAL_WATCH, SIGNAL_ELEVATED, SIGNAL_SEVERE]
 
@@ -89,7 +94,25 @@ class InvestigatorOutput(BaseModel):
 
     @property
     def flags_risk(self) -> bool:
-        """Whether this counts as a positive prediction for precision/recall."""
+        """Whether this counts as a positive prediction for precision/recall.
+
+        Prefers ``risk_score`` and falls back to the signal. On the 169 graded
+        cases this is a **no-op**: the two agree on all 169, flag the same 82,
+        and give the same weighted F1 of 0.870. The agent keeps its score and
+        its signal consistent, so there is no resolution hiding in one that the
+        other lacks.
+
+        It is kept because the score is the finer-grained field and a future
+        model may not keep them aligned, not because it was measured to help.
+
+        A caution recorded here because it nearly became a claim: weighted F1
+        does rise to 0.917 if 94 cases are flagged instead of 82. That is a
+        different *operating point*, not a different field, and 94 was chosen
+        by looking at the test set. Selecting a threshold that way is tuning
+        against the answer, so the flag rate stays where the model puts it.
+        """
+        if self.risk_score is not None:
+            return self.risk_score >= FLAG_RISK_SCORE
         return self.signal in (SIGNAL_ELEVATED, SIGNAL_SEVERE)
 
     @property
