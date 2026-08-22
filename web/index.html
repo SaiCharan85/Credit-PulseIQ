@@ -266,7 +266,9 @@ $('#go').onclick=async()=>{
   $('#out').innerHTML='<div class="card"><span class="spin">Loading filings and investigating&hellip;</span></div>';
   try{
     const r=await fetch('/api/assess',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({cik:+$('#cik').value,as_of:$('#asof').value,agent:$('#agent').value})});
+      body:JSON.stringify(Object.assign(
+        /^\d+$/.test($('#cik').value.trim())?{cik:+$('#cik').value}:{query:$('#cik').value.trim()},
+        {as_of:$('#asof').value,agent:$('#agent').value}))});
     const d=await r.json(); CURRENT=d.shipped?d:null; renderAssess(d); updateAsk();
   }catch(e){$('#out').innerHTML=`<div class="card blocked"><h3>Request failed</h3><p class="err">${esc(e)}</p></div>`;}
   b.disabled=false;
@@ -274,7 +276,21 @@ $('#go').onclick=async()=>{
 
 function renderAssess(d){
   const out=$('#out');
-  if(d.error){out.innerHTML=`<div class="card blocked"><h3>Could not assess</h3><p class="err">${esc(d.error)}</p></div>`;return;}
+  if(d.error){
+    // An ambiguous name is offered as choices rather than guessed at. This is
+    // the one step the reader cannot check, since they arrived without the
+    // identifier, so a silent wrong match would be undetectable.
+    const list=(d.candidates||[]).map(c=>`<tr class="clickable" data-pick="${c.cik}">
+        <td>${esc(c.name)}</td><td>${esc(c.ticker)}</td>
+        <td class="num">${c.cik}</td><td>${esc(c.reason)}</td></tr>`).join('');
+    out.innerHTML=`<div class="card blocked"><h3>Could not assess</h3>
+      <p class="err">${esc(d.error)}</p>`+(list?`<table style="margin-top:12px">
+      <tr><th>Company</th><th>Ticker</th><th style="text-align:right">CIK</th><th>Matched on</th></tr>
+      ${list}</table><p class="note">Click a row to assess it.</p>`:'')+`</div>`;
+    out.querySelectorAll('[data-pick]').forEach(tr=>tr.onclick=()=>{
+      $('#cik').value=tr.dataset.pick; $('#go').click();});
+    return;
+  }
   let h=`<div class="card"><h3>Routing</h3><ul class="plain route">
     <li>${esc(d.triage.depth)} pass &mdash; ${d.triage.steps} step budget</li>
     ${d.triage.reasons.map(r=>`<li>${esc(r)}</li>`).join('')}
