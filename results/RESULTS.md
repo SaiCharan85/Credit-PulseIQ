@@ -298,6 +298,51 @@ Testing repeat offending properly requires labelling *every* restatement rather
 than the first per filer, which changes the label definition and therefore the
 question. That is a new study, not attempt eight.
 
+## Attempt eight: a better estimator, an honest split, and a correction
+
+Every earlier earnings attempt used `LogisticRegression(C=1.0)` and a split
+that let the same companies appear in training and test. Both were fixed at
+once, because they pull in opposite directions and either alone would mislead.
+
+| split | estimator | train | test | gap |
+| --- | --- | --- | --- | --- |
+| firms overlap | logistic | 0.7799 | 0.6400 | +0.140 |
+| firms overlap | GBM | 0.8503 | 0.6583 | +0.192 |
+| **group-aware** | logistic | 0.9762 | **0.5667** | +0.409 |
+| **group-aware** | GBM | 0.9800 | **0.5856** | +0.394 |
+
+**Every earnings number reported above is inflated by roughly +0.073 AUC of
+firm memorisation.** 95% of test rows are companies already present in
+training, with near-identical quarterly features. The honest figure for the
+best configuration is **0.586**, not 0.640.
+
+A stronger estimator does not help: GBM over logistic is +0.0189 with a 95% CI
+of [-0.0117, +0.0491], spanning zero.
+
+### Why no further modelling will fix this
+
+The group-aware train-test gap is **+0.39** -- the model fits its training rows
+almost perfectly and none of it transfers. That is not a function-class
+limitation. It means the patterns are firm-specific: the model can learn *which
+companies* restated and cannot learn *what makes* a company restate.
+
+Three consequences, stated so the question is not reopened a ninth time:
+
+* **A neural network would be worse.** It is strictly more flexible than a GBM
+  that is already overfitting by 0.39, and group-aware training leaves 42
+  positives in 1,596 rows.
+* **A different function class is the wrong axis.** A logit and a boosted-tree
+  model performing identically says the bottleneck is information, not
+  flexibility.
+* **An agent cannot read its way out.** The text signals it would use appear in
+  41-82% of the whole population. Reading what everybody has does not
+  discriminate.
+
+Eight attempts, three function classes, four information sources, two label
+definitions, one clean leak canary throughout. Most restatements are clerical
+errors, and errors have no precursor: a mistyped tax rate is not forecastable
+from a balance sheet fourteen months earlier by any method.
+
 ## Scope
 
 Under the honest-scoping rule this leg is **demo-grade, not a backtested
@@ -316,3 +361,4 @@ to find.
 | `eq_signal_probe.csv` | per-row filing-text signals, train and test folds |
 | `eq_engineered.log` | the paired engineered-feature comparison |
 | `eq_oversight.log` | the oversight-signal comparison and signal prevalence |
+| `eq_gbm_groupaware.log` | estimator and split-strategy comparison, attempt eight |

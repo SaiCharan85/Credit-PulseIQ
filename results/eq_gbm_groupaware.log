@@ -1,0 +1,20 @@
+  index 300/1066
+  index 600/1066
+  index 900/1066
+
+test 6944 rows (217 pos); 6589/6944 (95%) are firms already in training
+training 12603 -> 1596 rows once test firms are removed (42 pos)
+
+split         estimator       train     test      gap
+firms overlap logistic       0.7799   0.6400  +0.1400
+firms overlap gbm            0.8503   0.6583  +0.1921
+group-aware   logistic       0.9762   0.5667  +0.4094
+group-aware   gbm            0.9800   0.5856  +0.3944
+
+=== does the estimator help? (group-aware, paired) ===
+  GBM - logistic: +0.0189
+    95% CI        [-0.0117, +0.0491]
+    Bonferroni /8 [-0.0238, +0.0637]
+    verdict       NO EFFECT -- the leg stays closed
+
+  memorisation premium inside every earlier earnings number: +0.0726 AUC
