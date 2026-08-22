@@ -246,6 +246,58 @@ Six approaches, one conclusion. No seventh was attempted; each further cut of
 the same data buys a multiple-comparisons problem that costs more credibility
 than any number it could produce.
 
+## Attempt seven: regulator and governance signals. A real but marginal effect.
+
+The first six attempts all drew from filed ratios and eight event flags. This
+one used information none of them had: SEC staff comment letters
+(`UPLOAD`/`CORRESP`), executive departures (8-K item 5.02), and the filer's own
+prior restatement history. Run on the income-decreasing label at filers over
+$100M -- 217 test positives.
+
+| arm | AUC |
+| --- | --- |
+| base covariates | 0.6053 |
+| **+ oversight signals** | **0.6400** |
+| difference | **+0.0348**, 95% CI [+0.0125, +0.0572] |
+| same, Bonferroni-corrected for seven attempts | CI [+0.0064, +0.0644] |
+
+**The interval excludes zero even after correcting for every attempt made on
+this leg.** It is the first robust signal the earnings leg has produced.
+
+### A quarter of the first result was my own leakage
+
+The initial run reported +0.0433. It was inflated by a feature bug flagged
+before the verdict arrived: labels come from `first_event_per_company`, so a
+positive row sits in the twelve months before a company's *first* restatement
+and by construction has no prior. The prevalence table showed it plainly --
+prior restatements appeared in 17.7% of all rows but only 7.8% of restaters,
+an inverted lift. The model was free to learn "no prior restatement therefore
+likelier to restate", which is the label construction talking, not the data.
+
+Dropping the three prior-restatement features costs 0.0099 of the 0.0433. What
+remains survives that removal, a Bonferroni correction, and re-fitting with
+scaled features after the first fit failed to converge.
+
+### Why it is still marginal
+
+Pre-committed before the run: an effect below +0.05 is reported and not built
+on. +0.0348 is below it, and 0.640 sits at the bottom edge of the 0.65-0.75
+the published literature reaches. It is a real effect on a model that is still
+not useful.
+
+The prevalence table explains why it cannot be larger. Comment letters appear
+in 52.1% of all rows and 67.7% of restaters; officer events in 82.2% and 90.3%.
+These are routine corporate events, not warnings -- the same shape as
+going-concern language appearing in 41.7% of non-restaters. A signal present on
+half the population cannot separate a 3% positive class by much, however real
+its association.
+
+### What would be needed
+
+Testing repeat offending properly requires labelling *every* restatement rather
+than the first per filer, which changes the label definition and therefore the
+question. That is a new study, not attempt eight.
+
 ## Scope
 
 Under the honest-scoping rule this leg is **demo-grade, not a backtested
@@ -263,3 +315,4 @@ to find.
 | `eq_baselines.log` | full baseline output including the leak canary |
 | `eq_signal_probe.csv` | per-row filing-text signals, train and test folds |
 | `eq_engineered.log` | the paired engineered-feature comparison |
+| `eq_oversight.log` | the oversight-signal comparison and signal prevalence |

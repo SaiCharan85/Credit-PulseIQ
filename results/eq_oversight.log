@@ -1,0 +1,29 @@
+panel 19547 rows, 50 base covariates
+prior-restatement history for 887 filers
+  index 200/1066
+  index 400/1066
+  index 600/1066
+  index 800/1066
+  index 1000/1066
+filing index unavailable for 0/1066 filers
+train 12603 (332 pos) | test 6944 (217 pos)
+
+  signal prevalence on the test fold:
+    ovs_comment_letters         52.1% of rows |  67.7% of restaters
+    ovs_officer_events          82.2% of rows |  90.3% of restaters
+    ovs_prior_restatements      17.7% of rows |   7.8% of restaters
+C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\sklearn\linear_model\_logistic.py:473: ConvergenceWarning: lbfgs failed to converge after 2000 iteration(s) (status=1):
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=2000).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+
+=== paired on identical rows ===
+  base features               : AUC 0.6060
+  base + oversight signals    : AUC 0.6493
+  difference                  : +0.0433  95% CI [+0.0200, +0.0673]
+  verdict                     : MARGINAL -- report, do not build on it
