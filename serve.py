@@ -38,6 +38,7 @@ from agents.outcomes_lookup import load_outcomes, survived_note
 from agents.schemas import SIGNAL_ORDER
 from agents.screening import build as build_screen
 from agents.screening import is_screening
+from data.company_search import load_directory, resolve
 from data.edgar import EdgarClient
 
 app = FastAPI(title="CreditPulse IQ", docs_url="/api/docs")
@@ -68,13 +69,20 @@ UPLOAD = _File(...)
 
 
 class AssessRequest(BaseModel):
-    cik: int
+    #: Either a CIK or a name/ticker. Nobody knows CIK 867773; they know
+    #: "Diebold" or "DBD", and requiring the identifier made the tool
+    #: unusable for the person it is for.
+    cik: int | None = None
+    query: str = ""
     as_of: date
     agent: str = "rules"
 
 
 class BatchRequest(BaseModel):
-    ciks: list[int]
+    ciks: list[int] = []
+    #: Free-text names or tickers, resolved before assessment. Anything
+    #: ambiguous is reported rather than guessed.
+    names: list[str] = []
     as_of: date
     agent: str = "rules"
 
@@ -93,6 +101,27 @@ def index() -> str:
     return INDEX.read_text(encoding="utf8")
 
 
+@app.get("/api/search")
+def company_search(q: str) -> JSONResponse:
+    """Name or ticker to CIK. Ambiguity is returned, never resolved silently."""
+    try:
+        directory = load_directory()
+    except Exception as exc:  # noqa: BLE001
+        return JSONResponse({"error": f"company directory unavailable: {exc}"}, status_code=503)
+    match, candidates = resolve(q, directory)
+    return JSONResponse(
+        {
+            "query": q,
+            "resolved": {"cik": match.cik, "name": match.name, "ticker": match.ticker,
+                         "reason": match.reason} if match else None,
+            "candidates": [
+                {"cik": c.cik, "name": c.name, "ticker": c.ticker, "reason": c.reason}
+                for c in candidates
+            ],
+        }
+    )
+
+
 @app.get("/api/health")
 def health() -> dict:
     return {"ok": True, "arms": ARM_AUC, "hazard_baseline_auc": HAZARD_AUC}
@@ -101,15 +130,42 @@ def health() -> dict:
 @app.post("/api/assess")
 def assess(req: AssessRequest) -> JSONResponse:
     load_env_file()
+    cik = req.cik
+    resolved_note = ""
+    if cik is None:
+        if not req.query.strip():
+            return JSONResponse({"error": "give a CIK, company name or ticker"}, status_code=400)
+        try:
+            match, candidates = resolve(req.query, load_directory())
+        except Exception as exc:  # noqa: BLE001
+            return JSONResponse({"error": f"company lookup failed: {exc}"}, status_code=503)
+        if match is None:
+            return JSONResponse(
+                {
+                    "error": (
+                        f"'{req.query}' matches {len(candidates)} filers; choose one"
+                        if candidates
+                        else f"no SEC filer matches '{req.query}'"
+                    ),
+                    "candidates": [
+                        {"cik": c.cik, "name": c.name, "ticker": c.ticker, "reason": c.reason}
+                        for c in candidates
+                    ],
+                },
+                status_code=409 if candidates else 404,
+            )
+        cik = match.cik
+        resolved_note = f"{match.name} ({match.ticker})" if match.ticker else match.name
+
     edgar = EdgarClient()
     try:
-        facts = edgar.facts(req.cik)
+        facts = edgar.facts(cik)
     except Exception as exc:  # noqa: BLE001
         return JSONResponse(
-            {"error": f"could not load filings for CIK {req.cik}: {exc}"}, status_code=400
+            {"error": f"could not load filings for CIK {cik}: {exc}"}, status_code=400
         )
     if not facts:
-        return JSONResponse({"error": f"no XBRL facts for CIK {req.cik}"}, status_code=404)
+        return JSONResponse({"error": f"no XBRL facts for CIK {cik}"}, status_code=404)
 
     extra: dict = {}
     if req.agent == "react":
@@ -127,8 +183,8 @@ def assess(req: AssessRequest) -> JSONResponse:
             )
         investigator = DistressInvestigator(CachingClient(inner=client))
         try:
-            extra["filing_index"] = edgar.filing_index(req.cik)
-            extra["fetch_document"] = lambda a, d: edgar.fetch_filing_document(req.cik, a, d)
+            extra["filing_index"] = edgar.filing_index(cik)
+            extra["fetch_document"] = lambda a, d: edgar.fetch_filing_document(cik, a, d)
         except Exception:  # noqa: BLE001
             pass
     else:
@@ -140,11 +196,12 @@ def assess(req: AssessRequest) -> JSONResponse:
     # 0.51-0.61 AUC over six approaches, so they never move the graded signal.
     notes = earnings_notes(facts, req.as_of)
     result = Orchestrator(investigator, context_notes=notes).run(
-        req.cik, req.as_of, facts, **extra
+        cik, req.as_of, facts, **extra
     )
 
     payload: dict = {
-        "cik": req.cik,
+        "cik": cik,
+        "company": resolved_note,
         "as_of": req.as_of.isoformat(),
         "agent": req.agent,
         "arm_auc": ARM_AUC.get(req.agent),
@@ -235,7 +292,17 @@ def batch(req: BatchRequest) -> JSONResponse:
             status_code=400,
         )
     load_env_file()
-    ciks = req.ciks[:MAX_BATCH]
+    ciks = list(req.ciks)
+    unresolved: list[str] = []
+    if req.names:
+        directory = load_directory()
+        for raw in req.names:
+            match, _ = resolve(raw, directory)
+            if match is None:
+                unresolved.append(raw)
+            else:
+                ciks.append(match.cik)
+    ciks = ciks[:MAX_BATCH]
     edgar = EdgarClient()
     investigator = RuleBasedInvestigator()
     rows = [_assess_one(edgar, investigator, c, req.as_of) for c in ciks]
@@ -258,9 +325,10 @@ def batch(req: BatchRequest) -> JSONResponse:
     return JSONResponse(
         {
             "as_of": req.as_of.isoformat(),
-            "requested": len(req.ciks),
+            "requested": len(ciks) + len(unresolved),
             "assessed": sum(1 for r in rows if r["status"] == "ok"),
-            "truncated": len(req.ciks) > MAX_BATCH,
+            "truncated": len(req.ciks) + len(req.names) > MAX_BATCH,
+            "unresolved": unresolved,
             "rows": ranked,
         }
     )

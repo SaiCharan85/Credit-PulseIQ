@@ -132,7 +132,8 @@
     <section class="view on" id="v-assess">
       <div class="card">
         <div class="row">
-          <div style="width:130px"><label>CIK</label><input id="cik" value="867773"></div>
+          <div style="width:290px"><label>Company &mdash; name, ticker or CIK</label>
+            <input id="cik" value="Diebold" placeholder="e.g. Diebold, AAPL, or 867773"></div>
           <div style="width:170px"><label>Prediction date</label><input id="asof" type="date" value="2024-07-01"></div>
           <div style="width:250px"><label>Investigator</label>
             <select id="agent">
@@ -142,9 +143,9 @@
           <button id="go">Assess</button>
         </div>
         <div class="hint">
-          <code data-cik="867773" data-d="2024-07-01">867773</code> filed Ch.11; hazard scored it 0.47 &middot;
+          <code data-cik="Diebold" data-d="2024-07-01">Diebold</code> filed Ch.11; hazard scored it 0.47 &middot;
           <code data-cik="1584754" data-d="2024-07-01">1584754</code> agent moved 0.05&rarr;0.95 with filing text &middot;
-          <code data-cik="320193" data-d="2024-06-01">320193</code> Apple &mdash; control false-positives
+          <code data-cik="AAPL" data-d="2024-06-01">AAPL</code> Apple &mdash; control false-positives
         </div>
       </div>
       <div id="out"></div>
@@ -286,6 +287,7 @@ function renderAssess(d){
   const m=d.memo;
   h+=`<div class="card"><div class="verdict">
       <span class="badge ${esc(m.signal)}">${esc(m.signal.replace(/_/g,' '))}</span>
+      ${d.company ? `<div class="metric"><span class="v" style="font-size:16px">${esc(d.company)}</span><span class="k">CIK ${d.cik}</span></div>` : ''}
       ${m.risk_score!=null?`<div class="metric"><span class="v">${m.risk_score.toFixed(0)}</span><span class="k">risk score / 100</span></div>`:''}
       <div class="metric"><span class="v">${m.confidence.toFixed(2)}</span><span class="k">confidence</span></div>
       <div class="metric"><span class="v">${m.tool_calls}</span><span class="k">tool calls</span></div></div>
