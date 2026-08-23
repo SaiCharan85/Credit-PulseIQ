@@ -172,6 +172,48 @@
   .bar-fill{display:block;height:100%;border-radius:5px;transition:width .35s ease}
   .bar-val{font-family:var(--mono);font-size:12.5px;text-align:right}
 
+  /* ---- diagnostic screen ---- */
+  .idhead{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;
+          flex-wrap:wrap}
+  .idname{font-size:19px;font-weight:660;letter-spacing:-.3px}
+  .idmeta{display:flex;gap:18px;flex-wrap:wrap;margin-top:7px;font-size:12px;color:var(--faint)}
+  .idmeta b{color:var(--dim);font-family:var(--mono);font-weight:600}
+  .idsic{margin-top:7px;font-size:12.5px;color:var(--dim)}
+  .idzone{text-align:right}
+  .idzone-l{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.7px}
+  .idzone-v{font-family:var(--mono);font-size:15px;margin-top:3px}
+
+  .gauge{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0 14px}
+  .seg .seg-bar{height:9px;border-radius:3px;background:var(--bg);
+                border:1px solid var(--line)}
+  .seg.on .seg-bar{background:var(--c);border-color:var(--c)}
+  .seg .seg-lbl{font-size:10.5px;color:var(--faint);margin-top:7px;letter-spacing:.3px}
+  .seg.on .seg-lbl{color:var(--ink);font-weight:600}
+  .gauge-read{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:4px}
+  .zone-chip{font-size:12px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
+             padding:7px 13px;border-radius:7px;color:var(--c);border:1px solid var(--c);
+             background:color-mix(in srgb,var(--c) 13%,transparent)}
+  .gauge-sub{font-size:12.5px;color:var(--dim)}
+  .warnnote{border-left-color:var(--warn);color:var(--warn)}
+  .pill.breach{background:rgba(208,59,59,.15);color:#ff8078}
+  .pill.within{background:rgba(12,163,12,.13);color:var(--ok)}
+  .dim{color:var(--faint)}
+
+  .timeline{position:relative;padding-left:4px}
+  .tl-row{display:grid;grid-template-columns:96px 26px 1fr;align-items:start;
+          padding:9px 0;position:relative}
+  .tl-row:not(:last-child) .tl-mark::after{content:'';position:absolute;left:50%;top:16px;
+    bottom:-14px;width:1px;background:var(--line);transform:translateX(-50%)}
+  .tl-date{font-family:var(--mono);font-size:12px;color:var(--faint);padding-top:1px}
+  .tl-mark{position:relative;display:grid;place-items:start center;padding-top:3px}
+  .tl-mark span{width:9px;height:9px;border-radius:50%;background:var(--c);
+                box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 22%,transparent);display:block}
+  .tl-zone{font-size:13px;font-weight:600}
+  .tl-note{font-size:12px;color:var(--faint);margin-top:1px}
+  .tl-row.current .tl-zone{font-size:14px}
+  .disclaimer{color:var(--dim);font-size:12.5px;line-height:1.65;
+              border-color:#2b3446;background:#11151d}
+
   /* ---- footer ---- */
   footer{border-top:1px solid var(--line);margin-top:40px;padding:24px 30px 42px;
          color:var(--faint);font-size:12px;line-height:1.7}
@@ -193,6 +235,7 @@
     <div class="sect">Start</div>
     <a data-v="overview" class="on">Overview</a>
     <div class="sect">Analyse</div>
+    <a data-v="diagnostic">Distress diagnostic</a>
     <a data-v="assess">Assess a filer</a>
     <a data-v="portfolio">Portfolio</a>
     <a data-v="document">Document scan</a>
@@ -285,7 +328,22 @@
     </section>
 
 
-<section class="view" id="v-assess">
+<section class="view" id="v-diagnostic">
+      <div class="card">
+        <div class="row">
+          <div style="width:290px"><label>Company &mdash; name, ticker or CIK</label>
+            <input id="dq" value="Diebold" placeholder="e.g. Diebold, AAPL, or 28823"></div>
+          <div style="width:170px"><label>Assessment date</label>
+            <input id="ddate" type="date" value="2024-07-01"></div>
+          <button id="dgo">Diagnose</button>
+        </div>
+        <div class="hint">A diagnosis of filings already made, as they stood on the
+          assessment date. Figures filed after that date are withheld.</div>
+      </div>
+      <div id="dout"></div>
+    </section>
+
+    <section class="view" id="v-assess">
       <div class="card">
         <div class="row">
           <div style="width:290px"><label>Company &mdash; name, ticker or CIK</label>
@@ -415,12 +473,14 @@
 </main>
 
 <script src="/chart.js"></script>
+<script src="/diagnostic.js"></script>
 <script>
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const num=v=>v==null?'n/a':(Math.abs(v)>=1000||(Math.abs(v)<0.01&&v!==0))?v.toExponential(3)
   :(+v).toFixed(4).replace(/\.?0+$/,'');
 const TITLES={overview:['Overview','What this system does, how it works, and what it measured.'],
+  diagnostic:['Distress diagnostic','A dated reading of filings already made. Not a projection.'],
   assess:['Assess a filer','One company, one prediction date. Every figure recomputed from the filed source.'],
   portfolio:['Portfolio','Screen many filers at once with the deterministic control.'],
   document:['Document scan','Deterministic distress-language detection over an uploaded filing.'],
@@ -443,6 +503,22 @@ $$('[data-go]').forEach(b=>b.onclick=()=>{
 /* ---------- assess ---------- */
 $$('#v-assess .hint code').forEach(c=>c.onclick=()=>{
   $('#cik').value=c.dataset.cik; $('#asof').value=c.dataset.d; $('#go').click();});
+
+$('#dgo').onclick=async()=>{
+  const b=$('#dgo'); b.disabled=true;
+  $('#dout').innerHTML='<div class="card"><span class="spin">Reading filings&hellip;</span></div>';
+  const v=$('#dq').value.trim();
+  const key=/^\d+$/.test(v)?`cik=${v}`:`query=${encodeURIComponent(v)}`;
+  try{
+    const r=await fetch(`/api/diagnostic?${key}&as_of=${$('#ddate').value}`);
+    renderDiagnostic($('#dout'), await r.json());
+    $('#dout').querySelectorAll('[data-pick]').forEach(tr=>tr.onclick=()=>{
+      $('#dq').value=tr.dataset.pick; $('#dgo').click();});
+  }catch(e){
+    $('#dout').innerHTML=`<div class="card blocked"><p class="err">${esc(e)}</p></div>`;
+  }
+  b.disabled=false;
+};
 
 $('#go').onclick=async()=>{
   const b=$('#go'); b.disabled=true;

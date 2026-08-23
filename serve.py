@@ -31,6 +31,8 @@ from fastapi import File as _File
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 
+from agents.diagnostic import ZONES
+from agents.diagnostic import build as build_diagnostic
 from agents.earnings_notes import earnings_notes
 from agents.explain import explain, is_conceptual
 from agents.llm import load_env_file
@@ -100,6 +102,16 @@ class AskRequest(BaseModel):
 @app.get("/", response_class=HTMLResponse)
 def index() -> str:
     return INDEX.read_text(encoding="utf8")
+
+
+@app.get("/diagnostic.js")
+def diagnosticjs():
+    from fastapi.responses import Response
+
+    return Response(
+        (Path(__file__).parent / "web" / "diagnostic.js").read_text(encoding="utf8"),
+        media_type="application/javascript",
+    )
 
 
 @app.get("/chart.js")
@@ -178,6 +190,72 @@ def trend(cik: int, as_of: date, metric: str = "current_ratio", periods: int = 8
             for p in built.points
         ],
         "note": "; ".join(built.notes),
+    })
+
+
+@app.get("/api/diagnostic")
+def diagnostic(as_of: date, cik: int | None = None, query: str = "") -> JSONResponse:
+    """A dated diagnosis of filings already made. Never a projection."""
+    load_env_file()
+    if cik is None:
+        if not query.strip():
+            return JSONResponse({"error": "give a CIK, name or ticker"}, status_code=400)
+        try:
+            match, candidates = resolve(query, load_directory())
+        except Exception as exc:  # noqa: BLE001
+            return JSONResponse({"error": f"lookup failed: {exc}"}, status_code=503)
+        if match is None:
+            return JSONResponse(
+                {
+                    "error": (f"'{query}' matches {len(candidates)} filers; choose one"
+                              if candidates else f"no SEC filer matches '{query}'"),
+                    "candidates": [
+                        {"cik": c.cik, "name": c.name, "ticker": c.ticker, "reason": c.reason}
+                        for c in candidates
+                    ],
+                },
+                status_code=409 if candidates else 404,
+            )
+        cik = match.cik
+
+    edgar = EdgarClient()
+    try:
+        facts = edgar.facts(cik)
+        subs = edgar.submissions(cik)
+    except Exception as exc:  # noqa: BLE001
+        return JSONResponse({"error": f"could not load CIK {cik}: {exc}"}, status_code=400)
+
+    d = build_diagnostic(cik, as_of, facts, subs)
+    return JSONResponse({
+        "cik": d.cik,
+        "name": d.name,
+        "ticker": d.ticker,
+        "exchange": d.exchange,
+        "sic": d.sic,
+        "sic_description": d.sic_description,
+        "state": d.state,
+        "as_of": d.as_of.isoformat() if d.as_of else None,
+        "period_end": d.period_end.isoformat() if d.period_end else None,
+        "filing_age_days": d.filing_age_days,
+        "stale": d.stale,
+        "zone": d.zone,
+        "zone_label": d.zone_label,
+        "zones": [{"key": k, "label": lbl, "note": n} for k, lbl, n in ZONES],
+        "reported": [
+            {"key": r.key, "label": r.label, "value": r.value, "computable": r.computable}
+            for r in d.reported
+        ],
+        "calculated": [
+            {"key": r.key, "label": r.label, "value": r.value, "computable": r.computable,
+             "threshold": r.threshold, "breached": r.breached}
+            for r in d.calculated
+        ],
+        "timeline": [
+            {"as_of": t.as_of.isoformat(),
+             "period_end": t.period_end.isoformat() if t.period_end else None,
+             "zone": t.zone, "breached": t.breached, "computable": t.computable}
+            for t in d.timeline
+        ],
     })
 
 
