@@ -1381,6 +1381,19 @@ def ask_question(req: AskRequest) -> JSONResponse:
             parts.append(("Where it ranks", _rank_answer(req.assessment)))
             handled = True
 
+        # A definitional aside is a part like any other, so it composes: a
+        # reader can ask what a term means *and* something about the filer in
+        # one breath. The compound rewrite had dropped this branch entirely,
+        # and the answer-quality matrix caught it on its first run.
+        if (
+            _ASKS_A_DEFINITION.search(req.question)
+            and not _REFERS_TO_LOADED.search(req.question)
+        ):
+            explained = explain(CachingClient(inner=client), req.question)
+            if explained.allowed and explained.text:
+                parts.append(("What that means", explained.text))
+                handled = True
+
         other = _names_another_company(req.question, int(cik))
         if other:
             compared = _compare_with(int(cik), other, as_of or date.today(),
