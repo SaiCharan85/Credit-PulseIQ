@@ -1533,7 +1533,6 @@ cik,tier,severity,signal,event_date,as_of_date,source_form,source_accession,nois
 1355096,stress,2,listing_rule_failure,2025-05-16,2025-05-16,8-K,0001104659-25-049822,0
 1355096,near_default,3,delisting_filed,2025-05-27,2025-05-27,25,0001104659-25-052986,0
 1355096,early_warning,1,late_annual_report,2026-04-01,2026-04-01,NT 10-K,0001104659-26-037941,0
-1355096,default,4,chapter11_petition,2026-04-16,2026-04-17,8-K,0001104659-26-044521,0
 1355096,near_default,3,debt_acceleration,2026-04-17,2026-04-17,8-K,0001104659-26-044521,0
 1355096,stress,2,listing_rule_failure,2026-04-20,2026-04-20,8-K,0001355096-26-000015,0
 1355096,near_default,3,delisting_by_exchange,2026-06-08,2026-06-08,25-NSE,0001354457-26-000540,0

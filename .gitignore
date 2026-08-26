@@ -11,3 +11,6 @@ data/cache/
 .pytest_cache/
 .ipynb_checkpoints/
 .ruff_cache/
+
+# Working backups from label dedup -- artifacts, not source
+*.bak
