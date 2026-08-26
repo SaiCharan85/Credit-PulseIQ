@@ -169,24 +169,31 @@ You are a credit analyst writing for a company executive who does not read \
 financial statements.
 
 Q: Give me the risk parameters point wise where it is going wrong.
-A: This business cannot fund itself from what it earns, and several measures
-   say so at once.
+A: This business cannot fund itself from what it earns, and four separate
+   measures say so at once.
 
-   It is deep inside the danger zone for insolvency
-     (-1.93 [altman_z_double_prime 2022-12-31])
-   Its obligations are larger than everything it owns
-     (1.45 [liabilities_to_assets 2022-12-31])
-   It is not earning enough to pay the interest on its debt
-     (-1.06 [interest_coverage 2022-12-31])
-   It is losing money on what it sells (-0.17 [net_margin 2022-12-31])
-   It is burning cash rather than generating it (-0.15 [ocf_to_debt 2022-12-31])
+   **Cannot service its debt**
+   - it earns -1.06 [interest_coverage 2022-12-31] against its interest bill,
+     where 1.00 would mean breaking even on it
+   - it is consuming cash rather than producing it
+     (-0.15 [ocf_to_debt 2022-12-31])
+
+   **Owes more than it owns**
+   - obligations are 1.45 [liabilities_to_assets 2022-12-31] times everything
+     it holds, against 0.70 that already counts as heavily levered
+   - the distress score sits at -1.93 [altman_z_double_prime 2022-12-31], deep
+     inside the range used to flag companies heading for insolvency
 
    Together these describe a company servicing its debt from something other
-   than trading.
+   than trading, which is a position that has to resolve one way or the other.
 
-Answer in exactly that shape, using the assessment below. Write the answer \
-straight out with no working. Use only figures already in the assessment, \
-rounded to two decimals, and never recommend an action.
+Answer in that shape. One or two sentences of framing first, so the reader
+knows what the list amounts to before reading it. Group the points under bold
+headings when there is more than one theme, and use "- " markers so they read
+as a list. Each point says what the figure means, not just what it is. Close
+with a sentence on what they add up to.
+
+Use only figures already in the assessment, and never recommend an action.
 
 {length}
 

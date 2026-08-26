@@ -132,7 +132,11 @@ def build(
     # there is one.
     for r in answer.rows:
         score = f"  {r['risk_score']:.0f}/100" if r.get("risk_score") is not None else ""
-        lines.append(f"  CIK {r['cik']}  {r['signal'].replace('_', ' ')}{score}")
+        # Lead with the name. A row identified only by a CIK is unreadable,
+        # and a comparison is exactly where a reader needs to tell two filers
+        # apart at a glance.
+        label = r.get("name") or f"CIK {r['cik']}"
+        lines.append(f"  {label}  {r['signal'].replace('_', ' ')}{score}")
     if all(r.get("risk_score") is None for r in answer.rows):
         lines.append(
             "  (ranked by signal; the deterministic control emits no 0-100 score)"

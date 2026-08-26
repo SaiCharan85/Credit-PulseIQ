@@ -1035,41 +1035,188 @@ _REFERS_TO_LOADED = re.compile(
 
 #: Words that look like company names but are ordinary question vocabulary.
 #: Without this every sentence starting "What" resolves to some filer.
+#: Sentence-opening words and question vocabulary that capitalise innocently.
+#: Kept, but it is the second line of defence -- the length floor and the cue
+#: requirement below do the real work, because no stopword list survives typos.
 _NOT_A_COMPANY = {
     "what", "why", "how", "when", "where", "which", "who", "is", "does", "the",
     "this", "that", "it", "its", "and", "or", "but", "compare", "explain",
     "show", "give", "tell", "ok", "so", "chapter", "should", "would", "could",
+    "can", "cna", "cant", "did", "will", "please", "also", "then",
+    "here", "there", "about", "with", "from", "into", "your", "their",
 }
+
+#: The shortest a bare capitalised word may be before it is treated as a
+#: company. "Can" and "Cna" are three letters and both resolve against the SEC
+#: directory; nothing shorter than four is worth the false positives.
+_MIN_NAME_CHARS = 4
+
+#: A phrase that announces a company is coming. When one is present the phrase
+#: after it is what the reader named, which is how "compare this to Valaris"
+#: finds Valaris instead of a typo earlier in the sentence.
+_COMPANY_CUE = re.compile(
+    r"\b(?:compared?\s+(?:it\s+|this\s+|them\s+)?(?:to|with|against)"
+    r"|versus|vs\.?|against|relative to|next to|alongside"
+    r"|how (?:does|do|is|are)|what about|how about|and also)\s+",
+    re.I,
+)
+
+
+def _resolve_phrase(phrase: str, directory, loaded_cik: int) -> str:
+    """A directory match for one phrase, if it is a different filer."""
+    if len(phrase) < _MIN_NAME_CHARS:
+        return ""
+    if all(w.lower() in _NOT_A_COMPANY for w in phrase.split()):
+        return ""
+    match, _ = resolve(phrase, directory)
+    return match.name if match and match.cik != loaded_cik else ""
 
 
 def _names_another_company(question: str, loaded_cik: int) -> str:
-    """A company named in the question that is not the one loaded.
+    """A company the reader named that is not the one loaded.
 
-    Deliberately conservative: it only fires on a name the SEC directory
-    resolves unambiguously to a *different* CIK. A guess here costs a real
-    answer -- the reader gets redirected instead of served -- so ambiguity
-    resolves to silence.
+    Conservative by construction. A false positive costs a real answer -- the
+    reader is redirected instead of served -- so anything ambiguous resolves to
+    silence and the question is answered normally.
     """
-    words = [
-        w.strip(".,?!'\"")
-        for w in question.split()
-        if w[:1].isupper() and w.strip(".,?!'\"").lower() not in _NOT_A_COMPANY
-    ]
-    if not words:
-        return ""
     try:
         directory = load_directory()
     except Exception:  # noqa: BLE001
         return ""
-    for n in (2, 1):
-        for i in range(len(words) - n + 1):
-            phrase = " ".join(words[i : i + n])
-            if len(phrase) < 3:
-                continue
-            match, _ = resolve(phrase, directory)
-            if match and match.cik != loaded_cik:
-                return match.name
+
+    def _candidates(text: str) -> list[str]:
+        words = [w.strip(".,?!'\"") for w in text.split()]
+        keep = [w for w in words if w[:1].isupper()]
+        out: list[str] = []
+        for n in (3, 2):          # multi-word first: two capitals in a row are
+            for i in range(len(keep) - n + 1):   # rarely an accident
+                out.append(" ".join(keep[i : i + n]))
+        out.extend(w for w in keep if len(w) >= _MIN_NAME_CHARS)
+        return out
+
+    # After a cue first. "compare this to Valaris" names Valaris, and looking
+    # there before scanning the whole sentence is what stops an earlier typo
+    # from winning.
+    for cue in _COMPANY_CUE.finditer(question):
+        for phrase in _candidates(question[cue.end() :]):
+            found = _resolve_phrase(phrase, directory, loaded_cik)
+            if found:
+                return found
+
+    # No cue: only a multi-word capitalised phrase, or a word long enough that
+    # a sentence opener cannot masquerade as one.
+    for phrase in _candidates(question):
+        found = _resolve_phrase(phrase, directory, loaded_cik)
+        if found:
+            return found
     return ""
+
+
+#: The reader asking for two filers side by side, rather than merely mentioning
+#: another company in passing.
+_WANTS_COMPARISON = re.compile(
+    r"\bcompare|\bcomparison|\bversus\b|\bvs\.?\b|\bagainst\b"
+    r"|\bbetter or worse\b|\bhow does .{0,30}stack up|\bside by side\b"
+    r"|\brelative to\b|\bwho is (?:worse|better|riskier|safer)\b",
+    re.I,
+)
+
+
+def _compare_with(cik: int, other_name: str, as_of: date, question: str,
+                  assessment: dict) -> dict | None:
+    """Assess the named filer and put the two side by side.
+
+    Returns None on any failure, so a comparison we cannot make falls through
+    to the redirect rather than becoming an error. The other company is
+    resolved, fetched and assessed here -- it is never discussed on the
+    strength of the model having heard of it.
+    """
+    from agents.rulebased import RuleBasedInvestigator
+    from agents.screening import build as build_screen
+
+    try:
+        directory = load_directory()
+        match, _ = resolve(other_name, directory)
+        if match is None or match.cik == cik:
+            return None
+        edgar = EdgarClient()
+        rows = [
+            _assess_one(edgar, RuleBasedInvestigator(), c, as_of)
+            for c in (cik, match.cik)
+        ]
+        # _assess_one resolves a name; make sure the loaded filer carries the
+        # one already on screen rather than falling back to a bare CIK.
+        for row in rows:
+            if row.get("cik") == cik and assessment.get("company"):
+                row["name"] = assessment["company"]
+    except Exception:  # noqa: BLE001 - a failed comparison degrades to advice
+        return None
+    if any(r.get("status") != "ok" for r in rows):
+        return None
+
+    screened = build_screen(question, rows, as_of)
+    loaded = assessment.get("company") or f"CIK {cik}"
+    return {
+        "question": question,
+        "answer": (
+            f"Both filers assessed from their own filings as at {as_of}, then "
+            f"compared -- neither is described from memory.\n\n"
+            f"{screened.text}"
+        ),
+        "allowed": True,
+        "reason": "compared_on_request",
+        "mode": "company",
+        "compared": [loaded, match.name],
+        "rows": screened.rows,
+        "caveats": screened.caveats,
+        "ungrounded_numbers": [],
+    }
+
+
+#: Asking where this filer sits against the population. Answerable from the
+#: ranking already attached to the assessment, and previously unreachable
+#: because the company redirect fired on the typo first.
+_ASKS_RANK = re.compile(
+    r"\bpercentile\b|\bwhat percent\b|\brank(?:s|ed|ing)?\b"
+    r"|\bcompared with (?:the )?(?:other|rest|population|peers)\b"
+    r"|\bwhere does (?:it|this) (?:sit|stand|fall)\b",
+    re.I,
+)
+
+
+def _placement(pct: float) -> str:
+    """Where the filer sits, in words. "Above 100%" is arithmetically true for
+    the top-ranked name and reads like a bug."""
+    if pct >= 99.5:
+        return ("The statistical ranker places this filer at the very top "
+                "of the population it was trained on.")
+    if pct <= 0.5:
+        return ("The statistical ranker places this filer at the very bottom "
+                "of the population it was trained on.")
+    return f"The statistical ranker places this filer above {pct:.0f}% of the population it was trained on."
+
+
+def _rank_answer(assessment: dict) -> str:
+    """Plain-English placement, or an honest note that there is none."""
+    ranked = assessment.get("ranked") or {}
+    pct = ranked.get("percentile")
+    if pct is None:
+        return (
+            "No statistical ranking was produced for this filer -- the ranker "
+            "needs enough reported history to build a feature row, and this "
+            "one did not have it. The assessment above still stands on its own."
+        )
+    lo, hi = (ranked.get("resampled_range") or [0, 0])[:2]
+    return (
+        f"{_placement(pct)}\n\n"
+        f"That is an ordering, not a probability. It says where this company "
+        f"sits relative to others, and nothing about how likely it is to fail: "
+        f"the ranker scores {ranked.get('resampled_auc', 0):.3f} AUC across 25 "
+        f"group-aware resamples [{lo:.3f}, {hi:.3f}], and that ordering holds "
+        f"while the absolute level does not transfer.\n\n"
+        f"The investigation is a separate reading, and where the two disagree "
+        f"the assessment says so rather than averaging them."
+    )
 
 
 def _compute_on_request(cik: int, as_of: date, question: str, assessment: dict) -> dict:
@@ -1202,52 +1349,67 @@ def ask_question(req: AskRequest) -> JSONResponse:
     # filer -- but "the assessment does not contain information about Apple" is
     # a dead end. A reader who names a company wants that company, so say where
     # to get it rather than only what is missing.
+    # A compound question gets a compound answer.
+    #
+    # The routing here was a chain of early returns, so "at what percentile
+    # does it rank, and also compare this to Valaris" answered the percentile
+    # and dropped the comparison without saying so. People do not ask one thing
+    # at a time, and silently serving half a question is worse than refusing
+    # it: the reader has no way to know the rest was ignored.
+    #
+    # Each part is answered by whatever owns it, and the parts are composed.
     if req.mode == "company" and cik:
+        parts: list[tuple[str, str]] = []
+        handled = False
+
+        if _ASKS_RANK.search(req.question) and req.assessment.get("ranked"):
+            parts.append(("Where it ranks", _rank_answer(req.assessment)))
+            handled = True
+
         other = _names_another_company(req.question, int(cik))
         if other:
+            compared = _compare_with(int(cik), other, as_of or date.today(),
+                                     req.question, req.assessment)
+            if compared:
+                parts.append((f"Compared with {other}", compared["answer"]))
+            else:
+                parts.append((
+                    f"About {other}",
+                    f"This chat is scoped to "
+                    f"{req.assessment.get('company') or f'CIK {cik}'}, and "
+                    f"{other} could not be assessed from its filings just now. "
+                    f"Search for it on the left to open it directly."
+                ))
+            handled = True
+
+        if handled:
+            # Whatever is left of the question, if anything, still goes to the
+            # model. A reader who asks for a rank *and* an explanation should
+            # get both, not a rank and silence.
+            leftover = _ASKS_RANK.sub(" ", req.question)
+            if other:
+                leftover = leftover.replace(other, " ")
+            if len(leftover.split()) >= 6:
+                try:
+                    extra = ask(CachingClient(inner=client), req.assessment,
+                                req.question)
+                    if extra.allowed and extra.text:
+                        parts.append(("On the filings", extra.text))
+                except Exception:  # noqa: BLE001 - a missing part, not a failure
+                    pass
+            body = "\n\n".join(
+                f"## {title}\n{text}" if len(parts) > 1 else text
+                for title, text in parts
+            )
             return JSONResponse({
                 "question": req.question,
-                "answer": (
-                    f"This chat is scoped to {req.assessment.get('company') or f'CIK {cik}'}, "
-                    f"so it holds no figures for {other}.\n\n"
-                    f"To ask about {other}, search for it on the left and it will be "
-                    f"assessed from its own filings. To put the two side by side, "
-                    f"stage both in Compare and ask there -- each is assessed before "
-                    f"it is discussed, so nothing is compared from memory."
-                ),
+                "answer": body,
                 "allowed": True,
-                "reason": "other_company",
+                "reason": "composed" if len(parts) > 1 else parts[0][0].lower(),
                 "mode": "company",
-                "suggest": other,
+                "parts": [t for t, _ in parts],
                 "ungrounded_numbers": [],
             })
-
-    # A definitional aside, mid-conversation. People do this: three questions
-    # about a filer, then "what does going concern mean anyway", then straight
-    # back. Refusing it -- "the assessment does not define going concern" --
-    # is technically true and reads as obtuse, and it forces the reader to go
-    # and change modes to ask a question they asked in passing.
-    #
-    # The discriminator is whether the question refers to the loaded company at
-    # all. "How leveraged is it" is conceptual by grammar and specific by
-    # intent; the pronoun gives it away. No pronoun and no company noun means
-    # the reader stepped out of the case to ask what a word means.
-    if (
-        req.mode == "company"
-        and cik
-        and _ASKS_A_DEFINITION.search(req.question)
-        and not _REFERS_TO_LOADED.search(req.question)
-    ):
-        result = explain(CachingClient(inner=client), req.question)
-        return JSONResponse({
-            "question": req.question,
-            "answer": result.text,
-            "allowed": result.allowed,
-            "reason": "definition",
-            "mode": "company",
-            "aside": True,
-            "ungrounded_numbers": [],
-        })
 
     # ---- explicit modes -------------------------------------------------
     #

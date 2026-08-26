@@ -157,7 +157,13 @@ def test_worked_examples_demonstrate_the_citation_format() -> None:
     module docstring, about bullet points. The examples have to show the
     bracket or the model will not write one, and every figure comes back
     untagged."""
+    import re
+
     from agents.qa import POINTS_PROMPT, SYSTEM_PROMPT
 
+    # The shape, not the metric. Naming one pinned the example to whichever
+    # ratio it happened to use, so rewriting the example for better structure
+    # failed a test about citation format.
+    cited = re.compile(r"-?[\d.]+ \[[a-z_]+ \d{4}-\d{2}-\d{2}\]")
     for prompt in (SYSTEM_PROMPT, POINTS_PROMPT):
-        assert "[current_ratio 2022-12-31]" in prompt or "[net_margin 2022-12-31]" in prompt
+        assert cited.search(prompt), "an example must demonstrate the bracket"
