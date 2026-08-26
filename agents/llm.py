@@ -537,7 +537,7 @@ class RateLimitedClient:
     def _retry_after(exc: Exception) -> float | None:
         import re
 
-        match = re.search(r"retry in ([0-9.]+)(ms|s)", str(exc), re.IGNORECASE)
+        match = re.search(r"retry in ([0-9.]+)(ms|s)\b", str(exc), re.IGNORECASE)
         if match:
             value = float(match.group(1))
             return value / 1000.0 if match.group(2).lower() == "ms" else value
@@ -686,12 +686,42 @@ def default_client(model: str = "", base_url: str = "") -> LLMClient:
 PREFLIGHT_MAX_TOKENS = 400
 
 
-def preflight(client: LLMClient) -> tuple[bool, str]:
+#: How long a successful preflight stands for. The check answers "is this
+#: endpoint reachable and correctly configured", which does not change between
+#: two requests a few seconds apart.
+PREFLIGHT_TTL_SECONDS = 300.0
+
+#: name -> (checked_at, ok, detail). Successes only; see ``preflight``.
+_PREFLIGHT_CACHE: dict[str, tuple[float, bool, str]] = {}
+
+
+def preflight(client: LLMClient, ttl: float = PREFLIGHT_TTL_SECONDS) -> tuple[bool, str]:
     """One cheap round-trip to confirm the endpoint answers.
 
-    Worth two seconds: a bad model ID or key would otherwise surface partway
-    through a 400-case backtest, after real tokens had been spent.
+    Worth two seconds at the head of a backtest: a bad model ID or key would
+    otherwise surface partway through 400 cases, after real tokens had been
+    spent.
+
+    Worth nothing at all on every request of a live server, which is what it
+    had become -- measured at **7.2 of the 8.9 seconds** of a fully cached
+    assessment, because the check itself is a real network call and is
+    deliberately not cached to disk. So a success stands for ``ttl`` seconds.
+
+    **Failures are never cached.** A user who fixes their key should see the
+    next request work, not wait out a timer; and the failure path costs
+    nothing to repeat because it is what is already blocking them.
     """
+    name = getattr(client, "name", "unknown")
+    hit = _PREFLIGHT_CACHE.get(name)
+    if hit and (time.monotonic() - hit[0]) < ttl:
+        return hit[1], hit[2]
+    ok, detail = _preflight_uncached(client)
+    if ok:
+        _PREFLIGHT_CACHE[name] = (time.monotonic(), ok, detail)
+    return ok, detail
+
+
+def _preflight_uncached(client: LLMClient) -> tuple[bool, str]:
     try:
         reply = client.complete(
             [{"role": "user", "content": 'Reply with exactly: {"ok": true}'}],
