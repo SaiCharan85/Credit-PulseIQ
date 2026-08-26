@@ -52,6 +52,46 @@ FLAGS_FOR_WATCH = 2
 #: Below this many computable metrics there is not enough to judge on.
 MIN_DEFINED_METRICS = 3
 
+#: A severe breach counts double a flag. Both matter; a measure past the severe
+#: level is a stronger statement than one merely near it, and collapsing them
+#: would put a filer with five near-misses level with one already insolvent.
+SEVERE_WEIGHT = 2
+
+
+def risk_score(signal: str, severe: Sequence[str], flagged: Sequence[str]) -> float:
+    """An ordinal 0-100 severity, positioned *inside* the signal's own band.
+
+    This arm emitted no score at all, which left "what is its risk score" --
+    an entirely reasonable question -- unanswerable for every filer it
+    assessed. The five-level signal was the only output, and five levels cannot
+    separate two filers sitting in the same band.
+
+    The score is derived from the band the signal already implies, then placed
+    within it by how many thresholds broke. Deriving it independently and
+    hoping the two agreed is exactly what the critic's consistency check exists
+    to catch -- a first attempt at this scored an ``elevated_risk`` filer at 36
+    against a band of [45, 75], and the guard blocked the memo, correctly. A
+    score that cannot contradict its own signal is better than one that is
+    checked for contradiction afterwards.
+
+    Deliberately a *rank*, not a probability. The test universe is enriched
+    with distressed filers far above the population base rate, so an absolute
+    probability drawn from it would not transfer. The Q&A guard enforces that
+    separately, refusing any answer that frames this number as a chance of
+    default.
+    """
+    from agents.critic import SIGNAL_BANDS
+
+    low, high = SIGNAL_BANDS.get(signal, (0.0, 0.0))
+    if high <= low:
+        return low
+    worst = SEVERE_WEIGHT * len(CASCADE)
+    weighted = min(SEVERE_WEIGHT * len(severe) + len(flagged), worst)
+    # Kept off the band edges: a filer exactly on a boundary reads as belonging
+    # to either neighbour, and the boundaries are where readers look hardest.
+    span = (high - low) * 0.9
+    return round(low + (high - low) * 0.05 + span * (weighted / worst), 1)
+
 
 class RuleBasedInvestigator:
     """Threshold cascade over the same typed tools."""
@@ -146,6 +186,7 @@ class RuleBasedInvestigator:
             as_of=as_of,
             signal=signal,
             confidence=confidence,
+            risk_score=risk_score(signal, severe, flagged),
             rationale=rationale,
             evidence=evidence,
             residual=residual,
