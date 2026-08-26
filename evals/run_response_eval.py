@@ -174,9 +174,20 @@ def _has_sections(answer: str, _resp: dict) -> str:
     if len(heads) < 2:
         return f"asked for subtopics, got {len(heads)} headings"
     sections = re.split(r"^#{2,4}\s+.*$", answer, flags=re.M)[1:]
-    bulleted = [bool(re.search(r"^\s*[-*•]\s+", s, re.M)) for s in sections]
-    if all(bulleted) or not any(bulleted):
-        return "every section used the same shape -- headings as decoration"
+    # A section that frames in prose and then lists is *already* mixed shape,
+    # and is the right answer when its items are parallel. Requiring sections
+    # to differ from each other failed a correct three-heading answer that did
+    # exactly that in all three -- the grader demanding variety for its own
+    # sake rather than structure that serves the content.
+    def _mixed(sec: str) -> bool:
+        lines = [ln for ln in sec.splitlines() if ln.strip()]
+        bullets = [ln for ln in lines if re.match(r"^\s*[-*•]\s+", ln)]
+        return bool(bullets) and len(bullets) < len(lines)
+
+    if not any(_mixed(sec) for sec in sections):
+        bulleted = [bool(re.search(r"^\s*[-*•]\s+", sec, re.M)) for sec in sections]
+        if all(bulleted) or not any(bulleted):
+            return "no section combines framing prose with its items"
     return ""
 
 

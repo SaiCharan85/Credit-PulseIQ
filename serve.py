@@ -1006,6 +1006,25 @@ def _history_section(events: list[dict], as_of: date) -> dict:
     }
 
 
+#: A question asking what a term *means*, as opposed to one asking about the
+#: filer that happens to lack a pronoun.
+#:
+#: The first version tested "conceptual grammar and no pronoun", which routed
+#: two ordinary company questions to the general-definitions path: "explain the
+#: liquidity position in about 250 words" came back as a textbook definition of
+#: liquidity, and "what did the auditor say" came back as "I answer general
+#: questions here". Plenty of real questions about a filer name no pronoun. The
+#: frame has to be definitional, not merely impersonal.
+_ASKS_A_DEFINITION = re.compile(
+    r"\bwhat (?:is|are) (?:a|an)\b"
+    r"|\bwhat does .{0,40}\b(?:mean|measure|tell|indicate|refer to)\b"
+    r"|\bwhat do .{0,40}\bmean\b"
+    r"|\bdefine\b|\bmeaning of\b|\bdifference between\b"
+    r"|\bmean anyway\b|\bwhat exactly is\b"
+    r"|\bhow (?:does|do) .{0,30}\bwork\b",
+    re.I,
+)
+
 #: A reference to the filer currently loaded. Its presence turns a
 #: grammatically general question ("how leveraged is it") into a specific one.
 _REFERS_TO_LOADED = re.compile(
@@ -1216,7 +1235,7 @@ def ask_question(req: AskRequest) -> JSONResponse:
     if (
         req.mode == "company"
         and cik
-        and is_conceptual(req.question)
+        and _ASKS_A_DEFINITION.search(req.question)
         and not _REFERS_TO_LOADED.search(req.question)
     ):
         result = explain(CachingClient(inner=client), req.question)
