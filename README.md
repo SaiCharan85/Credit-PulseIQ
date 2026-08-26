@@ -19,7 +19,7 @@ The project is deliberately built **eval-first**. The evaluation harness is the 
 | LLMs are unreliable at arithmetic | The LLM never computes; it calls typed tools |
 | LLMs fabricate plausible numbers | The verifier re-derives every cited figure and hard-fails what it can't reproduce |
 | Lookahead leakage invalidates most finance backtests | Enforced at the data layer *and* re-checked at the verify boundary |
-| Agentic systems ship unevaluated | Eval-first: 270 tests before a single model call |
+| Agentic systems ship unevaluated | Eval-first: the harness came before the agent, and now carries 1,297 tests |
 | Ground truth is assumed rather than verified | Four-signal labels; 363 text false-positives and 37 miscoded item codes rejected |
 | Survivorship bias | CIK-pinned identity; survivors verified as still filing |
 | Rare-event class imbalance | A severity ladder, so early warning is measurable at several thresholds |
@@ -51,7 +51,7 @@ L3 backtest, distress leg. 200 firm-period cases (100 Chapter 11 positives + 100
 
 | Metric | Agent, ratios only | **Agent, + filing-text tools** | Altman Z'' | Hazard (Shumway) |
 |---|---|---|---|---|
-| AUC | 0.881 | **0.965** | 0.885 | 0.966 |
+| AUC | 0.881 | **0.963** | 0.885 | 0.966 |
 | Calibration (ECE) | 0.135 | **0.081** | 0.141 | 0.101 |
 | Precision / recall | 0.795 / 0.714 | **0.870 / 0.897** | — | — |
 | Median lead time | 161 days | **155 days** | — | — |
@@ -99,7 +99,18 @@ agent                : 0.9634
 agent - GBM          : -0.0133  95% CI [-0.0421, +0.0124]  tie
 ```
 
-Gradient boosting does genuinely beat logistic regression -- by +0.057 group-aware, and in 6 of 6 walk-forward folds -- so for a ranked score the statistical model remains the right tool. But the agent is level with the best baseline we can build, not behind it.
+**Those two levels are inflated, and by how much is measurable.** Both were scored on the most recent window in the panel, and the walk-forward table above shows every method scoring higher on later folds -- logistic regression alone gains 0.23 AUC from the 2022 fold to the 2025 one without changing at all. Resampling separates the model from the window:
+
+```
+GBM, 25 group-aware random splits (whole firms held out)
+  mean 0.9169   95% of draws [0.8916, 0.9518]   draws reaching 0.9768: 0 of 25
+```
+
+The published 0.9768 does not sit at the top of that distribution, it sits **outside it**. Roughly 0.06 of it is the window being easy. The serving ranker therefore ships with 0.9169 in its metadata and the UI shows the resampled range, not the single-fold number.
+
+Two claims survive the correction intact. **Gradient boosting genuinely beats logistic regression** -- +0.0312 mean over the same 25 splits, better in 24 of 25, having previously rested on one fold. And **the agent still ties**: that comparison is paired on identical cases, so the shared window inflation cancels.
+
+One number needed reconciling. The agent's 0.9634 ranks by `risk_probability`, the Platt-calibrated continuous score; ranking the same 200 cases by the ordinal `risk_score` band gives 0.9377. Both are correct and they measure different resolutions of the same output. Resampled on the published column, the agent is 0.9651 with 95% of firm-level draws in [0.9337, 0.9874] -- which must **not** be read against the GBM's range above. The populations differ enormously: the agent's cases are half positives by construction, the GBM panel is nine percent. Only the paired test compares them honestly.
 
 **Where the gain came from.** 27 bankruptcies missed in the first arm are caught in the second, **none regressed**, and 26 of the 27 carried a filing-text signal. The agent's failure mode was never faulty reasoning -- it was blindness. It spent ~12 steps investigating a feature set that did not contain the answer for a quarter of the failures. You cannot reason your way to a covenant breach from a current ratio.
 
@@ -168,7 +179,7 @@ Found and fixed before the final numbers, each documented in the commit history:
 
 ## What exists today
 
-All five build phases are complete. **526 tests pass, all offline** -- the ReAct loop is tested against a scripted model, so agentic behaviour, the guard gate and memo assembly are all verified without an endpoint or a network.
+All five build phases are complete. **1,297 tests pass, all offline** -- the ReAct loop is tested against a scripted model, so agentic behaviour, the guard gate and memo assembly are all verified without an endpoint or a network.
 
 | phase | status |
 |---|---|
@@ -182,22 +193,23 @@ The eval ladder is populated end to end:
 
 | | covers | files |
 |---|---|---|
-| L0 | deterministic ratio, score, trend and peer arithmetic | 15 |
+| L0 | deterministic arithmetic, PDF and form parsing, the read-only verifier, "
+the ordinal risk score, label dedup, tracing | 24 |
 | L1 | XBRL extraction from real filings | 1 |
 | L2 | peer construction and trends at the tool boundary, incl. peer as-of leakage | 1 |
 | L3 | investigator vs real Chapter 11 and restatement outcomes | 3 |
 | L4 | end-to-end, filer facts in -> cited memo out | 1 |
-| L5 | guardrails and adversarial: decision framing, fabricated figures, abstention | 1 |
+| L5 | guardrails and adversarial: decision framing, fabricated figures, citation provenance, context poisoning, answer shape, follow-ups | 10 |
 
 | | |
 |---|---|
-| Distress universe | **369 CIK-pinned filers** — 156 Chapter 11, 213 still filing |
-| Chapter 11 labels | **156**, every one verified by four independent checks |
-| Graded distress events | **3,005** across four severity tiers |
+| Distress universe | **368 CIK-pinned filers** — 155 Chapter 11, 213 still filing |
+| Chapter 11 labels | **155**, verified four ways in-repo and spot-checked against court dockets |
+| Graded distress events | **3,004** across four severity tiers |
 | Earnings-quality universe | **12,570** point-in-time annual filers, no survivorship bias |
 | Restatement labels | **887** verified, after excluding 810 SPAC regulatory reclassifications |
 | Deterministic metrics | 36, each with a hand-computed L0 assertion |
-| Tests | **526** |
+| Tests | **1,297** |
 
 Labels by cohort, and the ladder by tier:
 
@@ -209,6 +221,51 @@ Labels by cohort, and the ladder by tier:
 | | | | `early_warning` | 1,210 | 246 |
 
 At 156 positives a recall estimate carries a 95% CI of roughly ±8pp — enough to report. Of those 156, **129 (83%) did not survive**: 92 deregistered via Form 15, 37 went dark, 21 emerged.
+
+### The stack, named
+
+| layer | what runs |
+|---|---|
+| **Orchestration** | LangGraph `StateGraph` — six nodes, a conditional guard edge, optional checkpointing |
+| **Agent** | hand-rolled ReAct loop over typed tools; step budget, forced abstention, deterministic critic with ≤2 retries |
+| **Verification** | read-only recomputation from raw XBRL at 1e-9; citation binding on measure *and* period |
+| **Ranking** | LightGBM, group-aware, served as an ordinal percentile beside the agent |
+| **Evals** | six-level ladder, 1,297 tests, adversarial probes, subgroup fairness, resampled AUC |
+| **Observability** | Langfuse spans and scores, SSE step streaming, per-memo audit trail |
+
+### What a reader actually gets
+
+Two models, two jobs, measured separately and shown side by side.
+
+| | job | resampled |
+|---|---|---|
+| **GBM ranker** | orders filers against each other; drives the watchlist | 0.9187, 25 group-aware splits [0.8885, 0.9394] |
+| **ReAct agent** | investigates one filer and writes the cited memo | 0.9651, firms resampled [0.9337, 0.9874] |
+
+They tie on discrimination, so neither overrules the other. What separates them
+is that the GBM emits a number and cannot say why, while every figure the agent
+quotes carries the measure and period it came from. **Where the two disagree the
+UI says so** rather than averaging them -- a filer the covariates rank high and
+the narrative reads healthy is the most interesting row on the screen.
+
+Around that:
+
+* **Every figure is verifiable.** `evals/run_figure_audit.py` goes back to
+  EDGAR, re-applies the as-of filter, recomputes, and compares against what is
+  on screen across four surfaces. Currently **142/142 to 1e-9**.
+* **Numbers cannot be invented.** An adversarial probe of twelve questions
+  designed to bait a figure the system does not have leaks **0**, with **0**
+  false refusals on a control group -- the control matters, because refusing
+  everything scores a perfect zero and is useless.
+* **Answers take the shape of the question.** Length, prose vs points vs
+  sections vs tables, and charts are each chosen from the question rather than
+  fixed in the prompt.
+* **Follow-ups work.** The last three turns are carried, scoped to one filer at
+  one date, and the conversation persists until the reader clears it. Ask about
+  a different company and it says where to go instead of guessing.
+* **Thin disclosure is flagged.** On the 26 backtest cases with two or fewer
+  reported figures the system ranks at 0.763 against 0.964 on the rest, so those
+  memos carry the caveat instead of looking equally confident.
 
 ### Findings that shaped the design
 
@@ -303,7 +360,56 @@ Two conclusions worth stating. First, the floor is real: below roughly 8B the mo
 
 ## Architecture
 
-**Pattern: orchestrator–workers.** A coordinator routes to specialized worker agents and fuses their outputs; workers do not talk to each other (orchestrated, not collaborative — chosen for auditability). Each worker is a **ReAct** tool-use loop. The whole thing is wrapped in a **deterministic critic–reviser** verification stage.
+**Orchestration: a LangGraph state machine around a hand-rolled ReAct loop.**
+
+The pipeline is declared as a graph, so the stages, the state each carries, and
+the branch at the guard gate are explicit rather than implied by call order:
+
+```
+                 ┌──────────────┐
+   CIK + date ──►│  load_facts  │  EDGAR fetch, then the as-of filter. Nothing
+                 └──────┬───────┘  after this point can see a later filing.
+              error ────┴──── ok
+                ↓            ↓
+              END      ┌──────────┐
+                       │  triage  │  How deep to look; sets the step budget.
+                       └────┬─────┘
+                            ↓
+                  ┌──────────────────┐
+                  │   investigate    │ ◄── the ReAct loop, ONE node
+                  │                  │     tool → observe → choose → repeat,
+                  └────────┬─────────┘     critic-checked, ≤2 bounded retries
+                           ↓
+                     ┌──────────┐
+                     │   rank   │  GBM over the same facts. Never gates.
+                     └────┬─────┘
+                          ↓
+                     ┌──────────┐
+                     │  guard   │  numeric · lookahead · scope · calibration
+                     └────┬─────┘
+                may_ship ─┴─ blocked
+                     ↓         ↓
+               ┌──────────┐   END  ← an outcome, not an error path
+               │ assemble │
+               └────┬─────┘
+                    ▼   cited memo + ranked percentile + audit trail
+```
+
+Three things the graph buys that the previous function did not. **Checkpointing:**
+a cold investigation is ~130s of sequential model calls, and with a thread id it
+resumes at the node it stopped on instead of paying that again. **A declared
+branch:** a blocked memo was an early return; it is now an edge that says the
+guard fired, which is a different statement from an error. **Streaming:**
+`graph.stream()` emits one update per node, which the SSE endpoint had been
+assembling by hand from a callback.
+
+**The ReAct loop stays inside a single node, deliberately.** The step budget, the
+forced abstention and the bounded critic retry are the behaviours the 0.963
+backtest measured across 200 cases. Re-expressing them as graph nodes would be a
+rewrite of the thing under measurement, and the figure would stop describing what
+ships. `evals/test_l3_graph.py` fails if a later refactor crosses that line.
+
+**Underlying pattern: orchestrator–workers.** A coordinator routes to specialized worker agents and fuses their outputs; workers do not talk to each other (orchestrated, not collaborative — chosen for auditability). Each worker is a **ReAct** tool-use loop. The whole thing is wrapped in a **deterministic critic–reviser** verification stage.
 
 ```
 watchlist & trigger  →  data plane  →  deterministic compute  →  orchestrator
