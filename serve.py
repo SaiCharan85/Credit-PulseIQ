@@ -1063,7 +1063,11 @@ _COMPANY_CUE = re.compile(
 
 
 def _resolve_phrase(phrase: str, directory, loaded_cik: int) -> str:
-    """A directory match for one phrase, if it is a different filer."""
+    """A directory match for one phrase, if it is a different filer.
+
+    Kept for the exact-name path; BM25 handles ranked matching in
+    ``_names_another_company``.
+    """
     if len(phrase) < _MIN_NAME_CHARS:
         return ""
     if all(w.lower() in _NOT_A_COMPANY for w in phrase.split()):
@@ -1094,18 +1098,29 @@ def _names_another_company(question: str, loaded_cik: int) -> str:
         out.extend(w for w in keep if len(w) >= _MIN_NAME_CHARS)
         return out
 
-    # After a cue first. "compare this to Valaris" names Valaris, and looking
-    # there before scanning the whole sentence is what stops an earlier typo
-    # from winning.
-    for cue in _COMPANY_CUE.finditer(question):
-        for phrase in _candidates(question[cue.end() :]):
-            found = _resolve_phrase(phrase, directory, loaded_cik)
-            if found:
-                return found
+    # Extraction is a rule; ranking is BM25. Feeding the whole sentence to the
+    # index found Here Group Ltd for "here" and Wheels Up for "up", so the
+    # index only ever sees phrases that plausibly name a company -- and then
+    # scores them, which is what the old positional scan could not do.
+    from data.bm25 import index
 
-    # No cue: only a multi-word capitalised phrase, or a word long enough that
-    # a sentence opener cannot masquerade as one.
-    for phrase in _candidates(question):
+    ix = index()
+    after_cue = [
+        phrase
+        for cue in _COMPANY_CUE.finditer(question)
+        for phrase in _candidates(question[cue.end() :])
+    ]
+    # A phrase the reader pointed at with a cue outranks one merely present.
+    hit = ix.best_in(question, after_cue, exclude_cik=loaded_cik)
+    if hit:
+        return hit.name
+    hit = ix.best_in(question, _candidates(question), exclude_cik=loaded_cik)
+    if hit:
+        return hit.name
+
+    # Exact-name fallback for filers the ranked index scores weakly -- a
+    # single distinctive token can fall below the evidence floor.
+    for phrase in after_cue or _candidates(question):
         found = _resolve_phrase(phrase, directory, loaded_cik)
         if found:
             return found
