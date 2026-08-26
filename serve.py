@@ -39,8 +39,9 @@ from agents.diagnostic import ZONES
 from agents.diagnostic import build as build_diagnostic
 from agents.earnings_notes import earnings_notes
 from agents.explain import explain, is_conceptual
+from agents.graph import run as graph_run
 from agents.llm import load_env_file
-from agents.orchestrator import Orchestrator
+from agents.orchestrator import Assessment, Orchestrator
 from agents.outcomes_lookup import load_outcomes, survived_note
 from agents.schemas import SIGNAL_ORDER
 from agents.screening import build as build_screen
@@ -557,8 +558,18 @@ def _assess_traced(req: AssessRequest, on_step, _trace) -> tuple[dict, int]:
     # Earnings-quality observations ride along as context. Measured at
     # 0.51-0.61 AUC over six approaches, so they never move the graded signal.
     notes = earnings_notes(facts, req.as_of)
-    result = Orchestrator(investigator, context_notes=notes).run(
-        cik, req.as_of, facts, **extra
+    # Through the graph. Facts are passed in rather than refetched -- they were
+    # loaded above to answer other questions, and a second EDGAR round trip
+    # against a rate-limited endpoint buys nothing.
+    state = graph_run(
+        investigator, cik, req.as_of, facts=facts, context_notes=notes, **extra
+    )
+    if state.get("error"):
+        return {"error": state["error"]}, 400
+    result = Assessment(
+        cik=cik, as_of=req.as_of, triage=state["triage"],
+        output=state.get("output"), guards=state.get("guards"),
+        memo=state.get("memo"), blocked_reason=state.get("blocked_reason", ""),
     )
 
     payload: dict = {

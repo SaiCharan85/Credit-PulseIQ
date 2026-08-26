@@ -43,6 +43,14 @@ class AssessmentState(TypedDict, total=False):
     as_of: date
     agent: str
     facts: Any
+    #: Extra keyword arguments for the investigator -- the filing-text tools
+    #: on the ReAct arm. Carried through the graph rather than closed over,
+    #: because losing them silently would cost the +0.084 AUC those tools buy
+    #: and the assessment would still look fine.
+    tool_kwargs: dict
+    #: Earnings-quality observations. Context-only: attached to the memo,
+    #: never allowed to move the graded signal.
+    context_notes: list
     triage: Any
     output: Any
     guards: Any
@@ -68,7 +76,14 @@ def build_graph(investigator: Any, edgar: Any = None, checkpointer: Any = None):
     client = edgar or EdgarClient()
 
     def load_facts(state: AssessmentState) -> dict:
-        """Fetch and as-of filter. The boundary the whole project rests on."""
+        """Fetch and as-of filter. The boundary the whole project rests on.
+
+        Skipped when the caller already holds the facts -- the API path loads
+        them to answer other questions first, and refetching would double the
+        EDGAR traffic against a rate-limited endpoint for no gain.
+        """
+        if state.get("facts"):
+            return {"steps": [{"node": "load_facts", "n": len(state["facts"])}]}
         try:
             facts = client.facts(state["cik"])
         except Exception as exc:  # noqa: BLE001
@@ -90,7 +105,10 @@ def build_graph(investigator: Any, edgar: Any = None, checkpointer: Any = None):
         if previous is not None:
             investigator.max_steps = plan.steps
         try:
-            output = investigator.run(state["cik"], state["as_of"], state["facts"])
+            output = investigator.run(
+                state["cik"], state["as_of"], state["facts"],
+                **(state.get("tool_kwargs") or {}),
+            )
         finally:
             if previous is not None:
                 investigator.max_steps = previous
@@ -122,7 +140,10 @@ def build_graph(investigator: Any, edgar: Any = None, checkpointer: Any = None):
     def assemble(state: AssessmentState) -> dict:
         from agents.orchestrator import build_memo
 
-        memo = build_memo(state["output"], state["guards"], state["triage"], [])
+        memo = build_memo(
+            state["output"], state["guards"], state["triage"],
+            state.get("context_notes") or [],
+        )
         return {"memo": memo, "steps": [{"node": "assemble"}]}
 
     def after_load(state: AssessmentState) -> str:
@@ -151,7 +172,8 @@ def build_graph(investigator: Any, edgar: Any = None, checkpointer: Any = None):
 
 
 def run(investigator: Any, cik: int, as_of: date, edgar: Any = None,
-        thread_id: str = "") -> AssessmentState:
+        thread_id: str = "", facts: Any = None, context_notes: list | None = None,
+        **tool_kwargs: Any) -> AssessmentState:
     """Run one assessment through the graph.
 
     ``thread_id`` turns on checkpointing for this run, so an interrupted
@@ -166,4 +188,11 @@ def run(investigator: Any, cik: int, as_of: date, edgar: Any = None,
         checkpointer = MemorySaver()
         config = {"configurable": {"thread_id": thread_id}}
     graph = build_graph(investigator, edgar=edgar, checkpointer=checkpointer)
-    return graph.invoke({"cik": cik, "as_of": as_of}, config or None)
+    state: dict[str, Any] = {"cik": cik, "as_of": as_of}
+    if facts is not None:
+        state["facts"] = facts
+    if context_notes:
+        state["context_notes"] = list(context_notes)
+    if tool_kwargs:
+        state["tool_kwargs"] = tool_kwargs
+    return graph.invoke(state, config or None)

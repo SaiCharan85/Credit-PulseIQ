@@ -403,6 +403,13 @@ guard fired, which is a different statement from an error. **Streaming:**
 `graph.stream()` emits one update per node, which the SSE endpoint had been
 assembling by hand from a callback.
 
+The API serves through this graph. `serve.py` builds the investigator, hands
+it to `agents.graph.run`, and the facts it already loaded are passed in rather
+than refetched -- a second EDGAR round trip against a rate-limited endpoint
+buys nothing. The filing-text tools and the context notes travel as graph
+state, because losing them silently would cost the +0.084 AUC those tools buy
+while the assessment still looked fine.
+
 **The ReAct loop stays inside a single node, deliberately.** The step budget, the
 forced abstention and the bounded critic retry are the behaviours the 0.963
 backtest measured across 200 cases. Re-expressing them as graph nodes would be a
