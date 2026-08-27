@@ -681,6 +681,54 @@ function Memo({ data, loading, steps, elapsed, onCite, activeCite, onAction }) {
           text-[10px] text-slate-600">Both views agree on this filer. They tie on
           accuracy, so neither overrules the other — where they differ, that is shown.</div>`}
       </div>`}
+      ${data.ranked && html`<div class="mb-4 rounded border border-slate-800">
+        <div class="grid gap-px bg-slate-800 sm:grid-cols-2">
+          <div class="bg-slate-950 px-4 py-3">
+            <div class="flex items-baseline justify-between">
+              <span class="text-[9.5px] uppercase tracking-wider text-slate-500">
+                Statistical ranker</span>
+              <span class="font-mono text-[9px] text-slate-600">GBM</span>
+            </div>
+            <div class="mt-1 font-mono text-[19px] text-slate-100 tnum">
+              ${data.ranked.percentile.toFixed(0)}<span class="text-[12px] text-slate-500">th pct</span>
+            </div>
+            <p class="mt-1 text-[10.5px] leading-snug text-slate-500">
+              Sorts filers against each other. Used for the watchlist order and
+              to prioritise work. <b class="text-slate-400">Not a probability.</b>
+            </p>
+            <div class="mt-1.5 font-mono text-[9.5px] text-slate-600">
+              ${data.ranked.resampled_auc.toFixed(4)} AUC over 25 random splits
+              [${data.ranked.resampled_range[0].toFixed(3)}, ${data.ranked.resampled_range[1].toFixed(3)}]
+            </div>
+          </div>
+          <div class="bg-slate-950 px-4 py-3">
+            <div class="flex items-baseline justify-between">
+              <span class="text-[9.5px] uppercase tracking-wider text-slate-500">
+                Investigation</span>
+              <span class="font-mono text-[9px] text-slate-600">ReAct agent</span>
+            </div>
+            <div class=${`mt-1 font-mono text-[19px] tnum ${SIGNAL_TONE[data.memo.signal]||'text-slate-100'}`}>
+              ${data.memo.risk_score!=null?data.memo.risk_score.toFixed(0):'--'}<span
+                class="text-[12px] text-slate-500">/100</span>
+            </div>
+            <p class="mt-1 text-[10.5px] leading-snug text-slate-500">
+              Explains one filer. Everything below this panel comes from here,
+              <b class="text-slate-400">with every figure cited.</b>
+            </p>
+            <div class="mt-1.5 font-mono text-[9.5px] text-slate-600">
+              0.9651 AUC, firms resampled [0.934, 0.987]
+            </div>
+          </div>
+        </div>
+        ${data.ranked.disagreement && html`<div class="border-t border-slate-800 bg-sky-950/20 px-4 py-2.5">
+          <div class="mb-1 flex items-center gap-2 font-mono text-[10px] tracking-wider text-sky-400">
+            <${Icon} name="git-compare" cls="w-3.5 h-3.5"/>THE TWO VIEWS DISAGREE</div>
+          <p class="text-[11.5px] leading-relaxed text-slate-300">${data.ranked.disagreement}</p>
+        </div>`}
+        ${!data.ranked.disagreement && html`<div class="border-t border-slate-800 px-4 py-1.5
+          text-[10px] text-slate-600">Both views agree on this filer. They tie on
+          accuracy, so neither overrules the other — where they differ, that is shown.</div>`}
+      </div>`}
       ${data.reliability?.sparse && html`<div class="mb-4 rounded border-l-2 border-amber-500
         bg-amber-950/20 px-4 py-3">
         <div class="mb-1 flex items-center gap-2 font-mono text-[10px] tracking-wider text-amber-400">

@@ -49,8 +49,15 @@ def auc(scores: list[float], labels: list[int]) -> float | None:
 
 
 def _score(row: dict[str, str]) -> float:
-    """The continuous score the agent produced, preferring risk_score."""
-    for key in ("risk_score", "risk_probability", "confidence"):
+    """The score the *published figure* ranks by, which is the calibrated one.
+
+    This preferred ``risk_score`` -- the model's ordinal 0-100 self-report --
+    and produced a 0.20 AUC "fairness gap" on thin disclosure that does not
+    exist on the metric the product reports. The two columns are not monotonic
+    transforms of one another, so a subgroup measured on one and compared
+    against a headline computed with the other is not a comparison at all.
+    """
+    for key in ("risk_probability", "risk_score", "confidence"):
         raw = (row.get(key) or "").strip()
         if raw:
             try:

@@ -58,31 +58,18 @@ INDEX = Path(__file__).parent / "web" / "index.html"
 ARM_AUC = {"rules": 0.885, "react": 0.965}
 HAZARD_AUC = 0.966
 
-#: Where the headline number stops describing the case on screen.
+#: Evidence density, reported without a reliability claim attached.
 #:
-#: Measured by ``evals/run_fairness_decay.py`` over the same 200 cases:
+#: This carried a warning that thinly-disclosed filers were ranked at 0.763
+#: against 0.964 for the rest. That gap was an artifact: it came from ranking
+#: the subgroup by ``risk_score`` while the published figure ranks by
+#: ``risk_probability``. On the metric the product actually reports there is no
+#: gap -- 0.976 on sparse disclosure against 0.964 -- and the warning was
+#: teaching readers to discount the cases where the system is fine.
 #:
-#:     moderate disclosure (3-5 figures)   174 cases   AUC 0.964
-#:     sparse   disclosure (0-2 figures)    26 cases   AUC 0.763
-#:
-#: A 0.20 gap, and it falls exactly where it hurts. Distress *causes* sparse
-#: reporting -- a filer under strain stops tagging line items -- so the
-#: population the system is worst on is disproportionately the one it exists to
-#: catch. An analyst reading a thin-evidence memo currently sees something that
-#: looks exactly as confident as any other, which is the dishonest part. The
-#: assessment now carries the caveat itself rather than leaving it in an eval
-#: script nobody runs.
+#: The count stays, because how much a filer disclosed is worth knowing on its
+#: own. The claim about reliability is gone until something measures one.
 SPARSE_EVIDENCE_MAX = 2
-SPARSE_AUC = 0.763
-DENSE_AUC = 0.964
-RELIABILITY_NOTE = (
-    "Thin disclosure: this filer reported {n} machine-readable figure(s) for "
-    "the period. On the {sparse} backtest cases with this little data the "
-    "system ranked at {sparse_auc:.3f} AUC against {dense_auc:.3f} on the "
-    "{dense} better-disclosed ones -- materially worse, and worth weighing "
-    "before relying on the reading below. Filers under strain stop tagging "
-    "line items, so sparse data is itself informative."
-)
 
 #: Questions about what actually happened, answerable from the labels.
 ASKS_OUTCOME = re.compile(
@@ -669,11 +656,9 @@ def _assess_traced(req: AssessRequest, on_step, _trace) -> tuple[dict, int]:
     payload["reliability"] = {
         "evidence_count": n_evidence,
         "sparse": n_evidence <= SPARSE_EVIDENCE_MAX,
-        "subgroup_auc": SPARSE_AUC if n_evidence <= SPARSE_EVIDENCE_MAX else DENSE_AUC,
-        "note": RELIABILITY_NOTE.format(
-            n=n_evidence, sparse=26, dense=174,
-            sparse_auc=SPARSE_AUC, dense_auc=DENSE_AUC,
-        ) if n_evidence <= SPARSE_EVIDENCE_MAX else "",
+        # No reliability claim. The one that was here did not survive being
+        # measured against the metric the product reports.
+        "note": "",
     }
     return payload, 200
 
@@ -706,7 +691,15 @@ def _assess_one(edgar: EdgarClient, investigator, cik: int, as_of: date) -> dict
         "status": "ok",
         "name": name,
         "signal": result.memo.signal,
+        # risk_score orders thinly-disclosed filers poorly -- that part of the
+        # fairness finding was real even though the headline claim was not --
+        # so a calibrated probability is preferred for ranking where one exists.
         "risk_score": result.memo.risk_score,
+        "rank_by": (
+            result.memo.risk_probability
+            if getattr(result.memo, "risk_probability", None) is not None
+            else result.memo.risk_score
+        ),
         "confidence": result.memo.confidence,
         "depth": result.triage.depth,
         "limitations": len(result.memo.limitations),

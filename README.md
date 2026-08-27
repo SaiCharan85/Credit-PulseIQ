@@ -263,9 +263,15 @@ Around that:
 * **Follow-ups work.** The last three turns are carried, scoped to one filer at
   one date, and the conversation persists until the reader clears it. Ask about
   a different company and it says where to go instead of guessing.
-* **Thin disclosure is flagged.** On the 26 backtest cases with two or fewer
-  reported figures the system ranks at 0.763 against 0.964 on the rest, so those
-  memos carry the caveat instead of looking equally confident.
+* **A fairness claim that did not survive being checked.** A 0.20 AUC gap on
+  thinly-disclosed filers was reported here and warned about in the UI. It was
+  an artifact: the subgroup was ranked by `risk_score` while the headline ranks
+  by `risk_probability`, and the two are not monotonic transforms of each other.
+  On the metric the product reports there is no gap -- 0.976 on sparse
+  disclosure against 0.964. The warning is withdrawn, because a caveat that is
+  not true teaches a reader to discount the cases where the system is fine.
+  What survives is narrower and real: `risk_score` does order sparse filers
+  badly, so the views that ranked by it now prefer the calibrated score.
 
 ### Findings that shaped the design
 
