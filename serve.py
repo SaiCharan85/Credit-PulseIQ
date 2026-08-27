@@ -579,7 +579,11 @@ def _assess_traced(req: AssessRequest, on_step, _trace) -> tuple[dict, int]:
         "agent": req.agent,
         "arm_auc": ARM_AUC.get(req.agent),
         "hazard_baseline_auc": HAZARD_AUC,
-        "n_facts": len(facts),
+        # The as-of view, not the whole fetch. This is printed as "figures
+        # available", and reporting the unfiltered total said 36,659 for a date
+        # at which 16,123 were visible -- twice the truth, on the one number
+        # whose job is to say how much the system could see.
+        "n_facts": _visible_fact_count(facts, req.as_of),
         "triage": {
             "depth": result.triage.depth,
             "steps": result.triage.steps,
@@ -631,6 +635,10 @@ def _assess_traced(req: AssessRequest, on_step, _trace) -> tuple[dict, int]:
     history = _history_section(filer_events(cik, req.as_of), req.as_of)
     if history:
         payload["memo"]["sections"].append(history)
+
+    future = _future_date_note(req.as_of)
+    if future:
+        payload["memo"]["limitations"] = [future, *payload["memo"]["limitations"]]
 
     # How much to trust this particular reading. Attached to the payload rather
     # than buried in an eval script: the subgroup where the headline AUC stops
@@ -957,6 +965,40 @@ def filer_events(cik: int, as_of: date, limit: int = 12) -> list[dict]:
         })
     out.sort(key=lambda e: e["event_date"])
     return out[-limit:]
+
+
+def _visible_fact_count(facts, as_of: date) -> int:
+    """How many facts were public on the prediction date."""
+    from data.facts import as_of_view
+
+    try:
+        return len(as_of_view(facts, as_of))
+    except Exception:  # noqa: BLE001 - a count is not worth failing an assessment
+        return len(facts)
+
+
+#: How far ahead of today an as-of date may sit before it is worth saying so.
+#: A day or two is a typo or a timezone; four years is a misunderstanding, and
+#: the reader should be told which they have.
+FUTURE_DATE_SLACK_DAYS = 2
+
+
+def _future_date_note(as_of: date) -> str:
+    """A limitation line when the prediction date has not happened yet.
+
+    Not refused. Asking about today is the ordinary case and the boundary is
+    fuzzy, so this goes where every other thing a reader should weigh already
+    lives -- in the memo's limitations, next to staleness.
+    """
+    ahead = (as_of - date.today()).days
+    if ahead <= FUTURE_DATE_SLACK_DAYS:
+        return ""
+    return (
+        f"The prediction date {as_of} is {ahead} days in the future. Nothing "
+        f"has been withheld because nothing filed after it exists yet, so this "
+        f"is a reading of everything on file rather than a point-in-time view. "
+        f"If you meant a past date, the as-of filter is doing nothing here."
+    )
 
 
 def _history_section(events: list[dict], as_of: date) -> dict:
