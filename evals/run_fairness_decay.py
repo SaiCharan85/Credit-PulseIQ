@@ -38,6 +38,9 @@ RESULTS = Path("results/backtest2_agent_200cases.csv")
 MIN_SUBGROUP = 20
 
 
+from evals.scoring import ranked  # noqa: E402
+
+
 def auc(scores: list[float], labels: list[int]) -> float | None:
     """Rank AUC with ties at half credit. None when one class is missing."""
     pos = [s for s, y in zip(scores, labels, strict=True) if y == 1]
@@ -48,33 +51,18 @@ def auc(scores: list[float], labels: list[int]) -> float | None:
     return wins / (len(pos) * len(neg))
 
 
-def _score(row: dict[str, str]) -> float:
-    """The score the *published figure* ranks by, which is the calibrated one.
-
-    This preferred ``risk_score`` -- the model's ordinal 0-100 self-report --
-    and produced a 0.20 AUC "fairness gap" on thin disclosure that does not
-    exist on the metric the product reports. The two columns are not monotonic
-    transforms of one another, so a subgroup measured on one and compared
-    against a headline computed with the other is not a comparison at all.
-    """
-    for key in ("risk_probability", "risk_score", "confidence"):
-        raw = (row.get(key) or "").strip()
-        if raw:
-            try:
-                return float(raw)
-            except ValueError:
-                continue
-    return 0.0
-
-
 def _report(title: str, groups: dict[str, list[dict[str, Any]]], note: str = "") -> None:
     print(f"\n{title}")
     print(f"  {'group':<26} {'n':>4} {'pos':>4} {'AUC':>7}   reading")
     print("  " + "-" * 66)
     for name in sorted(groups):
         rows = groups[name]
-        scores = [_score(r) for r in rows]
-        labels = [int(r["label"]) for r in rows]
+        # Unscorable cases are excluded and counted, never defaulted. The
+        # previous version read a blank score as 0.0 -- the safest possible
+        # value -- and three of the blanks in this very table were
+        # bankruptcies, which is how a 0.976 subgroup was published as 0.763.
+        graded = ranked(rows)
+        scores, labels = graded.scores, graded.labels
         a = auc(scores, labels)
         npos = sum(labels)
         if a is None:
@@ -144,8 +132,9 @@ def main(path: Path = RESULTS) -> int:
         print(f"no results at {path}; run the backtest first", file=sys.stderr)
         return 1
     rows = list(csv.DictReader(path.open(encoding="utf8")))
-    overall = auc([_score(r) for r in rows], [int(r["label"]) for r in rows])
-    npos = sum(int(r["label"]) for r in rows)
+    graded = ranked(rows)
+    overall = auc(graded.scores, graded.labels)
+    npos = sum(graded.labels)
     print("CreditPulse IQ -- subgroup fairness and decay")
     print(f"{path}  |  {len(rows)} cases, {npos} positives  |  overall AUC {overall:.4f}")
     print(
@@ -191,8 +180,12 @@ def main(path: Path = RESULTS) -> int:
         "DISCLOSURE DEPTH -- how much did the filer report?",
         {k: [r for r in rows if _bucket_evidence(r) == k] for k in {_bucket_evidence(r) for r in rows}},
         note=(
-            "Sparse filers are the fairness risk: distress removes tags, so the\n"
-            "  companies with least data are disproportionately the failing ones."
+            "Sparse filers looked like the fairness risk and are not, on the\n"
+            "  metric the product reports. An earlier version of this script read\n"
+            "  a blank risk_score as 0.0 -- the safest possible value -- and three\n"
+            "  of those blanks were bankruptcies. Three failures went to the bottom\n"
+            "  of the risk ranking, 0.976 became 0.763, and that figure was\n"
+            "  published and shown to readers as a reliability warning."
         ),
     )
     _report(
