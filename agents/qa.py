@@ -1534,7 +1534,13 @@ def ask(
     # Sections beat points. "Subtopics with a brief understanding of each" asks
     # for both, and a flat list cannot carry the grouping -- while the sectioned
     # prompt is free to use bullets inside a section, so nothing is given up.
-    if wants_sections(question):
+    # Depth implies organisation. A reader who asks for 400 words is not asking
+    # for four hundred words in one block, and delivering that is technically
+    # compliant and unreadable -- they have to hold the whole thing in their
+    # head to find the part they wanted. Past roughly a page, headings and
+    # scannable items are what depth is *for*, so a detailed request routes to
+    # the sectioned shape without needing the word "subtopic" in it.
+    if wants_sections(question) or (wants_detail(question) and not wants_points(question)):
         system = SECTIONED_PROMPT.format(length=length, figures=FIGURE_RULE)
     elif wants_points(question):
         system = POINTS_PROMPT.format(length=length, figures=FIGURE_RULE)

@@ -1111,6 +1111,53 @@ def _resolve_phrase(phrase: str, directory, loaded_cik: int) -> str:
     return match.name if match and match.cik != loaded_cik else ""
 
 
+def _companies_in_question(question: str, exclude: int | None = None,
+                           limit: int = 3) -> list[tuple[int, str]]:
+    """Every filer the question names, resolved from the raw text.
+
+    Case-insensitive and typo-tolerant because it goes through BM25 rather than
+    a capitalisation rule: "comapre this with valaris" resolves Valaris Ltd, and
+    the old heuristic -- capitalised words only -- could not see it at all.
+
+    Returns at most ``limit``: a question naming five companies is a screening
+    request, and answering it as a comparison would quietly drop most of them.
+    """
+    from data.bm25 import index
+
+    found: list[tuple[int, str]] = []
+    seen: set[int] = {exclude} if exclude else set()
+    try:
+        hits = index().search(question, limit=limit + len(seen) + 2)
+    except Exception:  # noqa: BLE001 - resolution failing costs a name, not the answer
+        return []
+    for hit in hits:
+        if hit.cik in seen or not hit.is_confident:
+            continue
+        seen.add(hit.cik)
+        found.append((hit.cik, hit.name))
+        if len(found) >= limit:
+            break
+    return found
+
+
+def _general_mode_pointer(question: str) -> str:
+    """Where the company half of a general-mode question can be answered.
+
+    Naming a company in general mode is not a reason to say nothing. The
+    concept still gets explained; this appends where the rest of the question
+    is answerable, instead of "I answer general questions here" and a dead end.
+    """
+    named = _companies_in_question(question)
+    if not named:
+        return ""
+    who = " and ".join(name for _cik, name in named)
+    return (
+        f"\n\nYou named {who}. General mode makes no claim about any company, "
+        "so nothing here is grounded in their filings. Ask the same question in "
+        "Compare and each one is assessed from its own filings first."
+    )
+
+
 def _names_another_company(question: str, loaded_cik: int) -> str:
     """A company the reader named that is not the one loaded.
 
@@ -1370,7 +1417,17 @@ def ask_question(req: AskRequest) -> JSONResponse:
         result = explain(CachingClient(inner=client), req.question)
         return JSONResponse({
             "question": req.question,
-            "answer": result.text,
+            "answer": (
+                result.text
+                if not _companies_in_question(req.question)
+                else result.text + "\n\n" + (
+                    "You named "
+                    + " and ".join(n for _c, n in _companies_in_question(req.question))
+                    + ". General mode makes no claim about any company, so switch to "
+                    "This company or Compare and the same question is answered from "
+                    "their filings."
+                )
+            ),
             "allowed": result.allowed,
             "reason": result.reason,
             "mode": "general",
@@ -1429,7 +1486,11 @@ def ask_question(req: AskRequest) -> JSONResponse:
                 parts.append(("What that means", explained.text))
                 handled = True
 
-        other = _names_another_company(req.question, int(cik))
+        # BM25 over the raw question, not capitalised words. The heuristic it
+        # replaces could not see "comapre this with valaris" at all -- lowercase
+        # and misspelt is how people actually type.
+        named = _companies_in_question(req.question, exclude=int(cik), limit=1)
+        other = named[0][1] if named else ""
         if other:
             compared = _compare_with(int(cik), other, as_of or date.today(),
                                      req.question, req.assessment)
@@ -1484,7 +1545,10 @@ def ask_question(req: AskRequest) -> JSONResponse:
         result = explain(CachingClient(inner=client), req.question)
         return JSONResponse({
             "question": req.question,
-            "answer": result.text,
+            # A company named in general mode is not a reason to say nothing.
+            # The concept still gets explained; the reader is then told where
+            # the company half of their question can actually be answered.
+            "answer": result.text + _general_mode_pointer(req.question),
             "allowed": result.allowed,
             "reason": result.reason or "general",
             "mode": "general",
@@ -1499,14 +1563,23 @@ def ask_question(req: AskRequest) -> JSONResponse:
         # Every filer named is assessed before it is discussed. The alternative
         # -- letting the model compare from recollection -- produces confident
         # prose about companies nothing in this system ever looked at.
-        targets = list(dict.fromkeys([*(req.ciks or []), *( [int(cik)] if cik else [] )]))
+        # Filers named in the sentence count as staged. Telling a reader who
+        # wrote "compare this with Valaris" to go and add Valaris somewhere
+        # else is the software asking them to do its job.
+        named = [c for c, _n in _companies_in_question(req.question, exclude=cik)]
+        targets = list(dict.fromkeys(
+            [*(req.ciks or []), *([int(cik)] if cik else []), *named]
+        ))
         if len(targets) < 2:
             return JSONResponse({
                 "question": req.question,
                 "answer": (
-                    "Comparison mode needs at least two filers. Add them in the "
-                    "Compare view and they will each be assessed from their own "
-                    "filings first -- nothing here is compared from memory."
+                    "Comparison needs two filers and I could identify "
+                    f"{len(targets)}. Name the other company in the question -- "
+                    "\"compare this with Valaris\" is enough -- or stage it in the "
+                    "Compare view. Either way each is assessed from its own "
+                    "filings before anything is said about it; nothing here is "
+                    "compared from memory."
                 ),
                 "allowed": True,
                 "reason": "compare_needs_two",
