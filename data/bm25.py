@@ -134,7 +134,13 @@ class Index:
             name, ticker = str(row.get("name") or ""), str(row.get("ticker") or "")
             # The ticker is indexed with the name: readers use both, and a
             # ticker is the rarest possible term for its company.
-            terms = tokenise(name) + ([ticker.lower()] if ticker else [])
+            terms = tokenise(name)
+            # The ticker is indexed under its own namespace. Folding it in with
+            # the name made "any" -- Sphere 3D's ticker -- the rarest term in
+            # the corpus, so every sentence containing the word resolved to
+            # that company.
+            if ticker:
+                terms.append(f"${ticker.lower()}")
             if not terms:
                 continue
             self.docs.append((int(row["cik"]), name, ticker, terms))
@@ -159,10 +165,15 @@ class Index:
         the candidate accounts for, so 1.0 is a full match and the threshold
         does not move when the corpus does.
         """
+        # A token the reader capitalised may be a ticker; one they did not is
+        # ordinary English. "ANY" is a filer, "any" is a word, and the only
+        # thing distinguishing them is the case the question was written in.
+        upper = {t.lower() for t in re.findall(r"\b[A-Z]{1,5}\b", query or "")}
         terms = [
             t for t in tokenise(query)
             if t not in _FURNITURE and t not in _COMMON and len(t) > 1
         ]
+        terms += [f"${t}" for t in upper]
         if not terms:
             return []
         scored: list[Hit] = []

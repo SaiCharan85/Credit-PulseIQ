@@ -1548,7 +1548,16 @@ def ask_question(req: AskRequest) -> JSONResponse:
             # A company named in general mode is not a reason to say nothing.
             # The concept still gets explained; the reader is then told where
             # the company half of their question can actually be answered.
-            "answer": result.text + _general_mode_pointer(req.question),
+            # The pointer is a footnote to an answer. Appending it to an empty
+            # explanation produced a card containing a note about a company the
+            # reader never mentioned and nothing else.
+            "answer": (
+                result.text + _general_mode_pointer(req.question)
+                if (result.text or "").strip()
+                else "I could not put that into words usefully. Try naming the "
+                     "term you want explained -- \"what is EBITDA\" or \"what "
+                     "does a covenant breach mean\" -- and I will."
+            ),
             "allowed": result.allowed,
             "reason": result.reason or "general",
             "mode": "general",
