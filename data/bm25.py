@@ -74,6 +74,33 @@ _COMMON = {
     "most", "much", "other", "others", "same", "some", "such", "very", "well",
 }
 
+#: Ordinary English that is also somebody's registered name.
+#:
+#: "value" appears in eighteen company names, "line" in nine, "growth" and
+#: "capital" in dozens. The ticker rule -- a lowercase token is not a ticker --
+#: did not cover these, because they match the *name* index rather than the
+#: ticker one. So "explain the value in this company's scenario" resolved to
+#: VALUE LINE INC and led the answer with a comparison to a company the reader
+#: had never heard of.
+#:
+#: The same case test applies: "Valaris" is not an English word and is safe to
+#: match lowercase, while these need the reader to have capitalised them. A
+#: word here is not banned -- write "Value Line" and it resolves.
+_ENGLISH_ALSO_A_NAME = {
+    "value", "line", "risk", "growth", "capital", "trust", "general", "united",
+    "american", "national", "first", "new", "old", "great", "grand", "prime",
+    "core", "summit", "peak", "vision", "future", "pioneer", "liberty",
+    "freedom", "eagle", "star", "sun", "moon", "river", "bridge", "gateway",
+    "anchor", "beacon", "compass", "signal", "spark", "surge", "wave", "range",
+    "match", "target", "focus", "select", "choice", "premier", "elite", "apex",
+    "atlas", "axis", "orbit", "origin", "unity", "victory", "sterling",
+    "cash", "credit", "equity", "asset", "assets", "income", "profit", "market",
+    "money", "fund", "funds", "bank", "energy", "power", "health", "care",
+    "life", "home", "auto", "food", "media", "data", "cloud", "digital",
+    "global", "world", "west", "east", "north", "south", "central", "pacific",
+    "atlantic", "metro", "city", "state", "public", "private", "open", "direct",
+}
+
 _TOKEN = re.compile(r"[a-z0-9]+")
 
 
@@ -169,9 +196,18 @@ class Index:
         # ordinary English. "ANY" is a filer, "any" is a word, and the only
         # thing distinguishing them is the case the question was written in.
         upper = {t.lower() for t in re.findall(r"\b[A-Z]{1,5}\b", query or "")}
+        # Any capitalised run, not only short ones: "Value Line" and
+        # "Tupperware" both count as the reader pointing at a name.
+        capitalised = {
+            w.lower()
+            for w in re.findall(r"\b[A-Z][A-Za-z]*\b", query or "")
+        }
         terms = [
             t for t in tokenise(query)
             if t not in _FURNITURE and t not in _COMMON and len(t) > 1
+            # An English word only counts as a name if the reader capitalised
+            # it. "value" is a word; "Value" in "Value Line" is a name.
+            and (t not in _ENGLISH_ALSO_A_NAME or t in capitalised)
         ]
         terms += [f"${t}" for t in upper]
         if not terms:

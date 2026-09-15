@@ -19,7 +19,7 @@ The project is deliberately built **eval-first**. The evaluation harness is the 
 | LLMs are unreliable at arithmetic | The LLM never computes; it calls typed tools |
 | LLMs fabricate plausible numbers | The verifier re-derives every cited figure and hard-fails what it can't reproduce |
 | Lookahead leakage invalidates most finance backtests | Enforced at the data layer *and* re-checked at the verify boundary |
-| Agentic systems ship unevaluated | Eval-first: the harness came before the agent, and now carries 1,297 tests |
+| Agentic systems ship unevaluated | Eval-first: the harness came before the agent, and now carries 1,344 tests |
 | Ground truth is assumed rather than verified | Four-signal labels; 363 text false-positives and 37 miscoded item codes rejected |
 | Survivorship bias | CIK-pinned identity; survivors verified as still filing |
 | Rare-event class imbalance | A severity ladder, so early warning is measurable at several thresholds |
@@ -179,7 +179,7 @@ Found and fixed before the final numbers, each documented in the commit history:
 
 ## What exists today
 
-All five build phases are complete. **1,297 tests pass, all offline** -- the ReAct loop is tested against a scripted model, so agentic behaviour, the guard gate and memo assembly are all verified without an endpoint or a network.
+All five build phases are complete. **1,344 tests pass, all offline** -- the ReAct loop is tested against a scripted model, so agentic behaviour, the guard gate and memo assembly are all verified without an endpoint or a network.
 
 | phase | status |
 |---|---|
@@ -193,13 +193,28 @@ The eval ladder is populated end to end:
 
 | | covers | files |
 |---|---|---|
-| L0 | deterministic arithmetic, PDF and form parsing, the read-only verifier, "
-the ordinal risk score, label dedup, tracing | 24 |
+| L0 | deterministic arithmetic, PDF and form parsing, the read-only verifier, the ordinal risk score, label dedup, tracing, retry parsing, score nulls | 29 |
 | L1 | XBRL extraction from real filings | 1 |
 | L2 | peer construction and trends at the tool boundary, incl. peer as-of leakage | 1 |
-| L3 | investigator vs real Chapter 11 and restatement outcomes | 3 |
+| L3 | investigator vs real Chapter 11 outcomes; the LangGraph pipeline | 4 |
 | L4 | end-to-end, filer facts in -> cited memo out | 1 |
-| L5 | guardrails and adversarial: decision framing, fabricated figures, citation provenance, context poisoning, answer shape, follow-ups | 10 |
+| L5 | guardrails and adversarial: decision framing, fabricated figures, citation provenance, context poisoning, answer shape, follow-ups, partial answers | 13 |
+
+Eleven harnesses run against a live model rather than a fixture. Each of the
+last three was added because a defect reached a reader that every existing eval
+passed cleanly:
+
+| | asks | current |
+|---|---|---|
+| `run_l3` | does the agent beat the baselines? | 0.963, ties a 0.977 GBM |
+| `run_response_eval` | are answers true and safe? | 39/39 over 8 categories |
+| `run_answer_quality` | do answers take the shape asked for? | 18/18 over 13 intents |
+| `run_figure_audit` | does every number reproduce from EDGAR? | 142/142 to 1e-9 |
+| `run_hallucination_probe` | can a figure be baited out of it? | 0 leaked, 0 false refusals |
+| `run_fairness_decay` | does it hold across subgroups? | found, then withdrew, a false gap |
+| `run_label_crosscheck` | are the labels right? | 8/8 against court dockets |
+| `run_evidence_recall` | did it find the signals present? | 84%, 0 never-looked |
+| `run_signal_probe` | which signals move the verdict? | the mechanism behind +0.084 |
 
 | | |
 |---|---|
@@ -209,7 +224,7 @@ the ordinal risk score, label dedup, tracing | 24 |
 | Earnings-quality universe | **12,570** point-in-time annual filers, no survivorship bias |
 | Restatement labels | **887** verified, after excluding 810 SPAC regulatory reclassifications |
 | Deterministic metrics | 36, each with a hand-computed L0 assertion |
-| Tests | **1,297** |
+| Tests | **1,344** |
 
 Labels by cohort, and the ladder by tier:
 
@@ -260,6 +275,17 @@ Around that:
 * **Answers take the shape of the question.** Length, prose vs points vs
   sections vs tables, and charts are each chosen from the question rather than
   fixed in the prompt.
+* **Names resolve by ranking, not by rule.** A hand-rolled heuristic matched
+  *Canaan Inc.* to three letters of a typo'd "Can you", and matched *CNA
+  Financial* while missing the *Valaris* the reader had actually named -- a
+  left-to-right scan takes whatever resolves first rather than whatever fits
+  best. BM25 over names and tickers ranks instead, so the best candidate in the
+  whole question wins and a weak match can be rejected on score. Two further
+  guards came out of using it: a ticker only matches when the reader capitalised
+  it, because ANY is Sphere 3D and "any" is a word; and ordinary English that is
+  also a registered name needs the same capitalisation, because "value" appears
+  in eighteen company names and once led an answer with a comparison to VALUE
+  LINE INC.
 * **Follow-ups work.** The last three turns are carried, scoped to one filer at
   one date, and the conversation persists until the reader clears it. Ask about
   a different company and it says where to go instead of guessing.

@@ -144,6 +144,27 @@ _WANTS_SECTIONS = re.compile(
     re.I,
 )
 
+#: Asking for a *set* of named things, each explained.
+#:
+#: "Give me the metrics used to analyse risk and explain them" triggered
+#: nothing -- not points, not sections, not detail -- so it came back as four
+#: undifferentiated paragraphs. The reader asked for an enumerated set with an
+#: explanation attached to each, which is the commonest shape of a real
+#: question and had no detector at all.
+#:
+#: The two halves both matter. A plural noun naming a set, and a request to
+#: explain it. "What is the current ratio" names one thing; "what metrics do
+#: you use and what do they mean" names a set and asks what each is for.
+_WANTS_ENUMERATION = re.compile(
+    r"\b(?:what|which|give me|list|show me|tell me|explain the)\b[^.?]{0,40}"
+    r"\b(?:metrics?|measures?|ratios?|factors?|indicators?|signals?|"
+    r"figures?|numbers?|criteria|inputs?|variables?|drivers?|components?)\b"
+    r"[^.?]{0,80}"
+    r"\b(?:explain|mean|means|meaning|indicate|indicates|tell us|show|"
+    r"used for|do they|are they|stand for|each)\b",
+    re.I,
+)
+
 #: A request to see values lined up for scanning, not read in sentences.
 _WANTS_TABLE = re.compile(
     r"\btable\b|\btabular\b|\bside[\s-]by[\s-]side\b|\bin columns?\b"
@@ -532,8 +553,14 @@ CHARTABLE = {
 
 
 def wants_sections(question: str) -> bool:
-    """Whether the answer needs headings, because it covers several subjects."""
-    return bool(_WANTS_SECTIONS.search(question))
+    """Whether the answer needs headings, because it covers several subjects.
+
+    An enumeration counts. "Give me the metrics and explain them" is a set of
+    subjects with an explanation owed on each, which is what the sectioned
+    shape is for -- it arrived as four flat paragraphs because no detector
+    recognised it.
+    """
+    return bool(_WANTS_SECTIONS.search(question) or _WANTS_ENUMERATION.search(question))
 
 
 def wants_table(question: str) -> bool:

@@ -1111,6 +1111,23 @@ def _resolve_phrase(phrase: str, directory, loaded_cik: int) -> str:
     return match.name if match and match.cik != loaded_cik else ""
 
 
+#: Whether comparing is the *point* of the question or a rider on it.
+#:
+#: "Compare this with Valaris" leads with the comparison. "Give me the metrics
+#: and explain them, and also how does it compare" does not -- and answering
+#: that one with a comparison first buries the thing that was actually asked
+#: for under a company the reader never mentioned.
+_COMPARISON_LEADS = re.compile(
+    r"^\W*(?:can you |could you |please |ok |okay |now |and )*"
+    r"(?:compare|contrast|rank|benchmark|stack|versus|vs\b)",
+    re.I,
+)
+
+
+def _comparison_leads(question: str) -> bool:
+    return bool(_COMPARISON_LEADS.search(question or ""))
+
+
 def _companies_in_question(question: str, exclude: int | None = None,
                            limit: int = 3) -> list[tuple[int, str]]:
     """Every filer the question names, resolved from the raw text.
@@ -1521,6 +1538,13 @@ def ask_question(req: AskRequest) -> JSONResponse:
                         parts.append(("On the filings", extra.text))
                 except Exception:  # noqa: BLE001 - a missing part, not a failure
                     pass
+            # What the reader asked for leads. Parts were appended in the order
+            # the code happens to check them, so "give me the metrics and
+            # explain them" came back headed "Compared with VALUE LINE INC" --
+            # a company they never mentioned, above the thing they wanted.
+            # Only a question whose opening verb is compare gets that first.
+            if not _comparison_leads(req.question):
+                parts.sort(key=lambda part: part[0].startswith("Compared with"))
             body = "\n\n".join(
                 f"## {title}\n{text}" if len(parts) > 1 else text
                 for title, text in parts
