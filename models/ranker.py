@@ -35,8 +35,11 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-MODEL_PATH = Path("data/cache/ranker.txt")
-META_PATH = Path("data/cache/ranker.json")
+# Shipped, not cached. data/cache is for things that can be regenerated on
+# demand; a trained model is an input the server needs at start-up, and a
+# deploy that silently lacks one drops the ranked column without erroring.
+MODEL_PATH = Path("models/artifacts/ranker.txt")
+META_PATH = Path("models/artifacts/ranker.json")
 
 #: Percentile gap at which the two views are called out as disagreeing. Wide on
 #: purpose: flagging every small difference would train readers to ignore it.

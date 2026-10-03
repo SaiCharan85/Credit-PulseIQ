@@ -1767,8 +1767,16 @@ def ask_question(req: AskRequest) -> JSONResponse:
 
 
 if __name__ == "__main__":
+    import os
+
     import uvicorn
 
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
-    print(f"CreditPulse IQ -> http://127.0.0.1:{port}", file=sys.stderr)
-    uvicorn.run(app, host="127.0.0.1", port=port, log_level="warning")
+    # A host assigns the port and expects the process to bind every interface.
+    # 127.0.0.1 accepts nothing from outside the container, so a deploy that
+    # starts cleanly still answers no requests -- it looks like a routing
+    # problem and is not one.
+    port = int(sys.argv[1]) if len(sys.argv) > 1 else int(os.environ.get("PORT", 8000))
+    host = os.environ.get("HOST", "0.0.0.0" if os.environ.get("PORT") else "127.0.0.1")
+    where = "0.0.0.0" if host == "0.0.0.0" else "127.0.0.1"
+    print(f"CreditPulse IQ -> http://{where}:{port}", file=sys.stderr)
+    uvicorn.run(app, host=host, port=port, log_level="warning")

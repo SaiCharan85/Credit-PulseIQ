@@ -1,0 +1,12 @@
+.git
+.venv
+venv
+__pycache__
+*.pyc
+.pytest_cache
+.ruff_cache
+# 36MB of replayed model responses: useful locally, dead weight in an image.
+data/cache/llm
+data/raw
+*.bak
+.env

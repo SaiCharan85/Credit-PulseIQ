@@ -1,0 +1,23 @@
+# One-click deploy config. Connect this repo at dashboard.render.com and Render
+# reads this file; nothing here holds a secret.
+services:
+  - type: web
+    name: creditpulse-iq
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      # SEC requires a declared contact address on every request, or it
+      # returns 403. Set this in the dashboard to a real address you own.
+      - key: CREDITPULSE_SEC_UA
+        sync: false
+      # Optional. Without a model endpoint the app still serves: the default
+      # rule-based arm and the GBM ranker need no model at all. Set these only
+      # if you want the ReAct arm live, and note a public URL will spend your
+      # quota at whatever rate strangers use it.
+      - key: CREDITPULSE_LLM_BASE_URL
+        sync: false
+      - key: CREDITPULSE_LLM_MODEL
+        sync: false
+      - key: CREDITPULSE_LLM_API_KEY
+        sync: false
