@@ -610,4 +610,8 @@ Known gaps, stated rather than hidden:
 
 ## License
 
-TBD (MIT suggested for a portfolio repo).
+Copyright (c) 2026 Sai Charan. Licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+
+You may read, run, modify and share this code for noncommercial purposes -- personal
+study, research, education, evaluation. Selling it, or using it in a commercial product
+or service, is not permitted without a separate written license from the author.

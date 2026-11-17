@@ -3,6 +3,7 @@ name = "creditpulse-iq"
 version = "0.0.1"
 description = "CreditPulse IQ — corporate credit-distress agent, backtested against real bankruptcy and AAER outcomes."
 requires-python = ">=3.10"
+license = { file = "LICENSE" }
 dependencies = [
     # Serving
     "fastapi>=0.110",
