@@ -20,7 +20,6 @@ from agents.schemas import (
     SIGNAL_WATCH,
     InvestigatorOutput,
 )
-from data.edgar import EdgarClient
 from evals.backtest import (
     CaseResult,
     assert_no_lookahead,
@@ -35,8 +34,11 @@ BEFORE = date(2026, 3, 1)
 
 
 @pytest.fixture(scope="module")
-def facts():
-    return EdgarClient(offline=True).facts(SLEEP_NUMBER)
+def facts(sleep_number_facts):
+    # The committed fixture through a temporary cache (conftest), not the local
+    # EDGAR cache: data/cache is gitignored, so reading it passed locally and
+    # failed on every clean checkout, CI included.
+    return sleep_number_facts
 
 
 def case(label: int, signal: str, confidence: float, days: int | None = None) -> CaseResult:

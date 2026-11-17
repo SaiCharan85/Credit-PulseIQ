@@ -19,7 +19,7 @@ The project is deliberately built **eval-first**. The evaluation harness is the 
 | LLMs are unreliable at arithmetic | The LLM never computes; it calls typed tools |
 | LLMs fabricate plausible numbers | The verifier re-derives every cited figure and hard-fails what it can't reproduce |
 | Lookahead leakage invalidates most finance backtests | Enforced at the data layer *and* re-checked at the verify boundary |
-| Agentic systems ship unevaluated | Eval-first: the harness came before the agent, and now carries 1,344 tests |
+| Agentic systems ship unevaluated | Eval-first: the harness came before the agent, and now carries 1,412 tests |
 | Ground truth is assumed rather than verified | Four-signal labels; 363 text false-positives and 37 miscoded item codes rejected |
 | Survivorship bias | CIK-pinned identity; survivors verified as still filing |
 | Rare-event class imbalance | A severity ladder, so early warning is measurable at several thresholds |
@@ -27,7 +27,7 @@ The project is deliberately built **eval-first**. The evaluation harness is the 
 | Silent failure on missing data | Undefined-not-wrong, and missingness carried as a *feature* (the data is MNAR) |
 | "Is the agent any good?" is unanswerable | Deterministic baselines it has to beat |
 
-**What it deliberately does not solve.** No credit decisions (advisory only), no private companies, no fraud oracle, covenant leg demo-grade, context leg never moves the graded number.
+**What it deliberately does not solve.** No credit decisions (advisory only), no private companies, no fraud oracle, covenant leg demo-grade, retrieved text never supplies a figure.
 
 The sharpest framing: *most "agentic finance" demos can't tell you whether their agent is right. This one is built so that question has an answer.*
 
@@ -41,7 +41,7 @@ Most "agentic finance" projects demo well on three hand-picked tickers and were 
 
 2. **Deterministic verification.** The LLM never does arithmetic. Every ratio, trend, and peer comparison is computed in Python from raw filing values; a verifier recomputes any figure the agent cites and hard-fails the response if it cannot be reproduced. This makes the output auditable and the evals gradeable.
 
-3. **Honest scoping.** Two legs (distress, earnings-quality) rest on real public labels and are backtested. The covenant leg and the context/retrieval leg are explicitly **not** backtested predictors — they are labeled as demo-grade / context-only rather than oversold. Knowing where a system does *not* work is part of the deliverable.
+3. **Honest scoping.** Two legs (distress, earnings-quality) rest on real public labels and are backtested. Filing-text retrieval is backtested as an input to the distress leg, never as a source of figures. The covenant leg is explicitly demo-grade rather than oversold. Knowing where a system does *not* work is part of the deliverable.
 
 ---
 
@@ -67,56 +67,23 @@ agent vs hazard : -0.0017   95% CI [-0.0262, +0.0225]   -> tie
 
 **The finding: giving the agent evidence a ratio model cannot read is worth +0.084 AUC.** That is the largest measured effect in the project and its interval is nowhere near zero. It converted a clear loss against the hazard baseline into a statistical tie, and cut catastrophic errors threefold.
 
-**The agent ties a properly specified baseline.** This section has been corrected twice, and both corrections are kept visible because how a number moved is part of what it means.
-
-The first version reported a tie against `LogisticRegression(C=1.0)` -- the sklearn default, never tuned. That is not a baseline, it is a strawman. A tuned LightGBM beat it, so the claim briefly became "the agent loses".
-
-That was also wrong, for a subtler reason. **The panel holds quarterly observations of the same companies, so every graded case was a firm the fitted models had already trained on -- a mean of 13.4 prior observations each, with nearly identical features.** They were being scored on companies they had memorised. The agent trains on nothing and investigates each case cold, so it never had that advantage.
-
-Removing test firms from the training data entirely (group-aware splitting, standard for panel data with repeated entities):
+**The agent ties a properly specified baseline -- which took two corrections to establish.** The first comparison was against an untuned `LogisticRegression`. A tuned LightGBM then appeared to beat the agent, but only because the panel repeats each firm quarterly: the fitted models had already trained on every graded company (13.4 prior observations each). Holding test firms out entirely (group-aware splitting) removes that memorisation:
 
 | identical 169 graded cases | AUC |
 |---|---|
 | Agent (ReAct + filing-text tools) | 0.9634 |
-| hazard, tuned LightGBM, **group-aware** | 0.9776 |
-| *hazard, tuned LightGBM, leaky* | *0.9919* |
+| LightGBM, regularised, group-aware | 0.9768 |
+| *LightGBM, leaky split* | *0.9919* |
 
 ```
-agent - GBM, leaky       : -0.0284  95% CI [-0.0552, -0.0082]  agent worse
-agent - GBM, group-aware : -0.0141  95% CI [-0.0438, +0.0133]  tie
-memorisation premium     : +0.0143 AUC to the GBM
+agent - GBM (group-aware, regularised) : -0.0133   95% CI [-0.0421, +0.0124]   -> tie
 ```
 
-On the full test fold the effect is larger still: group-aware splitting takes the GBM from 0.9858 to 0.8978 and the logistic model from 0.9567 to 0.8407. **Roughly 0.09 AUC of every fitted baseline in this project was firm memorisation**, and the agent's number is the only one that never contained any.
+Two caveats travel with those levels. Roughly **0.09 AUC of every fitted baseline was firm memorisation**, and the most recent window is easy: over 25 group-aware random splits the GBM averages 0.9169 [0.8916, 0.9518], so the serving ranker ships with 0.9169 rather than the single-fold number. The paired comparison is unaffected, because the window inflation is shared. (The agent ranks by its calibrated `risk_probability`; resampled by firm it is 0.9651 [0.9337, 0.9874].)
 
-One further correction, on the same theme. The gradient-boosted model was tuned on validation AUC alone, which selected a high-capacity configuration scoring **0.9946 on its own training rows** -- near-perfect recall. That memorisation was not merely cosmetic: constraining capacity drops training AUC to 0.9171 and *raises* test AUC from 0.9683 to 0.9746, monotonically across five configurations. Tuning for the train-test gap finds a better model than tuning for validation score.
+**Where the gain came from.** 27 bankruptcies missed without the filing-text tools are caught with them, none regressed, and 26 of the 27 carried a filing-text signal. The failure mode was blindness, not reasoning -- you cannot reason your way to a covenant breach from a current ratio. Precision *rose* (0.795 -> 0.870), so the tools did not simply make the agent more alarmist.
 
-Against that properly specified baseline -- regularised, group-aware, generalising rather than memorising:
-
-```
-regularised LightGBM : 0.9768   (train 0.9171)
-agent                : 0.9634
-agent - GBM          : -0.0133  95% CI [-0.0421, +0.0124]  tie
-```
-
-**Those two levels are inflated, and by how much is measurable.** Both were scored on the most recent window in the panel, and the walk-forward table above shows every method scoring higher on later folds -- logistic regression alone gains 0.23 AUC from the 2022 fold to the 2025 one without changing at all. Resampling separates the model from the window:
-
-```
-GBM, 25 group-aware random splits (whole firms held out)
-  mean 0.9169   95% of draws [0.8916, 0.9518]   draws reaching 0.9768: 0 of 25
-```
-
-The published 0.9768 does not sit at the top of that distribution, it sits **outside it**. Roughly 0.06 of it is the window being easy. The serving ranker therefore ships with 0.9169 in its metadata and the UI shows the resampled range, not the single-fold number.
-
-Two claims survive the correction intact. **Gradient boosting genuinely beats logistic regression** -- +0.0312 mean over the same 25 splits, better in 24 of 25, having previously rested on one fold. And **the agent still ties**: that comparison is paired on identical cases, so the shared window inflation cancels.
-
-One number needed reconciling. The agent's 0.9634 ranks by `risk_probability`, the Platt-calibrated continuous score; ranking the same 200 cases by the ordinal `risk_score` band gives 0.9377. Both are correct and they measure different resolutions of the same output. Resampled on the published column, the agent is 0.9651 with 95% of firm-level draws in [0.9337, 0.9874] -- which must **not** be read against the GBM's range above. The populations differ enormously: the agent's cases are half positives by construction, the GBM panel is nine percent. Only the paired test compares them honestly.
-
-**Where the gain came from.** 27 bankruptcies missed in the first arm are caught in the second, **none regressed**, and 26 of the 27 carried a filing-text signal. The agent's failure mode was never faulty reasoning -- it was blindness. It spent ~12 steps investigating a feature set that did not contain the answer for a quarter of the failures. You cannot reason your way to a covenant breach from a current ratio.
-
-The control matters as much as the effect: where no signal was found the verdict barely moved (CIK 1498710, 0.42 -> 0.48), and precision *rose* 0.795 -> 0.870. Had the tools merely made the model more alarmist, every score would have risen and precision would have collapsed.
-
-**Zero verification failures** across both arms. Not one fabricated figure reached an output; every cited number was independently recomputed from its provenance.
+**Zero verification failures** across both arms: every cited figure was independently recomputed from its provenance.
 
 Reproduce with `python -m evals.run_l3 --agent react --max-negatives 100`. Full numbers and limits in [`results/RESULTS.md`](results/RESULTS.md); methodology in [`SPEC.md`](SPEC.md) §7.
 
@@ -142,9 +109,7 @@ single - loop : -0.0093   paired-bootstrap 95% CI [-0.0287, +0.0092]   -> tie
 
 **Same ranking quality at a tenth of the model calls**, with a different error profile: single-pass missed no bankruptcy and warns earlier, at the cost of more false alarms.
 
-Retrieval is a hybrid of `bge-small` embeddings and BM25 fused by reciprocal rank, on Qdrant, over 875 10-K/10-Q filings (~139k section-aware chunks, 320 tokens with 64 overlap). **The prediction date is enforced by the store, not the caller**, and re-checked on every result: a chunk filed after the as-of date raises an error rather than leaking the outcome in words.
-
-Retrieval is evaluated against deterministic ground truth (no judge), 158 cases:
+The retrieval design is under [Architecture](#filing-text-retrieval-rag). It is evaluated against deterministic ground truth (no judge), 158 cases:
 
 | Warning | Recall@5 | MRR@10 | nDCG@10 |
 |---|---|---|---|
@@ -215,7 +180,7 @@ Found and fixed before the final numbers, each documented in the commit history:
 
 ## What exists today
 
-All five build phases are complete. **1,344 tests pass, all offline** -- the ReAct loop is tested against a scripted model, so agentic behaviour, the guard gate and memo assembly are all verified without an endpoint or a network.
+All six build phases are complete. **1,412 tests pass, all offline** -- the ReAct loop is tested against a scripted model, so agentic behaviour, the guard gate and memo assembly are all verified without an endpoint or a network.
 
 | phase | status |
 |---|---|
@@ -224,6 +189,7 @@ All five build phases are complete. **1,344 tests pass, all offline** -- the ReA
 | 3. Distress investigator, fully backtested | complete — **the deliverable** |
 | 4. Earnings-quality leg | complete **as a measured negative**; demo-grade |
 | 5. Orchestrator, guardrails, cited memo | complete, honestly scoped to one green leg |
+| 6. Filing-text RAG + single-pass investigator | complete as a backtested design; not yet wired into the app |
 
 The eval ladder is populated end to end:
 
@@ -260,7 +226,8 @@ passed cleanly:
 | Earnings-quality universe | **12,570** point-in-time annual filers, no survivorship bias |
 | Restatement labels | **887** verified, after excluding 810 SPAC regulatory reclassifications |
 | Deterministic metrics | 36, each with a hand-computed L0 assertion |
-| Tests | **1,344** |
+| Filing-text chunks indexed | **~139k** from 875 10-K/10-Q filings |
+| Tests | **1,412** |
 
 Labels by cohort, and the ladder by tier:
 
@@ -278,11 +245,12 @@ At 156 positives a recall estimate carries a 95% CI of roughly ±8pp — enough 
 | layer | what runs |
 |---|---|
 | **Orchestration** | LangGraph `StateGraph` — six nodes, a conditional guard edge, optional checkpointing |
-| **Agent** | hand-rolled ReAct loop over typed tools; step budget, forced abstention, deterministic critic with ≤2 retries |
+| **Agent** | hand-rolled ReAct loop over typed tools (served); single-pass investigator over the same tools plus retrieved passages (backtested); deterministic critic with ≤2 retries |
 | **Verification** | read-only recomputation from raw XBRL at 1e-9; citation binding on measure *and* period |
+| **Retrieval** | Qdrant hybrid search (bge-small + BM25, RRF), store-enforced as-of filter |
 | **Ranking** | LightGBM, group-aware, served as an ordinal percentile beside the agent |
-| **Evals** | six-level ladder, 1,297 tests, adversarial probes, subgroup fairness, resampled AUC |
-| **Observability** | Langfuse spans and scores, SSE step streaming, per-memo audit trail |
+| **Evals** | six-level ladder, 1,412 tests, adversarial probes, subgroup fairness, resampled AUC, retrieval Recall/MRR/nDCG |
+| **Observability** | Langfuse spans, scores and experiments (A/B arms, retrieval variants), SSE step streaming, per-memo audit trail |
 
 ### What a reader actually gets
 
@@ -311,29 +279,11 @@ Around that:
 * **Answers take the shape of the question.** Length, prose vs points vs
   sections vs tables, and charts are each chosen from the question rather than
   fixed in the prompt.
-* **Names resolve by ranking, not by rule.** A hand-rolled heuristic matched
-  *Canaan Inc.* to three letters of a typo'd "Can you", and matched *CNA
-  Financial* while missing the *Valaris* the reader had actually named -- a
-  left-to-right scan takes whatever resolves first rather than whatever fits
-  best. BM25 over names and tickers ranks instead, so the best candidate in the
-  whole question wins and a weak match can be rejected on score. Two further
-  guards came out of using it: a ticker only matches when the reader capitalised
-  it, because ANY is Sphere 3D and "any" is a word; and ordinary English that is
-  also a registered name needs the same capitalisation, because "value" appears
-  in eighteen company names and once led an answer with a comparison to VALUE
-  LINE INC.
+* **Names resolve by ranking, not by rule.** BM25 over names and tickers picks the best candidate in the whole question and rejects weak matches on score; a left-to-right heuristic had matched *Canaan Inc.* to a typo'd "Can you". Tickers and English words that are also company names ("any", "value") only match when capitalised.
 * **Follow-ups work.** The last three turns are carried, scoped to one filer at
   one date, and the conversation persists until the reader clears it. Ask about
   a different company and it says where to go instead of guessing.
-* **A fairness claim that did not survive being checked.** A 0.20 AUC gap on
-  thinly-disclosed filers was reported here and warned about in the UI. It was
-  an artifact: the subgroup was ranked by `risk_score` while the headline ranks
-  by `risk_probability`, and the two are not monotonic transforms of each other.
-  On the metric the product reports there is no gap -- 0.976 on sparse
-  disclosure against 0.964. The warning is withdrawn, because a caveat that is
-  not true teaches a reader to discount the cases where the system is fine.
-  What survives is narrower and real: `risk_score` does order sparse filers
-  badly, so the views that ranked by it now prefer the calibrated score.
+* **A fairness claim that did not survive being checked.** A 0.20 AUC gap on thinly-disclosed filers was an artefact of ranking that subgroup by `risk_score` instead of the headline `risk_probability`; on the reported metric there is no gap (0.976 vs 0.964). The UI warning was withdrawn, and views that ranked by `risk_score` now use the calibrated score.
 
 ### Findings that shaped the design
 
@@ -345,27 +295,9 @@ Each came out of real data and is pinned by a test:
 - **Distress erases the tag you need.** Sleep Number's final pre-bankruptcy 10-K reports no long-term debt at all; its entire $588m is reclassified to `DebtCurrent`. Naive extraction leaves leverage undefined on exactly the companies the model exists to catch.
 - **Missingness is not random.** Data goes missing *because* of distress, which makes it MNAR — so imputation would erase the signal, and absence is carried as an explicit feature instead.
 
-### Deterministic baselines (the bar the agent must beat)
+### Deterministic baselines and calibration
 
-Without a baseline an L3 precision figure is uninterpretable. If the ReAct investigator can't beat a 1980-vintage logit on the same as-of data, that is a result worth reporting honestly.
-
-The hazard framing is deliberate: Shumway (2001) showed that static one-observation-per-firm models are biased, and it handles the fact that survivors are **censored** rather than proven negatives.
-
-### Calibration
-
-Measuring ECE says a model is overconfident; it does not fix it. Monotonic recalibration is fitted on a **separate temporal fold** — the model trains on the earliest window, the calibrator on a later slice it never saw, and the test set stays untouched:
-
-| Calibrator | ECE | AUC |
-|---|---|---|
-| None | 0.1653 | 0.9393 |
-| Platt | 0.0431 | 0.9393 |
-| **Isotonic** | **0.0250** | 0.9386 |
-
-**6.6× better calibrated with the ranking intact** — AUC holding constant is the correctness check, since both maps are monotonic. The raw model stated 0.091 where the event occurred 0.3% of the time.
-
-Holding out a calibration fold costs some discrimination (AUC 0.957 → 0.939, fitting on 3,209 rows instead of 4,365). Stated rather than hidden.
-
-Panel: **5,582 firm-period observations**, 354 filers, 500 positives, 1-year horizon. Split **temporally** at 2024-06-01 (a random split would leak, since a firm's adjacent quarters are near-identical). Test set: 1,217 rows, 100 positives, 8.2% base rate.
+The agent is graded against baselines on the same as-of data. A discrete-time hazard (Shumway 2001) treats survivors as **censored** rather than proven negatives. Panel: 5,582 firm-quarters, 354 filers, 500 positives, split **temporally** at 2024-06-01 (test: 1,217 rows, 100 positives, 8.2% base rate).
 
 | Model | Test AUC | P@10 | P@25 | ECE |
 |---|---|---|---|---|
@@ -373,14 +305,7 @@ Panel: **5,582 firm-period observations**, 354 filers, 500 positives, 1-year hor
 | **Tier 1 — discrete-time hazard** | **0.957** | **0.700** | **0.760** | 0.160 |
 | *Leak canary — labels shuffled* | *0.488* | *0.300* | *0.200* | — |
 
-**The leak canary is the number that matters most.** Permuting labels collapses the model to chance, which is what says the signal is in the data rather than in the pipeline. It runs as `--shuffle-labels`.
-
-Read these honestly:
-
-- **Calibration is poor (ECE 0.16).** `class_weight="balanced"` deliberately inflates probabilities away from the 8.2% base rate, and the base rate itself swings by year (2.9% in 2021 → 15.0% in 2023 → 6.6% in 2025). Discrimination is the comparable quantity; these are not population default rates (Zmijewski 1984 — the universe is enriched far above the true ~0.5%).
-- **Coefficients are not individually interpretable.** `current_ratio` and `quick_ratio` come out with large opposite signs — textbook multicollinearity between near-identical covariates.
-- **Test AUC exceeds train AUC (0.957 vs 0.897).** With 100 test positives that is ~2 standard errors, and the periods have different base rates; it is not treated as a real improvement.
-- **Missingness helps, but modestly.** Metrics alone reach 0.937; missingness indicators alone reach 0.740 with P@25 of just 0.20. Ablation confirms the model reads distress rather than proxying sector — a real risk, since survivors are missing `Liabilities` (and hence Altman/Ohlson) far more often than distressed filers (46% vs 19%), largely a REIT/financial composition effect.
+**The leak canary matters most**: permuting labels collapses the model to chance, so the signal is in the data, not the pipeline (`--shuffle-labels`). Isotonic recalibration fitted on a separate temporal fold cuts ECE from 0.165 to **0.025** with ranking intact (AUC 0.939). Probabilities do not transfer to the population -- the universe is enriched far above the ~0.5% true rate (Zmijewski 1984) -- rankings do. Full caveats in [`SPEC.md`](SPEC.md) §7.1.
 
 ---
 
@@ -491,8 +416,9 @@ watchlist & trigger  →  data plane  →  deterministic compute  →  orchestra
                                                                       │
               ┌───────────────────┬──────────────────┬────────────────┤
               ▼                   ▼                  ▼                ▼
-          distress        earnings quality       covenant        context
-       (Ch. 11 labels)     (AAER labels)       (demo-grade)   (retrieval, context-only)
+          distress        earnings quality       covenant     filing-text RAG
+       (Ch. 11 labels)     (AAER labels)       (demo-grade)   (feeds distress;
+                                                                 never a figure)
               └───────────────────┴───────────┬──────┴────────────────┘
                                               ▼
                                       verify & fuse  →  cited risk memo + audit trail
@@ -505,11 +431,50 @@ watchlist & trigger  →  data plane  →  deterministic compute  →  orchestra
   - *Distress* — financial-deterioration investigation. Backtested vs Chapter 11. **Reference implementation — build first.**
   - *Earnings quality* — accrual/red-flag investigation. Backtested vs AAER.
   - *Covenant* — extracts terms + computes headroom. **Demo-grade** (thin public data, proxy labels only).
-  - *Context/retrieval* — findings-triggered retrieval over related filings/news/peers to explain a signal. **Context-only:** contributes narrative, never moves the graded numeric signal, every claim cited and groundedness-checked. Out of the outcome backtest.
+  - *Filing-text RAG* — retrieves what the filings *say* (going-concern doubt, liquidity plans, control weaknesses, debt terms) for the distress investigator. **Never a source of figures**: numbers come only from XBRL through the compute layer. Backtested in the single-pass arm; not yet used by the served app or its chat.
 - **Verify & fuse** — recomputes every cited figure, fuses signals into one graded assessment, escalates to *insufficient evidence* rather than guessing.
 - **Output** — an evidence-cited, confidence-scored memo with a full audit trail, for human review.
 
 Model serving via vLLM; a **separate** judge model scores memo quality (never the generating model).
+
+### Filing-text retrieval (RAG)
+
+Used by the single-pass investigator, which replaces the ReAct loop's ~10 tool-choosing calls with one call over a precomputed evidence pack plus retrieved passages. Backtested; the served app still runs the ReAct loop.
+
+```
+INGEST  (offline, resumable, memory-guarded)        QUERY  (per case: one filer, one prediction date)
+
+EDGAR 10-K / 10-Q HTML                               5 standard credit questions
+   │  html -> text; tables dropped                       │
+   ▼                                                     ▼
+section splitter                                  ┌───────────────────────────────────┐
+   │  contents page skipped; Items 1A, 7, 7A,      │ FILTER FIRST, built by the store: │
+   │  8, 9A ... labelled                           │   cik = filer                     │
+   ▼                                               │   as_of - 18 months <= filed      │
+recursive splitter: 320 tokens, 64 overlap         │   filed <= as_of                  │
+   │  sanitised; injection-flagged                 └─────────────────┬─────────────────┘
+   ▼                                                                 ▼
+embed: bge-small dense (384-d) + BM25 sparse       dense ──┐
+   │  local ONNX, no torch                                 ├── RRF fusion -> dedupe by text hash
+   ▼                                               sparse ─┘                │
+Qdrant `filing_chunks`                                                      ▼
+   payload: cik, form, filed, section, chunk_no    re-check each hit: filed > as_of -> LookaheadError
+                                                                            ▼
+                                                   P1..P10 + evidence pack (same ToolBox figures)
+                                                                            ▼
+                                                   ONE model call -> critic + verbatim-quote check
+                                                                            ▼   (<=2 retries, then abstain)
+                                                                       cited memo
+```
+
+| Choice | Why |
+|---|---|
+| **As-of filter built by the store** | The caller passes a date and cannot loosen it. A 10-K filed after the petition says "Chapter 11" plainly -- leakage in words is harder to spot than in a ratio, so every hit is re-checked and a future chunk fails the run loudly. |
+| **Filter first, then rank** | One filer before one date is a few thousand chunks. With payload indexes Qdrant scans that set exactly, avoiding the recall loss approximate (HNSW) search suffers under strict filters. |
+| **Hybrid dense + BM25** | Embeddings catch paraphrase; BM25 catches terms of art ("going concern", "forbearance"). Fused by reciprocal rank, so the two scores need no calibration against each other. |
+| **Section-aware chunks** | A query can search only where a disclosure lives -- this lifted material-weakness Recall@5 from 0.67 to 0.88. |
+| **Dedupe by text hash** | Risk factors are copied quarter to quarter; five copies of one paragraph are one result. |
+| **Verbatim quotes only** | The critic verifies a number by recomputing it; a sentence can only be verified by finding it, so every quote must appear in the passage it cites. |
 
 **Governed by design.** Guardrails are the enforcement pillar of a governance-aware design, not the whole of it: the cited audit trail (auditability), the human-in-the-loop memo (oversight), the online judge and drift alarms (monitoring), and the documented limitations (honesty) are the rest. Because the system is advisory and never makes a credit decision, it sits outside fair-lending and high-risk-decisioning regimes by design, while mapping cleanly onto model-risk-management and NIST AI RMF expectations. See [`SPEC.md`](SPEC.md) § 10.
 
@@ -524,7 +489,7 @@ The eval harness is the point. Tooling is matched to what each layer actually is
 | **L0** | Deterministic ratio/trend/peer math | Unit test | pytest | ✅ |
 | **L1** | XBRL extraction accuracy | Unit test | pytest | ✅ |
 | **L2** | Peer-group + trend correctness | Unit test | pytest | ✅ |
-| **L3** | Investigator diagnosis vs real labels | **Outcome-based backtest** | **custom harness** (pytest-driven) | built, running |
+| **L3** | Investigator diagnosis vs real labels; tool loop vs single-pass A/B | **Outcome-based backtest** | **custom harness** (pytest-driven) | ✅ |
 | **L4** | End-to-end (name → memo), cost/latency | Outcome + behavioral | custom harness + DeepEval | |
 | **L5** | Guardrails / adversarial; retrieval groundedness | LLM-as-judge / behavioral | DeepEval; RAGAS (context leg) | |
 | **RAG** | Retrieval: Recall@5, MRR@10, precision@5, nDCG@10, coverage; verbatim-quote check; answer relevance | Deterministic ground truth, no judge | custom (`evals/run_rag_recall.py`) | ✅ |

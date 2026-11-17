@@ -18,7 +18,7 @@ Guiding principle: **the eval harness is the deliverable; the agent slots into i
 
 ## 2. Data plane
 
-**Input.** SEC EDGAR — XBRL financial statements (structured) and filing exhibits (credit agreements, for the covenant leg). Bulk download for backfill; REST API for incremental.
+**Input.** SEC EDGAR — XBRL financial statements (structured), the text of 10-K/10-Q filings (for retrieval, §5.1) and filing exhibits (credit agreements, for the covenant leg). Bulk download for backfill; REST API for incremental.
 
 **Universe.** Start small (a few hundred names) spanning failed and surviving companies so the backtest has positives and negatives.
 
@@ -148,7 +148,25 @@ Shared tools:
 
 **Covenant investigator** — extracts covenant terms from the credit-agreement exhibit, computes current headroom against the actual financials. **Demo-grade:** no large public labeled covenant-extraction set and only proxy breach labels (waiver 8-Ks, going-concern language), so it is presented as extraction + headroom, not a validated breach predictor.
 
-**Output schema (per investigator).** A typed object: signal, confidence, evidence (cited line items + recomputed figures), and a residual/unexplained field that can trigger escalation.
+**Single-pass investigator** — the distress investigator's alternative design. Every tool the ReAct loop chooses between is deterministic, so code runs them all up front (`build_pack`: metrics with thresholds, trends, peers, prior events, filing events, going-concern scan) and adds passages retrieved from the filings (§5.1). One model call, then the **unchanged** critic and bounded retry. One check is added: every quoted passage must appear verbatim in the passage it cites. It lives beside the critic, not in it, so the critic stays byte-for-byte what earlier backtests measured.
+
+**Output schema (per investigator).** A typed object: signal, confidence, evidence (cited line items + recomputed figures), and a residual/unexplained field that can trigger escalation. The single-pass investigator adds cited passage ids.
+
+### 5.1 Filing-text retrieval
+
+Retrieval supplies what the filings *say* — going-concern doubt, liquidity plans, control weaknesses, debt terms — never a figure. Numbers come only from XBRL through §3.
+
+**Ingestion (`rag/ingest.py`).** 10-K/10-Q HTML → text with tables dropped → section splitter (detects and skips the contents page; labels Items 1A, 7, 7A, 8, 9A and the rest) → recursive splitter, 320 tokens with 64 overlap → sanitised, injection-flagged chunks. Resumable (skips stored accessions) and memory-guarded. Current store: 875 filings, 124 filers, ~139k chunks.
+
+**Index.** Qdrant collection `filing_chunks`: `bge-small-en-v1.5` dense vectors (384-d, local ONNX) and BM25 sparse vectors, with payload indexes on `cik`, `filed_ord`, `section`, `form`, `accession`. Local mode for development, cloud for the full store; credentials only in `.env`.
+
+**Query (`FilingStore.search`).**
+- *The as-of filter is built by the store, not the caller.* `search` takes the prediction date as a required argument and constructs `cik = filer AND as_of − 18 months ≤ filed ≤ as_of` itself. Every returned hit is checked again; a future chunk raises `LookaheadError`. A filing made after the petition states the outcome in words, which is harder to spot than a leaked ratio, so this fails loudly rather than producing a quietly excellent backtest.
+- *Filter first, then rank.* One filer before one date is a few thousand chunks; with payload indexes Qdrant scans that set exactly instead of using approximate (HNSW) search, which loses recall under strict filters.
+- *Hybrid.* Dense and BM25 candidates (40 each) fused by reciprocal rank, so their scores need no calibration against each other. Duplicate text (risk factors copied quarter to quarter) is collapsed by hash.
+- *Section filters* are optional per query; the material-weakness queries search the controls item and risk factors only.
+
+**Use.** The single-pass investigator asks five standard credit questions (three passages each, ten at most) and passes them as `P1..Pn`, fenced as untrusted company text that is data, never instructions.
 
 ---
 
@@ -217,6 +235,22 @@ Results on a **temporal** hold-out at 2024-06-01 (test: 1,217 rows, 100 positive
 
 **Statistical power is a gate, not an afterthought.** 25 positives gives a recall estimate with a 95% CI of roughly ±20pp, and leaves ECE reliability bins too sparse to read. The universe must reach ~100 positives and a few hundred survivors before L3 numbers are reported as results rather than as a smoke test. Discovery already surfaced 58 confirmed positives in 2025–26 alone, so this is a scaling step, not a research problem.
 
+### 7.2 Single-pass vs tool loop, and retrieval (built)
+
+A/B on 199 stratified cases (99 bankruptcies), identical cases, grading and critic:
+
+| | ReAct tool loop | Single-pass + retrieval |
+|---|---|---|
+| AUC (abstentions scored 0.5) | 0.974 | 0.964 |
+| Paired-bootstrap difference | | −0.009, 95% CI [−0.029, +0.009] — tie |
+| Bankruptcies called healthy | 8 / 99 | 0 / 99 |
+| Base-rate-corrected precision | 0.46 | 0.32 |
+| Model calls per case | ~10 | ~1 |
+
+Retrieval is scored without a judge. Ground truth for each (filer, as-of, warning) is the set of stored chunks matching the deterministic warning patterns; queries are plain language, so lexical overlap alone cannot carry the result. Metrics: Recall@5, MRR@10, precision@5, nDCG@10, and **coverage** reported separately (a coverage miss is an ingestion fault no ranking can fix). Going concern: Recall@5 0.93, nDCG 0.75. Material weakness with section-filtered queries: 0.88 / 0.67. Covenant trouble: ~0.4 / ~0.25 — see §13. Results are uploaded to Langfuse as experiments on shared datasets so variants line up case by case.
+
+**Infrastructure findings.** Two backtests pacing separately against one provider quota overshoot it, so pacing is shared through a file ledger across threads and processes. A rate-limit retry window of ~1 minute recorded 55 refused calls as agent abstentions; rate limits and 503s now retry for ~10 minutes, and an infrastructure failure is never graded as a judgment.
+
 **Online eval (production).** An LLM-as-judge (separate model) scores live memos on groundedness, calibration, and scope where the outcome is not yet known — this watches quality *drift* over time, complementing the offline backtest.
 
 ---
@@ -275,6 +309,7 @@ Guardrails are the *enforcement* pillar of governance, not the whole of it. Gove
 
 - **Agent model:** a strong open instruct model served via vLLM (OpenAI-compatible endpoint, continuous batching for the backtest sweeps, guided decoding for the typed output schemas). Not fine-tuned.
 - **Judge model:** a separate model (free-tier hosted is fine) — never grade with the generating model.
+- **Rate limits are the binding constraint on free tiers**, not capability. Calls are paced proactively under the provider's tokens-per-minute ceiling (shared across processes), responses are cached by model and conversation so reruns cost nothing, and a stall watchdog restarts a silent run from the cache.
 - **Optional later:** LoRA/QLoRA fine-tune of the *narrow classifiers* (earnings-quality, distress) where AAER and bankruptcy labels are abundant — runs on free Colab/Kaggle GPU. Not the agent.
 
 ---
@@ -283,9 +318,10 @@ Guardrails are the *enforcement* pillar of governance, not the whole of it. Gove
 
 1. **Ground truth + scaffold.** Repo, EDGAR data plane for a small universe, both label sets with as-of dating baked in from line one. ✅
 2. **Deterministic spine + L0.** Compute layer as pure functions; L0 conformance evals gating in CI. No LLM yet. ✅
-3. **Distress investigator, fully backtested.** One investigator end-to-end (tools, vLLM loop, verification, schema) + its L3 backtest with lookahead controls, lead-time, and false-confidence rate. Do not proceed until it produces a real calibration curve. ← next
-4. **Earnings-quality investigator.** Second leg against AAER, reusing the harness the first leg forced you to build.
-5. **Assemble + scope honestly.** Orchestrator fusing the two green legs; guardrails; covenant attached as labeled demo; cited memo; then the feedback layer.
+3. **Distress investigator, fully backtested.** One investigator end-to-end (tools, vLLM loop, verification, schema) + its L3 backtest with lookahead controls, lead-time, and false-confidence rate. Do not proceed until it produces a real calibration curve. ✅
+4. **Earnings-quality investigator.** Second leg against AAER, reusing the harness the first leg forced you to build. ✅ measured and failed; demo-grade.
+5. **Assemble + scope honestly.** Orchestrator; guardrails; covenant attached as labeled demo; cited memo. ✅ scoped to one green leg; feedback layer not built.
+6. **Filing-text retrieval + single-pass investigator.** Ingestion, store-enforced as-of retrieval, retrieval evals, and an A/B against the tool loop. ✅ tie at a tenth of the model calls; not yet wired into serving.
 
 Each phase is shippable and demonstrable on its own. The README leads with the L3 numbers, not the architecture.
 
@@ -300,6 +336,9 @@ Each phase is shippable and demonstrable on its own. The README leads with the L
 - **Public-company coverage** — the underserved private/middle-market segment is intentionally out of scope; not faked with synthetic data.
 - **Universe size (current)** — 25 positives is enough to build and debug the harness, not enough to report L3 numbers. See §7.
 - **Survivors are censored, not proven negatives** — a name with no event on record may simply not have failed *yet*.
+- **Covenant-trouble retrieval is weak** (Recall@5 ~0.4). Embeddings rank "we were in compliance with our covenants" beside "we were not in compliance", and two query rewrites did not fix it; a graded key (stated breach 2, covenant stress 1) measures it fairly. Planned fix: a deterministic covenant scan in the evidence pack, as the going-concern scan already is, then a cross-encoder re-ranker for covenant queries. It does not limit the headline — single-pass missed no bankruptcy without it.
+- **Prose faithfulness is not measured.** A small NLI model labelled correct, figure-heavy claims as contradicted, so it measured itself, not the agent, and was disabled. Figures are verified by the critic and quotes by exact match; free-text claims need a checker validated against hand-labelled claims first.
+- **Retrieval is backtested, not served.** The app and its chat modes still run the ReAct investigator; the single-pass investigator is not yet wired into the graph.
 
 ### 13.1 Measured metric coverage
 

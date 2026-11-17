@@ -45,7 +45,6 @@ from agents.schemas import (
 from agents.tools import STATUS_SEVERE, THRESHOLDS, ToolBox
 from compute.lineitems import FactIndex
 from compute.ratios import compute_metric
-from data.edgar import EdgarClient
 from data.facts import as_of_view
 
 SLEEP_NUMBER = 827187
@@ -53,8 +52,11 @@ BEFORE_BANKRUPTCY = date(2026, 3, 1)  # petition was 2026-06-11
 
 
 @pytest.fixture(scope="module")
-def facts():
-    return EdgarClient(offline=True).facts(SLEEP_NUMBER)
+def facts(sleep_number_facts):
+    # The committed fixture through a temporary cache (conftest), not the local
+    # EDGAR cache: data/cache is gitignored, so reading it passed locally and
+    # failed on every clean checkout, CI included.
+    return sleep_number_facts
 
 
 def tool_call(tool: str, **arguments) -> str:

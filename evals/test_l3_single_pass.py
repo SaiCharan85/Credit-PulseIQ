@@ -23,7 +23,6 @@ from agents.llm import ScriptedClient
 from agents.schemas import SIGNAL_INSUFFICIENT
 from agents.single_pass import SinglePassInvestigator, check_quotes
 from agents.tools import ToolBox
-from data.edgar import EdgarClient
 from rag.chunking import Chunk
 from rag.embed import HashEmbedder
 from rag.store import FilingStore, open_client
@@ -35,8 +34,11 @@ GOING = ("These conditions raise substantial doubt about the Company's ability t
 
 
 @pytest.fixture(scope="module")
-def facts():
-    return EdgarClient(offline=True).facts(SLEEP_NUMBER)
+def facts(sleep_number_facts):
+    # The committed fixture through a temporary cache (conftest), not the local
+    # EDGAR cache: data/cache is gitignored, so reading it passed locally and
+    # failed on every clean checkout, CI included.
+    return sleep_number_facts
 
 
 @pytest.fixture()
