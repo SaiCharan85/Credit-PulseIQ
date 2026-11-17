@@ -1,0 +1,39 @@
+17:06:36 pipeline start
+17:06:38 OneDrive paused (closed); restarted at the end
+17:06:38 START ingest attempt 1: rag.ingest --all --store cloud --cooldown 0 --pause-gb 2.0 --stop-gb 1.2  -> results/rag_ingest_full.log
+17:24:47 END   ingest attempt 1: exit 0
+17:24:47 START recall eval: evals.run_rag_recall --store cloud --out results/rag_recall_full.log  -> results/rag_recall_full_run.log
+17:31:18 END   recall eval: exit 0
+17:31:18 START A/B arm 1: tool loop, cache replay: evals.run_l3 --agent react --max-negatives 100 --offline --results data/cache/l3_react_replay.csv  -> results/backtest3_react_replay.log
+17:34:28 END   A/B arm 1: tool loop, cache replay: exit 0
+17:34:28 START A/B arm 2: single-pass, live: evals.run_l3 --agent single --store cloud --max-negatives 100 --tpm 16000 --results data/cache/l3_single.csv  -> results/backtest3_single_run.log
+23:03:24 A/B start (single-pass fixed: 4096-token output, brief thinking; LLM timeout; watchdog)
+23:03:24 START single-pass arm, live: evals.run_l3 --agent single --store cloud --max-negatives 100 --tpm 16000 --results data/cache/l3_single.csv  -> results/backtest3_single_run.log
+23:06:17 parallel tool-loop arm start
+23:06:17 START tool-loop arm (parallel), live: evals.run_l3 --agent react --max-negatives 100 --tpm 8000 --results data/cache/l3_react_full.csv  -> results/backtest3_react_full.log
+01:53:51 A/B start (parallel arms, 4 workers each, shared 15000 TPM ledger)
+01:53:51 START tool-loop arm, live on all cases: evals.run_l3 --agent react --max-negatives 100 --tpm 15000 --workers 4 --results data/cache/l3_react_full.csv  -> results/backtest3_react_full.log
+01:53:52 START single-pass arm, live: evals.run_l3 --agent single --store cloud --max-negatives 100 --tpm 15000 --workers 4 --results data/cache/l3_single.csv  -> results/backtest3_single_run.log
+05:16:08 END   single-pass arm, live: exit 0
+05:16:08 START faithfulness + relevance (NLI, no LLM): evals.run_faithfulness --store cloud  -> results/faithfulness_run.log
+06:15:28 END   faithfulness + relevance (NLI, no LLM): exit 0
+06:15:28 START recall + precision@5: evals.run_rag_recall --store cloud --out results/rag_recall_full.log  -> results/rag_recall_full_run.log
+06:34:28 END   recall + precision@5: exit 0
+10:58:16 STALL tool-loop arm, live on all cases: no new LLM response for 30 min; restarting
+10:58:17 END   tool-loop arm, live on all cases: exit 1 (stalled)
+10:58:17 START tool-loop arm, live on all cases (restart 1): evals.run_l3 --agent react --max-negatives 100 --tpm 15000 --workers 4 --results data/cache/l3_react_full.csv  -> results/backtest3_react_full.log
+11:22:51 A/B completion start (single-pass gaps 55, tool loop running)
+11:22:51 WAIT  tool-loop backtest pid 34220 to finish
+11:22:51 START single-pass re-run (infra failures only; rest from cache): evals.run_l3 --agent single --store cloud --max-negatives 100 --tpm 15000 --workers 4 --results data\cache\l3_single.csv  -> results/backtest3_single_rerun.log
+12:39:59 END   tool-loop backtest pid 34220
+12:39:59 tool loop has 8 missing/failed cases; re-running (attempt 1)
+12:39:59 START tool-loop re-run: evals.run_l3 --agent react --max-negatives 100 --tpm 15000 --workers 4 --results data\cache\l3_react_full.csv  -> results/backtest3_react_rerun.log
+13:18:35 END   tool-loop re-run: exit 0
+14:28:23 END   single-pass re-run (infra failures only; rest from cache): exit 0
+14:28:23 gaps after re-runs: single-pass 6, tool loop 0
+14:28:23 START A/B comparison (paired bootstrap): evals.compare_arms data\cache\l3_react_full.csv data\cache\l3_single.csv  -> results/ab_comparison_run.log
+14:29:23 END   A/B comparison (paired bootstrap): exit 0
+14:29:23 START Langfuse upload (both arms): evals.to_langfuse --arm tool-loop-full=data\cache\l3_react_full.csv --arm single-pass-rag=data\cache\l3_single.csv  -> results/langfuse_upload.log
+14:36:23 END   Langfuse upload (both arms): exit 0
+14:36:23 OneDrive restarted
+14:36:23 A/B completion end

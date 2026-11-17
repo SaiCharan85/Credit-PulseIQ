@@ -1,0 +1,6 @@
+﻿A/B on the 180 cases both arms completed (99 bankruptcies, 81 healthy)
+  A l3_react_partial.csv   AUC 0.9781 | abstained 3/180 | mean steps 10.5
+  B l3_single.csv          AUC 0.9252 | abstained 49/180 | mean steps 0.8
+  AUC(B) - AUC(A): -0.0529   paired-bootstrap 95% CI [-0.0904, -0.0199]   P(B better) 0.00
+  An interval spanning 0 means the arms are not distinguishable on these cases.
+  only in A: 0   only in B: 19

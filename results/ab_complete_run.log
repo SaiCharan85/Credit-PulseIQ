@@ -1,0 +1,15 @@
+11:22:51 A/B completion start (single-pass gaps 55, tool loop running)
+11:22:51 WAIT  tool-loop backtest pid 34220 to finish
+11:22:51 START single-pass re-run (infra failures only; rest from cache): evals.run_l3 --agent single --store cloud --max-negatives 100 --tpm 15000 --workers 4 --results data\cache\l3_single.csv  -> results/backtest3_single_rerun.log
+12:39:59 END   tool-loop backtest pid 34220
+12:39:59 tool loop has 8 missing/failed cases; re-running (attempt 1)
+12:39:59 START tool-loop re-run: evals.run_l3 --agent react --max-negatives 100 --tpm 15000 --workers 4 --results data\cache\l3_react_full.csv  -> results/backtest3_react_rerun.log
+13:18:35 END   tool-loop re-run: exit 0
+14:28:23 END   single-pass re-run (infra failures only; rest from cache): exit 0
+14:28:23 gaps after re-runs: single-pass 6, tool loop 0
+14:28:23 START A/B comparison (paired bootstrap): evals.compare_arms data\cache\l3_react_full.csv data\cache\l3_single.csv  -> results/ab_comparison_run.log
+14:29:23 END   A/B comparison (paired bootstrap): exit 0
+14:29:23 START Langfuse upload (both arms): evals.to_langfuse --arm tool-loop-full=data\cache\l3_react_full.csv --arm single-pass-rag=data\cache\l3_single.csv  -> results/langfuse_upload.log
+14:36:23 END   Langfuse upload (both arms): exit 0
+14:36:23 OneDrive restarted
+14:36:23 A/B completion end

@@ -1,0 +1,21 @@
+Recall@5 (share of cases with a relevant chunk in the top 5); MRR@10 in brackets
+
+family             cases              hybrid             dense            sparse
+going_concern         18       0.94 [0.94]       0.89 [0.81]       0.83 [0.79]  
+material_weakness     21       0.81 [0.53]       0.90 [0.57]       0.71 [0.32]  
+covenant               8       0.62 [0.50]       0.62 [0.64]       0.38 [0.40]  
+all                   47       0.83              0.85              0.70         
+
+Coverage (probe found the warning in the latest report -> store has a matching chunk):
+  going_concern     18/18  (100%)
+  material_weakness 18/18  (100%)
+
+Hybrid misses (8):
+  material_weakness cik 105319 as of 2024-07-01: 2 relevant chunks, none in top 5
+  covenant          cik 867773 as of 2024-07-01: 3 relevant chunks, none in top 5
+  covenant          cik 720154 as of 2025-01-01: 4 relevant chunks, none in top 5
+  going_concern     cik 1159167 as of 2025-01-01: 12 relevant chunks, none in top 5
+  material_weakness cik 105319 as of 2025-04-01: 2 relevant chunks, none in top 5
+  covenant          cik 720154 as of 2025-07-01: 8 relevant chunks, none in top 5
+  material_weakness cik 764065 as of 2025-07-01: 12 relevant chunks, none in top 5
+  material_weakness cik 1099219 as of 2025-07-01: 6 relevant chunks, none in top 5

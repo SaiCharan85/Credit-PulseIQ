@@ -1,0 +1,4 @@
+dataset creditpulse-distress-ab: 199 items
+run tool-loop-full: 199 cases  {'auc': 0.9735, 'abstention_rate': 0.0151, 'mean_brier': 0.0687}
+run single-pass-rag: 199 cases  {'auc': 0.9642, 'abstention_rate': 0.0352, 'mean_brier': 0.08}
+open Langfuse > Datasets > creditpulse-distress-ab to compare runs

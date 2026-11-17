@@ -1,0 +1,51 @@
+﻿python : C:\Users\chara\OneDrive\Desktop\Credit-PulseIQ\rag\store.py:122: UserWarning: Qdrant client version 1.14.0 is 
+incompatible with server version 1.20.1. Major versions should match and minor version difference must not exceed 1. 
+Set check_compatibility=False to skip version check.
+At line:1 char:443
++ ... e '\+','_'; python -m evals.run_rag_recall --store cloud --variant $v ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\chara\... version check.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  return QdrantClient(url=url, api_key=key, timeout=60)
+variant: baseline
+Recall@5 (share of cases with a relevant chunk in the top 5); MRR@10 in brackets
+
+family             cases              hybrid             dense            sparse
+going_concern          0       0.00 [0.00]       0.00 [0.00]       0.00 [0.00]  
+material_weakness      0       0.00 [0.00]       0.00 [0.00]       0.00 [0.00]  
+covenant              24       0.42 [0.37]       0.42 [0.29]       0.29 [0.29]  
+all                   24       0.42              0.42              0.29         
+
+Context precision@5 (share of the top 5 that are relevant):
+going_concern          0       0.00              0.00              0.00         
+material_weakness      0       0.00              0.00              0.00         
+covenant              24       0.18              0.15              0.21         
+
+nDCG@10 (binary relevance; credits every relevant chunk by rank):
+going_concern          0       0.00              0.00              0.00         
+material_weakness      0       0.00              0.00              0.00         
+covenant              24       0.25              0.20              0.25         
+
+Covenant, GRADED key (2 = stated breach/waiver/forbearance, 1 = covenant stress), 24 cases:
+any_recall@5          24       0.46              0.42              0.42         
+any_precision@5       24       0.22              0.19              0.23         
+graded_ndcg@10        24       0.25              0.20              0.27         
+
+Coverage (probe found the warning in the latest report -> store has a matching chunk):
+
+Hybrid misses (14):
+  covenant          cik 867773 as of 2024-07-01: 3 relevant chunks, none in top 5
+  covenant          cik 1723580 as of 2024-07-01: 2 relevant chunks, none in top 5
+  covenant          cik 1835972 as of 2024-07-01: 5 relevant chunks, none in top 5
+  covenant          cik 92122 as of 2024-10-01: 3 relevant chunks, none in top 5
+  covenant          cik 1539838 as of 2024-10-01: 1 relevant chunks, none in top 5
+  covenant          cik 1835972 as of 2024-10-01: 4 relevant chunks, none in top 5
+  covenant          cik 1893311 as of 2024-10-01: 1 relevant chunks, none in top 5
+  covenant          cik 720154 as of 2025-01-01: 4 relevant chunks, none in top 5
+  covenant          cik 1415404 as of 2025-01-01: 1 relevant chunks, none in top 5
+  covenant          cik 1893311 as of 2025-01-01: 1 relevant chunks, none in top 5
+  covenant          cik 1893311 as of 2025-04-01: 1 relevant chunks, none in top 5
+  covenant          cik 92122 as of 2025-07-01: 2 relevant chunks, none in top 5
+  covenant          cik 720154 as of 2025-07-01: 8 relevant chunks, none in top 5
+  covenant          cik 1893311 as of 2025-07-01: 1 relevant chunks, none in top 5

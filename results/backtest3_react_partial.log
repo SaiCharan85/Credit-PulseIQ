@@ -1,0 +1,59 @@
+﻿python : loaded from .env: CREDITPULSE_SEC_UA, CREDITPULSE_LLM_BASE_URL, CREDITPULSE_LLM_MODEL, 
+CREDITPULSE_LLM_API_KEY, CREDITPULSE_JUDGE_MODEL, CREDITPULSE_JUDGE_BASE_URL, CREDITPULSE_JUDGE_API_KEY, 
+CREDITPULSE_QDRANT_URL, CREDITPULSE_QDRANT_API_KEY, LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY, LANGFUSE_HOST
+At line:1 char:427
++ ... ING='utf8'; python -m evals.run_l3 --agent react --max-negatives 100  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (loaded from .en..., LANGFUSE_HOST:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+stratified: 99 positives + 100/1113 negatives (fraction 0.090); precision is base-rate corrected
+offline replay: no API calls will be made
+L3 backtest: ReAct investigator (cached:ratelimited:openai-compatible:gemma-4-31b-it) over 199 test cases (cutoff 
+2024-06-01)
+  25/199
+  50/199
+  75/199
+  100/199
+  125/199
+  150/199
+  175/199
+skipped 19 case(s) missing from the replay cache
+per-case results -> data\cache\l3_react_partial.csv
+
+=== L3: ReAct investigator (cached:ratelimited:openai-compatible:gemma-4-31b-it) [PARTIAL] ===
+ran 180/199 cases before the quota stopped it. Recall, lead time and false-confidence are computed over positives and 
+remain valid; precision carries wider error bars.
+cases                 180  (positives 99)
+abstained             3  (1.7%)  honest 0 / protocol-failure 3
+precision / recall    0.935 / 0.896   F1 0.915  [base-rate corrected 0.563]
+median lead time      148 days
+FALSE-CONFIDENCE RATE 0.081  (8/99)
+calibration (ECE)     0.107    AUC 0.979
+mean steps / calls    10.5 / 10.3
+verification failures 0
+signals               {'elevated_risk': 16, 'healthy': 72, 'insufficient_evidence': 3, 'severe_risk': 76, 'watch': 13}
+
+  reliability curve (confidence -> observed failure rate):
+    [0.0-0.2)  n=   72  stated=0.06  observed=0.01
+    [0.2-0.4)  n=   13  stated=0.28  observed=0.69
+    [0.4-0.6)  n=   10  stated=0.51  observed=0.60
+    [0.6-0.8)  n=   12  stated=0.74  observed=0.92
+    [0.8-1.0)  n=   70  stated=0.90  observed=0.99
+
+=== baselines on the IDENTICAL 177 graded cases ===
+  agent react      : auc=0.9794
+  Tier 0 Altman Z'' : n=177  positives=96  base_rate=0.5424  AUC=0.890  Brier=0.1385  ECE=0.1299  P@10=1.000  
+P@25=1.000  P@50=0.960  P@100=0.800
+  Tier 1 hazard     : n=177  positives=96  base_rate=0.5424  AUC=0.968  Brier=0.0867  ECE=0.1132  P@10=1.000  
+P@25=1.000  P@50=1.000  P@100=0.900
+
+=== all 180 completed cases (abstentions scored 0.5, not dropped) ===
+  agent react      : auc=0.9781
+  Tier 0 Altman Z'' : n=180  positives=99  base_rate=0.5500  AUC=0.888  Brier=0.1383  ECE=0.1311  P@10=1.000  
+P@25=1.000  P@50=0.980  P@100=0.820
+  Tier 1 hazard     : n=180  positives=99  base_rate=0.5500  AUC=0.968  Brier=0.0860  ECE=0.1144  P@10=1.000  
+P@25=1.000  P@50=1.000  P@100=0.900
+
+AUC is comparable across rows; precision/recall are not directly comparable, because the agent may abstain and the 
+baselines never do.

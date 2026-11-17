@@ -1,0 +1,954 @@
+=== full run 04:54 ===
+RAM free 5.0 GB; 124 filers; store=local
+embedding on gpu
+C:\Users\chara\OneDrive\Desktop\Credit-PulseIQ\rag\store.py:86: UserWarning: Local mode is not recommended for collections with more than 20,000 points. Collection <filing_chunks> contains 27541 points. Consider using Qdrant in Docker or Qdrant Cloud for better performance with large datasets.
+  return QdrantClient(path=str(LOCAL_PATH))
+728 filings to ingest (147 already stored)
+C:\Users\chara\OneDrive\Desktop\Credit-PulseIQ\rag\store.py:137: UserWarning: Local mode is not recommended for collections with more than 20,000 points. Current collection contains 27605 points. Consider using Qdrant in Docker or Qdrant Cloud for better performance with large datasets.
+  self.client.upsert(
+[1/728] cik 37996 10-Q    2023-05-03  138 chunks   6.6s | RAM free 4.0 GB | ETA 4925 min
+[2/728] cik 37996 10-Q    2023-07-28  137 chunks   6.1s | RAM free 3.5 GB | ETA 2499 min
+[3/728] cik 37996 10-Q    2023-10-27  146 chunks   6.2s | RAM free 3.5 GB | ETA 1691 min
+[4/728] cik 37996 10-K    2024-02-07  223 chunks  10.2s | RAM free 3.5 GB | ETA 1299 min
+[5/728] cik 37996 10-Q    2024-04-25  136 chunks   6.4s | RAM free 3.5 GB | ETA 1055 min
+[6/728] cik 37996 10-Q    2024-07-25  133 chunks   5.8s | RAM free 3.4 GB | ETA 890 min
+[7/728] cik 50863 10-Q    2023-04-28   90 chunks   4.3s | RAM free 3.4 GB | ETA 770 min
+[8/728] cik 50863 10-Q    2023-07-28   98 chunks   4.8s | RAM free 3.4 GB | ETA 681 min
+[9/728] cik 50863 10-Q    2023-10-27   99 chunks   4.6s | RAM free 3.4 GB | ETA 611 min
+[10/728] cik 50863 10-K    2024-01-26  375 chunks  16.5s | RAM free 3.4 GB | ETA 570 min
+[11/728] cik 50863 10-Q    2024-04-26   95 chunks   4.7s | RAM free 3.4 GB | ETA 523 min
+[12/728] cik 50863 10-Q    2024-08-02  113 chunks   5.7s | RAM free 3.4 GB | ETA 485 min
+[13/728] cik 50863 10-Q    2024-11-01  125 chunks   5.2s | RAM free 3.4 GB | ETA 452 min
+[14/728] cik 59478 10-Q    2023-04-27   98 chunks   4.9s | RAM free 3.4 GB | ETA 423 min
+[15/728] cik 59478 10-Q    2023-08-08  109 chunks   5.8s | RAM free 3.4 GB | ETA 400 min
+[16/728] cik 59478 10-Q    2023-11-02  113 chunks   5.8s | RAM free 3.4 GB | ETA 379 min
+[17/728] cik 59478 10-K    2024-02-21  241 chunks  12.8s | RAM free 3.4 GB | ETA 365 min
+[18/728] cik 59478 10-Q    2024-04-30   94 chunks   5.0s | RAM free 3.4 GB | ETA 348 min
+[19/728] cik 59478 10-Q    2024-08-08  101 chunks   5.2s | RAM free 3.4 GB | ETA 333 min
+[20/728] cik 64803 10-K    2024-02-07  467 chunks  21.5s | RAM free 3.3 GB | ETA 329 min
+[21/728] cik 64803 10-Q    2024-05-01  137 chunks   6.9s | RAM free 3.3 GB | ETA 317 min
+[22/728] cik 64803 10-Q    2024-08-07  152 chunks   7.2s | RAM free 3.3 GB | ETA 306 min
+[23/728] cik 64803 10-Q    2024-11-06  169 chunks   8.3s | RAM free 3.3 GB | ETA 297 min
+[24/728] cik 64803 10-K    2025-02-12  445 chunks  21.5s | RAM free 3.3 GB | ETA 296 min
+[25/728] cik 64803 10-Q    2025-05-01  133 chunks   6.6s | RAM free 3.3 GB | ETA 287 min
+[26/728] cik 66382 10-Q    2023-01-11   86 chunks   4.3s | RAM free 3.3 GB | ETA 277 min
+[27/728] cik 66382 10-Q    2023-04-12   91 chunks   4.8s | RAM free 3.3 GB | ETA 269 min
+[28/728] cik 66382 10-K    2023-07-26  229 chunks  11.8s | RAM free 3.3 GB | ETA 264 min
+[29/728] cik 66382 10-Q    2023-10-11   75 chunks   4.4s | RAM free 3.3 GB | ETA 257 min
+[30/728] cik 66382 10-Q    2024-01-10   84 chunks   4.6s | RAM free 3.3 GB | ETA 250 min
+[31/728] cik 66382 10-Q    2024-04-10   86 chunks   4.4s | RAM free 3.3 GB | ETA 243 min
+[32/728] cik 70318 10-K    2023-02-21  449 chunks  25.2s | RAM free 3.3 GB | ETA 245 min
+[33/728] cik 70318 10-Q    2023-04-28  144 chunks   8.5s | RAM free 3.4 GB | ETA 240 min
+[34/728] cik 70318 10-Q    2023-07-31  167 chunks   9.8s | RAM free 3.4 GB | ETA 236 min
+[35/728] cik 70318 10-Q    2023-10-30  170 chunks   9.8s | RAM free 3.5 GB | ETA 233 min
+[36/728] cik 70318 10-K    2024-02-16  424 chunks  25.2s | RAM free 3.5 GB | ETA 234 min
+[37/728] cik 70318 10-Q    2024-04-30  142 chunks   8.2s | RAM free 3.5 GB | ETA 230 min
+[38/728] cik 70318 10-Q    2024-07-30  147 chunks   8.6s | RAM free 3.5 GB | ETA 227 min
+[39/728] cik 70318 10-Q    2024-10-29  154 chunks   9.4s | RAM free 3.5 GB | ETA 223 min
+[40/728] cik 70318 10-K    2025-02-18  387 chunks  24.8s | RAM free 3.4 GB | ETA 225 min
+[41/728] cik 70318 10-Q    2025-04-29   92 chunks   5.9s | RAM free 3.7 GB | ETA 221 min
+[42/728] cik 78003 10-Q    2023-11-08  212 chunks  13.6s | RAM free 3.7 GB | ETA 219 min
+[43/728] cik 78003 10-K    2024-02-22  417 chunks  26.7s | RAM free 3.7 GB | ETA 221 min
+[44/728] cik 78003 10-Q    2024-05-08  179 chunks  11.2s | RAM free 3.7 GB | ETA 219 min
+[45/728] cik 78003 10-Q    2024-08-05  197 chunks  11.1s | RAM free 3.7 GB | ETA 217 min
+[46/728] cik 78003 10-Q    2024-11-04  202 chunks  11.6s | RAM free 3.7 GB | ETA 215 min
+[47/728] cik 78003 10-K    2025-02-27  400 chunks  23.3s | RAM free 3.6 GB | ETA 216 min
+[48/728] cik 80424 10-Q    2023-01-19   84 chunks   5.1s | RAM free 3.6 GB | ETA 213 min
+[49/728] cik 80424 10-Q    2023-04-21   85 chunks   5.3s | RAM free 3.6 GB | ETA 209 min
+[50/728] cik 80424 10-K    2023-08-04  191 chunks  12.7s | RAM free 3.7 GB | ETA 208 min
+[51/728] cik 80424 10-Q    2023-10-18   66 chunks   3.9s | RAM free 3.6 GB | ETA 204 min
+[52/728] cik 80424 10-Q    2024-01-23   93 chunks   5.9s | RAM free 3.6 GB | ETA 201 min
+[53/728] cik 80424 10-Q    2024-04-19   92 chunks   5.9s | RAM free 3.6 GB | ETA 199 min
+[54/728] cik 80424 10-K    2024-08-05  195 chunks  12.3s | RAM free 3.5 GB | ETA 197 min
+[55/728] cik 89800 10-K    2024-02-20  257 chunks  16.2s | RAM free 3.5 GB | ETA 197 min
+[56/728] cik 89800 10-Q    2024-04-30   95 chunks   5.6s | RAM free 3.5 GB | ETA 194 min
+[57/728] cik 89800 10-Q    2024-07-23  106 chunks   6.6s | RAM free 3.5 GB | ETA 192 min
+[58/728] cik 89800 10-Q    2024-10-22  109 chunks   7.1s | RAM free 3.5 GB | ETA 190 min
+[59/728] cik 89800 10-K    2025-02-20  261 chunks  15.0s | RAM free 3.6 GB | ETA 189 min
+[60/728] cik 89800 10-Q    2025-04-29   93 chunks   5.1s | RAM free 3.6 GB | ETA 187 min
+[61/728] cik 92122 10-Q    2023-04-27  261 chunks  16.8s | RAM free 3.6 GB | ETA 187 min
+[62/728] cik 92122 10-Q    2023-08-03  319 chunks  20.9s | RAM free 3.5 GB | ETA 188 min
+[63/728] cik 92122 10-Q    2023-11-02  360 chunks  22.9s | RAM free 3.5 GB | ETA 189 min
+[64/728] cik 92122 10-K    2024-02-15  680 chunks  45.9s | RAM free 3.5 GB | ETA 194 min
+[65/728] cik 92122 10-Q    2024-05-02  231 chunks  14.8s | RAM free 3.5 GB | ETA 193 min
+[66/728] cik 92122 10-Q    2024-08-01  281 chunks  16.3s | RAM free 3.5 GB | ETA 193 min
+[67/728] cik 92122 10-Q    2024-10-31  307 chunks  18.1s | RAM free 3.5 GB | ETA 193 min
+[68/728] cik 92122 10-K    2025-02-20  667 chunks  35.9s | RAM free 3.5 GB | ETA 196 min
+[69/728] cik 92122 10-Q    2025-05-01  218 chunks  12.0s | RAM free 3.5 GB | ETA 195 min
+[70/728] cik 93556 10-Q    2023-05-04   51 chunks   3.6s | RAM free 3.5 GB | ETA 192 min
+[71/728] cik 93556 10-Q    2023-08-01   61 chunks   3.4s | RAM free 3.5 GB | ETA 190 min
+[72/728] cik 93556 10-Q    2023-10-30   67 chunks   3.4s | RAM free 3.5 GB | ETA 188 min
+[73/728] cik 93556 10-K    2024-02-27  181 chunks   9.7s | RAM free 3.5 GB | ETA 186 min
+[74/728] cik 93556 10-Q    2024-05-02   50 chunks   2.9s | RAM free 3.5 GB | ETA 184 min
+[75/728] cik 93556 10-Q    2024-07-30   57 chunks   3.4s | RAM free 3.5 GB | ETA 182 min
+[76/728] cik 101829 10-Q    2023-10-24  167 chunks  10.3s | RAM free 3.6 GB | ETA 181 min
+[77/728] cik 101829 10-K    2024-02-05  385 chunks  23.1s | RAM free 3.6 GB | ETA 182 min
+[78/728] cik 101829 10-Q    2024-04-23  121 chunks   7.5s | RAM free 3.7 GB | ETA 180 min
+[79/728] cik 101829 10-Q    2024-07-25  154 chunks   9.2s | RAM free 3.7 GB | ETA 179 min
+[80/728] cik 101829 10-Q    2024-10-22  167 chunks  10.3s | RAM free 3.6 GB | ETA 178 min
+[81/728] cik 101829 10-K    2025-02-03  417 chunks  26.1s | RAM free 3.6 GB | ETA 179 min
+[82/728] cik 103379 10-Q    2023-02-08  122 chunks   8.6s | RAM free 3.6 GB | ETA 178 min
+[83/728] cik 103379 10-K    2023-05-25  161 chunks  10.9s | RAM free 3.6 GB | ETA 177 min
+[84/728] cik 103379 10-Q    2023-08-03   83 chunks   4.8s | RAM free 3.6 GB | ETA 175 min
+[85/728] cik 103379 10-Q    2023-11-03  103 chunks   6.5s | RAM free 3.6 GB | ETA 174 min
+[86/728] cik 103379 10-Q    2024-02-07  123 chunks   7.6s | RAM free 3.6 GB | ETA 172 min
+[87/728] cik 103379 10-K    2024-05-23  148 chunks   8.7s | RAM free 3.7 GB | ETA 171 min
+[88/728] cik 109198 10-K    2023-03-29  113 chunks   7.6s | RAM free 3.7 GB | ETA 170 min
+[89/728] cik 109198 10-Q    2023-05-26   65 chunks   4.8s | RAM free 3.7 GB | ETA 168 min
+[90/728] cik 109198 10-Q    2023-08-25   71 chunks   4.7s | RAM free 3.7 GB | ETA 167 min
+[91/728] cik 109198 10-Q    2023-11-29   72 chunks   4.5s | RAM free 3.7 GB | ETA 165 min
+[92/728] cik 109198 10-K    2024-04-03  119 chunks   7.9s | RAM free 3.7 GB | ETA 164 min
+[93/728] cik 109198 10-Q    2024-05-31   62 chunks   4.5s | RAM free 3.7 GB | ETA 163 min
+[94/728] cik 109198 10-Q    2024-08-30   69 chunks   5.1s | RAM free 3.7 GB | ETA 161 min
+[95/728] cik 109198 10-Q    2024-12-04   75 chunks   5.3s | RAM free 3.6 GB | ETA 160 min
+[96/728] cik 200406 10-Q    2023-07-31  164 chunks  11.0s | RAM free 3.6 GB | ETA 160 min
+[97/728] cik 200406 10-Q    2023-10-27  152 chunks   9.2s | RAM free 3.6 GB | ETA 159 min
+[98/728] cik 200406 10-K    2024-02-16  262 chunks  16.4s | RAM free 3.6 GB | ETA 159 min
+[99/728] cik 200406 10-Q    2024-05-01  133 chunks   7.8s | RAM free 3.6 GB | ETA 158 min
+[100/728] cik 200406 10-Q    2024-07-25  145 chunks   8.3s | RAM free 3.6 GB | ETA 157 min
+[101/728] cik 200406 10-Q    2024-10-23  152 chunks   8.7s | RAM free 3.6 GB | ETA 156 min
+[102/728] cik 318154 10-Q    2023-08-04  131 chunks   6.8s | RAM free 3.6 GB | ETA 155 min
+[103/728] cik 318154 10-Q    2023-10-31  144 chunks   8.9s | RAM free 3.6 GB | ETA 154 min
+[104/728] cik 318154 10-K    2024-02-14  204 chunks  12.4s | RAM free 3.6 GB | ETA 154 min
+[105/728] cik 318154 10-Q    2024-05-03  140 chunks   8.0s | RAM free 3.8 GB | ETA 153 min
+[106/728] cik 318154 10-Q    2024-08-07  145 chunks   8.9s | RAM free 3.8 GB | ETA 152 min
+[107/728] cik 318154 10-Q    2024-10-31  145 chunks   8.1s | RAM free 3.8 GB | ETA 151 min
+[108/728] cik 719955 10-Q    2023-09-01   63 chunks   3.7s | RAM free 3.8 GB | ETA 150 min
+[109/728] cik 719955 10-Q    2023-11-28   65 chunks   3.8s | RAM free 3.8 GB | ETA 149 min
+[110/728] cik 719955 10-K    2024-03-20  203 chunks  11.7s | RAM free 3.8 GB | ETA 148 min
+[111/728] cik 719955 10-Q    2024-05-24   58 chunks   3.5s | RAM free 3.8 GB | ETA 147 min
+[112/728] cik 719955 10-Q    2024-08-23   64 chunks   3.4s | RAM free 3.8 GB | ETA 146 min
+[113/728] cik 719955 10-Q    2024-11-22   67 chunks   3.6s | RAM free 3.8 GB | ETA 145 min
+[114/728] cik 723254 10-Q    2023-10-05   58 chunks   3.2s | RAM free 3.8 GB | ETA 143 min
+[115/728] cik 723254 10-Q    2024-01-08   70 chunks   4.2s | RAM free 3.8 GB | ETA 142 min
+[116/728] cik 723254 10-Q    2024-04-05   73 chunks   4.2s | RAM free 3.8 GB | ETA 141 min
+[117/728] cik 723254 10-K    2024-07-25  168 chunks   9.4s | RAM free 3.8 GB | ETA 141 min
+[118/728] cik 723254 10-Q    2024-10-04   61 chunks   3.4s | RAM free 3.8 GB | ETA 140 min
+[119/728] cik 723254 10-Q    2025-01-08   73 chunks   4.7s | RAM free 3.8 GB | ETA 139 min
+[120/728] cik 723254 10-Q    2025-04-03   75 chunks   4.5s | RAM free 3.8 GB | ETA 138 min
+[121/728] cik 745732 10-K    2024-04-02  105 chunks   6.3s | RAM free 3.8 GB | ETA 137 min
+[122/728] cik 745732 10-Q    2024-06-12   45 chunks   2.5s | RAM free 3.8 GB | ETA 136 min
+[123/728] cik 745732 10-Q    2024-09-11   48 chunks   2.8s | RAM free 3.8 GB | ETA 135 min
+[124/728] cik 745732 10-Q    2024-12-11   52 chunks   3.0s | RAM free 3.8 GB | ETA 134 min
+[125/728] cik 745732 10-K    2025-04-01  105 chunks   6.1s | RAM free 3.8 GB | ETA 133 min
+[126/728] cik 745732 10-Q    2025-06-11   58 chunks   3.4s | RAM free 3.8 GB | ETA 132 min
+[127/728] cik 764478 10-K    2024-03-15  188 chunks  11.0s | RAM free 3.8 GB | ETA 132 min
+[128/728] cik 764478 10-Q    2024-06-07   54 chunks   3.6s | RAM free 3.8 GB | ETA 131 min
+[129/728] cik 764478 10-Q    2024-09-06   55 chunks   3.8s | RAM free 3.8 GB | ETA 130 min
+[130/728] cik 764478 10-Q    2024-12-06   57 chunks   3.6s | RAM free 3.8 GB | ETA 129 min
+[131/728] cik 764478 10-K    2025-03-19  190 chunks  12.0s | RAM free 3.8 GB | ETA 129 min
+[132/728] cik 764478 10-Q    2025-06-06   59 chunks   3.9s | RAM free 3.9 GB | ETA 128 min
+[133/728] cik 766704 10-Q    2023-10-31  150 chunks   9.5s | RAM free 3.9 GB | ETA 127 min
+[134/728] cik 766704 10-K    2024-02-15  439 chunks  27.3s | RAM free 3.8 GB | ETA 128 min
+[135/728] cik 766704 10-Q    2024-04-30  142 chunks   9.2s | RAM free 3.6 GB | ETA 128 min
+[136/728] cik 766704 10-Q    2024-07-30  151 chunks   9.6s | RAM free 3.8 GB | ETA 127 min
+[137/728] cik 766704 10-Q    2024-10-29  165 chunks  10.6s | RAM free 3.8 GB | ETA 127 min
+[138/728] cik 766704 10-K    2025-02-12  458 chunks  27.3s | RAM free 3.8 GB | ETA 128 min
+[139/728] cik 797468 10-Q    2023-08-02   88 chunks   5.5s | RAM free 3.8 GB | ETA 127 min
+[140/728] cik 797468 10-Q    2023-11-07   94 chunks   5.9s | RAM free 3.8 GB | ETA 127 min
+[141/728] cik 797468 10-K    2024-02-14  369 chunks  21.5s | RAM free 3.8 GB | ETA 127 min
+[142/728] cik 797468 10-Q    2024-05-07   82 chunks   4.7s | RAM free 3.8 GB | ETA 126 min
+[143/728] cik 797468 10-Q    2024-08-07   86 chunks   4.9s | RAM free 3.8 GB | ETA 126 min
+[144/728] cik 797468 10-Q    2024-11-12   87 chunks   5.4s | RAM free 3.8 GB | ETA 125 min
+[145/728] cik 812074 10-Q    2023-04-26   87 chunks   4.8s | RAM free 3.8 GB | ETA 124 min
+[146/728] cik 812074 10-Q    2023-08-02  119 chunks   7.8s | RAM free 3.8 GB | ETA 124 min
+[147/728] cik 812074 10-Q    2023-11-01  122 chunks   7.1s | RAM free 3.7 GB | ETA 123 min
+[148/728] cik 812074 10-K    2024-02-14  154 chunks   9.0s | RAM free 3.8 GB | ETA 123 min
+[149/728] cik 812074 10-Q    2024-05-01   79 chunks   4.7s | RAM free 3.8 GB | ETA 122 min
+[150/728] cik 812074 10-Q    2024-07-31  102 chunks   6.8s | RAM free 3.7 GB | ETA 121 min
+[151/728] cik 812074 10-Q    2024-10-30  111 chunks   7.0s | RAM free 3.8 GB | ETA 121 min
+[152/728] cik 812074 10-K    2025-02-12  147 chunks   9.5s | RAM free 3.8 GB | ETA 121 min
+[153/728] cik 821189 10-K    2023-02-23  180 chunks  11.0s | RAM free 3.8 GB | ETA 120 min
+[154/728] cik 821189 10-Q    2023-05-04   81 chunks   5.6s | RAM free 3.8 GB | ETA 120 min
+[155/728] cik 821189 10-Q    2023-08-03   94 chunks   6.1s | RAM free 3.8 GB | ETA 119 min
+[156/728] cik 821189 10-Q    2023-11-02   92 chunks   6.3s | RAM free 3.8 GB | ETA 119 min
+[157/728] cik 821189 10-K    2024-02-22  166 chunks  10.6s | RAM free 3.8 GB | ETA 118 min
+[158/728] cik 821189 10-Q    2024-05-02   74 chunks   5.0s | RAM free 3.8 GB | ETA 118 min
+[159/728] cik 827187 10-K    2024-02-23  161 chunks  10.0s | RAM free 3.8 GB | ETA 117 min
+[160/728] cik 827187 10-Q    2024-05-07   53 chunks   3.2s | RAM free 3.8 GB | ETA 117 min
+[161/728] cik 827187 10-Q    2024-08-06   61 chunks   3.9s | RAM free 3.8 GB | ETA 116 min
+[162/728] cik 827187 10-Q    2024-11-05   63 chunks   4.1s | RAM free 3.8 GB | ETA 115 min
+[163/728] cik 827187 10-K    2025-03-07  160 chunks  10.1s | RAM free 3.8 GB | ETA 115 min
+[164/728] cik 827187 10-Q    2025-05-06   56 chunks   3.5s | RAM free 3.8 GB | ETA 114 min
+[165/728] cik 831259 10-K    2023-02-15  570 chunks  33.3s | RAM free 3.8 GB | ETA 115 min
+[166/728] cik 831259 10-Q    2023-05-04  131 chunks   7.3s | RAM free 3.8 GB | ETA 115 min
+[167/728] cik 831259 10-Q    2023-08-03  157 chunks   8.9s | RAM free 3.8 GB | ETA 115 min
+[168/728] cik 831259 10-Q    2023-11-03  161 chunks   9.5s | RAM free 3.8 GB | ETA 114 min
+[169/728] cik 831259 10-K    2024-02-16  571 chunks  34.5s | RAM free 3.8 GB | ETA 115 min
+[170/728] cik 831259 10-Q    2024-05-08  130 chunks   8.3s | RAM free 3.8 GB | ETA 115 min
+[171/728] cik 831259 10-Q    2024-08-07  163 chunks  11.0s | RAM free 3.8 GB | ETA 115 min
+[172/728] cik 858877 10-Q    2023-05-24  208 chunks  12.8s | RAM free 3.7 GB | ETA 115 min
+[173/728] cik 858877 10-K    2023-09-07  232 chunks  15.4s | RAM free 3.5 GB | ETA 115 min
+[174/728] cik 858877 10-Q    2023-11-21  196 chunks  11.6s | RAM free 3.5 GB | ETA 114 min
+[175/728] cik 858877 10-Q    2024-02-20  203 chunks  12.5s | RAM free 3.5 GB | ETA 114 min
+[176/728] cik 858877 10-Q    2024-05-21  212 chunks  12.9s | RAM free 3.5 GB | ETA 114 min
+[177/728] cik 858877 10-K    2024-09-05  248 chunks  14.3s | RAM free 3.5 GB | ETA 114 min
+[178/728] cik 866787 10-Q    2024-03-15   79 chunks   4.8s | RAM free 3.5 GB | ETA 113 min
+[179/728] cik 866787 10-Q    2024-06-07   78 chunks   4.9s | RAM free 3.5 GB | ETA 113 min
+[180/728] cik 866787 10-K    2024-10-28  176 chunks  10.4s | RAM free 3.5 GB | ETA 113 min
+[181/728] cik 866787 10-Q    2024-12-20   67 chunks   3.9s | RAM free 3.5 GB | ETA 112 min
+[182/728] cik 866787 10-Q    2025-03-21   77 chunks   4.5s | RAM free 3.5 GB | ETA 111 min
+[183/728] cik 866787 10-Q    2025-06-13   80 chunks   4.6s | RAM free 3.5 GB | ETA 111 min
+[184/728] cik 878927 10-K    2023-02-22  162 chunks   9.9s | RAM free 3.5 GB | ETA 111 min
+[185/728] cik 878927 10-Q    2023-05-08   43 chunks   2.4s | RAM free 3.5 GB | ETA 110 min
+[186/728] cik 878927 10-Q    2023-08-04   47 chunks   3.0s | RAM free 3.4 GB | ETA 109 min
+[187/728] cik 878927 10-Q    2023-11-06   47 chunks   2.7s | RAM free 3.5 GB | ETA 109 min
+[188/728] cik 878927 10-K    2024-02-26   81 chunks   4.6s | RAM free 3.5 GB | ETA 108 min
+[189/728] cik 878927 10-Q    2024-05-07   43 chunks   2.4s | RAM free 3.5 GB | ETA 107 min
+[190/728] cik 878927 10-Q    2024-08-05   45 chunks   2.8s | RAM free 3.5 GB | ETA 107 min
+[191/728] cik 882095 10-Q    2023-05-03   78 chunks   4.3s | RAM free 3.5 GB | ETA 106 min
+[192/728] cik 882095 10-Q    2023-08-04   83 chunks   5.2s | RAM free 3.5 GB | ETA 106 min
+[193/728] cik 882095 10-Q    2023-11-07   83 chunks   4.9s | RAM free 3.5 GB | ETA 105 min
+[194/728] cik 882095 10-K    2024-02-23  237 chunks  12.8s | RAM free 3.5 GB | ETA 105 min
+[195/728] cik 882095 10-Q    2024-05-08   91 chunks   4.8s | RAM free 3.6 GB | ETA 105 min
+[196/728] cik 882095 10-Q    2024-08-08   95 chunks   5.3s | RAM free 3.6 GB | ETA 104 min
+[197/728] cik 882095 10-Q    2024-11-12  105 chunks   5.8s | RAM free 3.6 GB | ETA 104 min
+[198/728] cik 890447 10-K    2023-03-01  421 chunks  23.3s | RAM free 3.6 GB | ETA 104 min
+[199/728] cik 890447 10-Q    2023-05-09  147 chunks   8.3s | RAM free 3.5 GB | ETA 104 min
+[200/728] cik 890447 10-Q    2023-08-09  168 chunks   9.8s | RAM free 3.5 GB | ETA 104 min
+[201/728] cik 890447 10-Q    2023-11-07  185 chunks  10.4s | RAM free 3.5 GB | ETA 103 min
+[202/728] cik 890447 10-K    2024-03-07  384 chunks  21.6s | RAM free 3.5 GB | ETA 104 min
+[203/728] cik 890447 10-Q    2024-05-09  150 chunks   9.2s | RAM free 3.5 GB | ETA 103 min
+[204/728] cik 890447 10-Q/A  2024-05-17    8 chunks   0.6s | RAM free 3.5 GB | ETA 103 min
+[205/728] cik 890447 10-K/A  2024-05-17   10 chunks   0.7s | RAM free 3.5 GB | ETA 102 min
+[206/728] cik 918646 10-Q    2023-01-26   85 chunks   5.2s | RAM free 3.5 GB | ETA 101 min
+[207/728] cik 918646 10-K    2023-05-19  249 chunks  14.4s | RAM free 3.5 GB | ETA 101 min
+[208/728] cik 918646 10-Q    2023-07-27   72 chunks   3.9s | RAM free 3.5 GB | ETA 101 min
+[209/728] cik 918646 10-Q    2023-10-26   77 chunks   4.9s | RAM free 3.5 GB | ETA 100 min
+[210/728] cik 918646 10-Q    2024-01-25   76 chunks   4.7s | RAM free 3.5 GB | ETA 100 min
+[211/728] cik 918646 10-K    2024-05-22  263 chunks  15.0s | RAM free 3.5 GB | ETA 100 min
+[212/728] cik 927653 10-K    2023-05-09  311 chunks  19.7s | RAM free 3.5 GB | ETA 100 min
+[213/728] cik 927653 10-Q    2023-08-02   47 chunks   2.3s | RAM free 3.6 GB | ETA 100 min
+[214/728] cik 927653 10-Q    2023-11-02   55 chunks   2.7s | RAM free 3.6 GB | ETA 99 min
+[215/728] cik 927653 10-Q    2024-02-08   61 chunks   3.4s | RAM free 3.6 GB | ETA 99 min
+[216/728] cik 927653 10-K    2024-05-08  279 chunks  14.6s | RAM free 3.5 GB | ETA 99 min
+[217/728] cik 927653 10-Q    2024-08-07   42 chunks   2.4s | RAM free 3.6 GB | ETA 98 min
+[218/728] cik 927653 10-Q    2024-11-07   59 chunks   3.5s | RAM free 3.6 GB | ETA 98 min
+[219/728] cik 927653 10-Q    2025-02-06   61 chunks   3.8s | RAM free 3.6 GB | ETA 97 min
+[220/728] cik 936468 10-Q    2023-10-17  119 chunks   7.0s | RAM free 3.6 GB | ETA 97 min
+[221/728] cik 936468 10-K    2024-01-23  315 chunks  17.2s | RAM free 3.6 GB | ETA 97 min
+[222/728] cik 936468 10-Q    2024-04-23  104 chunks  15.3s | RAM free 3.6 GB | ETA 97 min
+[223/728] cik 936468 10-Q    2024-07-23  122 chunks  19.9s | RAM free 3.4 GB | ETA 97 min
+[224/728] cik 936468 10-Q    2024-10-22  121 chunks  18.8s | RAM free 3.5 GB | ETA 97 min
+[225/728] cik 936468 10-K    2025-01-28  324 chunks  52.3s | RAM free 3.5 GB | ETA 98 min
+[226/728] cik 1018724 10-Q    2023-08-04  130 chunks  20.0s | RAM free 3.8 GB | ETA 99 min
+[227/728] cik 1018724 10-Q    2023-10-27  131 chunks  19.1s | RAM free 3.8 GB | ETA 99 min
+[228/728] cik 1018724 10-K    2024-02-02  204 chunks  34.7s | RAM free 3.8 GB | ETA 99 min
+[229/728] cik 1018724 10-Q    2024-05-01  122 chunks  18.9s | RAM free 3.7 GB | ETA 99 min
+[230/728] cik 1018724 10-Q    2024-08-02  129 chunks  21.5s | RAM free 3.7 GB | ETA 100 min
+[231/728] cik 1018724 10-Q    2024-11-01  133 chunks  20.4s | RAM free 3.7 GB | ETA 100 min
+[232/728] cik 1037976 10-Q    2023-05-04   77 chunks  10.8s | RAM free 3.7 GB | ETA 100 min
+[233/728] cik 1037976 10-Q    2023-08-03   86 chunks  12.4s | RAM free 3.8 GB | ETA 99 min
+[234/728] cik 1037976 10-Q    2023-11-02   88 chunks  13.0s | RAM free 3.8 GB | ETA 99 min
+[235/728] cik 1037976 10-K    2024-02-27  265 chunks  39.2s | RAM free 3.8 GB | ETA 100 min
+[236/728] cik 1037976 10-Q    2024-05-06   72 chunks  10.4s | RAM free 3.7 GB | ETA 100 min
+[237/728] cik 1037976 10-Q    2024-08-06   87 chunks  13.6s | RAM free 3.7 GB | ETA 100 min
+[238/728] cik 1037976 10-Q    2024-11-06   86 chunks  13.7s | RAM free 3.7 GB | ETA 100 min
+[239/728] cik 1037976 10-K    2025-02-19  273 chunks  42.7s | RAM free 4.0 GB | ETA 101 min
+[240/728] cik 1037976 10-Q    2025-05-07   78 chunks  11.9s | RAM free 3.9 GB | ETA 100 min
+[241/728] cik 1043219 10-Q    2023-05-04  239 chunks  37.6s | RAM free 3.9 GB | ETA 101 min
+[242/728] cik 1043219 10-Q    2023-08-03  244 chunks  39.1s | RAM free 3.9 GB | ETA 102 min
+[243/728] cik 1043219 10-Q    2023-11-02  167 chunks  27.3s | RAM free 3.9 GB | ETA 102 min
+[244/728] cik 1043219 10-K    2024-02-15  288 chunks  43.7s | RAM free 4.0 GB | ETA 103 min
+[245/728] cik 1043219 10-Q    2024-05-02  232 chunks  39.4s | RAM free 3.9 GB | ETA 104 min
+[246/728] cik 1043219 10-Q    2024-07-29  241 chunks  38.8s | RAM free 3.8 GB | ETA 104 min
+[247/728] cik 1058623 10-Q    2023-10-27   82 chunks  13.4s | RAM free 3.8 GB | ETA 104 min
+[248/728] cik 1058623 10-K    2024-02-27   90 chunks  14.4s | RAM free 3.7 GB | ETA 104 min
+[249/728] cik 1058623 10-Q    2024-05-03   72 chunks  10.2s | RAM free 3.8 GB | ETA 104 min
+[250/728] cik 1058623 10-Q    2024-08-02   83 chunks  14.6s | RAM free 3.7 GB | ETA 104 min
+[251/728] cik 1058623 10-Q    2024-11-01   86 chunks  12.7s | RAM free 3.8 GB | ETA 104 min
+[252/728] cik 1058623 10-K    2025-02-27   98 chunks  18.5s | RAM free 3.8 GB | ETA 104 min
+[253/728] cik 1058623 10-Q    2025-05-01   65 chunks  11.5s | RAM free 3.8 GB | ETA 103 min
+[254/728] cik 1065280 10-Q    2023-04-21   60 chunks   8.6s | RAM free 3.8 GB | ETA 103 min
+[255/728] cik 1065280 10-Q    2023-07-21   70 chunks  10.9s | RAM free 3.8 GB | ETA 103 min
+[256/728] cik 1065280 10-Q    2023-10-20   75 chunks  12.0s | RAM free 3.8 GB | ETA 102 min
+[257/728] cik 1065280 10-K    2024-01-26   97 chunks  14.9s | RAM free 3.9 GB | ETA 102 min
+[258/728] cik 1065280 10-Q    2024-04-22   69 chunks  10.8s | RAM free 3.8 GB | ETA 102 min
+[259/728] cik 1065280 10-Q    2024-07-19   77 chunks  12.1s | RAM free 3.6 GB | ETA 102 min
+[260/728] cik 1081316 10-K    2023-02-27  946 chunks 154.2s | RAM free 3.6 GB | ETA 106 min
+[261/728] cik 1081316 10-Q    2023-05-08  364 chunks  59.2s | RAM free 3.6 GB | ETA 107 min
+[262/728] cik 1081316 10-Q    2023-08-07  440 chunks  72.2s | RAM free 3.8 GB | ETA 109 min
+[263/728] cik 1081316 10-Q    2023-11-06  458 chunks  75.8s | RAM free 3.8 GB | ETA 111 min
+[264/728] cik 1081316 10-K    2024-02-26  985 chunks 153.3s | RAM free 3.8 GB | ETA 115 min
+[265/728] cik 1081316 10-Q    2024-05-06  433 chunks  66.7s | RAM free 4.3 GB | ETA 116 min
+[266/728] cik 1090012 10-K    2024-02-28  252 chunks  40.0s | RAM free 4.3 GB | ETA 117 min
+[267/728] cik 1090012 10-Q    2024-05-02   31 chunks   4.2s | RAM free 4.4 GB | ETA 116 min
+[268/728] cik 1090012 10-Q    2024-08-07   30 chunks   4.0s | RAM free 4.4 GB | ETA 116 min
+[269/728] cik 1090012 10-Q    2024-11-06   34 chunks   4.9s | RAM free 4.4 GB | ETA 115 min
+[270/728] cik 1090012 10-K    2025-02-19  260 chunks  40.5s | RAM free 4.4 GB | ETA 116 min
+[271/728] cik 1090012 10-Q    2025-05-07   36 chunks   6.1s | RAM free 4.5 GB | ETA 115 min
+[272/728] cik 1100682 10-Q    2023-05-11   73 chunks   9.6s | RAM free 4.5 GB | ETA 115 min
+[273/728] cik 1100682 10-Q    2023-08-09   84 chunks  12.1s | RAM free 4.5 GB | ETA 115 min
+[274/728] cik 1100682 10-Q    2023-11-08   87 chunks  13.9s | RAM free 4.5 GB | ETA 114 min
+[275/728] cik 1100682 10-K    2024-02-14  256 chunks  39.9s | RAM free 4.5 GB | ETA 115 min
+[276/728] cik 1100682 10-Q    2024-05-09   82 chunks  13.3s | RAM free 4.5 GB | ETA 114 min
+[277/728] cik 1100682 10-Q    2024-08-07   99 chunks  16.3s | RAM free 4.5 GB | ETA 114 min
+[278/728] cik 1101680 10-K    2023-03-10  269 chunks  41.5s | RAM free 4.5 GB | ETA 115 min
+[279/728] cik 1101680 10-Q    2023-05-09   90 chunks  12.2s | RAM free 4.4 GB | ETA 115 min
+[280/728] cik 1101680 10-K    2024-08-13  384 chunks  57.6s | RAM free 4.5 GB | ETA 115 min
+[281/728] cik 1101680 10-Q    2024-08-13  107 chunks  17.3s | RAM free 4.6 GB | ETA 115 min
+[282/728] cik 1101680 10-Q    2024-08-13  101 chunks  16.1s | RAM free 4.6 GB | ETA 115 min
+[283/728] cik 1101680 10-Q/A  2024-08-13  109 chunks  15.8s | RAM free 4.5 GB | ETA 115 min
+[284/728] cik 1101680 10-K/A  2024-08-13  324 chunks  51.1s | RAM free 4.5 GB | ETA 116 min
+[285/728] cik 1101680 10-Q/A  2024-08-13  108 chunks  15.0s | RAM free 4.4 GB | ETA 115 min
+[286/728] cik 1101680 10-Q/A  2024-08-13  108 chunks  15.2s | RAM free 4.4 GB | ETA 115 min
+[287/728] cik 1101680 10-Q/A  2024-08-13   87 chunks  14.0s | RAM free 4.4 GB | ETA 115 min
+[288/728] cik 1101680 10-Q    2024-08-20   90 chunks  15.7s | RAM free 4.3 GB | ETA 115 min
+[289/728] cik 1101680 10-Q    2024-09-03  110 chunks  18.1s | RAM free 4.3 GB | ETA 114 min
+[290/728] cik 1101680 10-Q    2024-11-12  114 chunks  18.8s | RAM free 4.3 GB | ETA 114 min
+[291/728] cik 1103982 10-K    2023-02-03  314 chunks  49.6s | RAM free 4.4 GB | ETA 115 min
+[292/728] cik 1103982 10-Q    2023-04-27  127 chunks  19.5s | RAM free 4.4 GB | ETA 115 min
+=== full run resumed 11:13 cooldown 1.0 ===
+RAM free 5.0 GB; 124 filers; store=local
+embedding on gpu
+C:\Users\chara\OneDrive\Desktop\Credit-PulseIQ\rag\store.py:86: UserWarning: Local mode is not recommended for collections with more than 20,000 points. Collection <filing_chunks> contains 74207 points. Consider using Qdrant in Docker or Qdrant Cloud for better performance with large datasets.
+  return QdrantClient(path=str(LOCAL_PATH))
+exit 127
+=== full run resumed 11:44 store=cloud cooldown 1.0 ===
+RAM free 5.2 GB; 124 filers; store=cloud
+embedding on gpu
+C:\Users\chara\OneDrive\Desktop\Credit-PulseIQ\rag\store.py:95: UserWarning: Qdrant client version 1.14.0 is incompatible with server version 1.20.1. Major versions should match and minor version difference must not exceed 1. Set check_compatibility=False to skip version check.
+  return QdrantClient(url=url, api_key=key, timeout=60)
+435 filings to ingest (440 already stored)
+[1/435] cik 1103982 10-Q    2023-11-01  152 chunks   6.7s | RAM free 5.0 GB | ETA 835 min
+[2/435] cik 1103982 10-K    2024-02-02  284 chunks  12.9s | RAM free 4.4 GB | ETA 491 min
+[3/435] cik 1103982 10-Q    2024-04-30  115 chunks   5.3s | RAM free 4.4 GB | ETA 371 min
+[4/435] cik 1108109 10-K    2023-02-17  359 chunks  16.3s | RAM free 4.4 GB | ETA 319 min
+[5/435] cik 1108109 10-Q    2023-05-02  134 chunks   7.5s | RAM free 3.9 GB | ETA 289 min
+[6/435] cik 1108109 10-Q    2023-08-03  139 chunks   8.5s | RAM free 4.0 GB | ETA 260 min
+[7/435] cik 1108109 10-Q    2023-10-26  139 chunks   6.3s | RAM free 4.2 GB | ETA 238 min
+[8/435] cik 1108109 10-K    2024-02-21  185 chunks   8.1s | RAM free 4.2 GB | ETA 222 min
+[9/435] cik 1108109 10-Q    2024-04-25  121 chunks   6.0s | RAM free 4.2 GB | ETA 208 min
+[10/435] cik 1133421 10-Q    2023-07-27   80 chunks   4.2s | RAM free 4.2 GB | ETA 194 min
+[11/435] cik 1133421 10-Q    2023-10-26   83 chunks   4.1s | RAM free 4.2 GB | ETA 182 min
+[12/435] cik 1133421 10-K    2024-01-25  232 chunks  10.2s | RAM free 4.2 GB | ETA 175 min
+[13/435] cik 1133421 10-Q    2024-04-25   75 chunks   3.9s | RAM free 4.3 GB | ETA 169 min
+[14/435] cik 1133421 10-Q    2024-07-25   80 chunks   4.2s | RAM free 4.3 GB | ETA 161 min
+[15/435] cik 1133421 10-Q    2024-10-24   82 chunks   4.5s | RAM free 4.3 GB | ETA 154 min
+[16/435] cik 1133421 10-K    2025-01-30  232 chunks  10.6s | RAM free 4.2 GB | ETA 151 min
+[17/435] cik 1133421 10-Q    2025-04-22   76 chunks   3.8s | RAM free 4.4 GB | ETA 148 min
+[18/435] cik 1164727 10-Q    2023-10-26  243 chunks  16.6s | RAM free 4.3 GB | ETA 147 min
+[19/435] cik 1164727 10-K    2024-02-29  537 chunks  23.5s | RAM free 3.9 GB | ETA 154 min
+[20/435] cik 1164727 10-Q    2024-04-29  177 chunks   9.4s | RAM free 4.2 GB | ETA 158 min
+[21/435] cik 1164727 10-Q    2024-07-25  212 chunks   9.7s | RAM free 4.3 GB | ETA 157 min
+[22/435] cik 1164727 10-Q    2024-10-24  229 chunks  10.3s | RAM free 4.3 GB | ETA 156 min
+[23/435] cik 1164727 10-K    2025-02-21  550 chunks  22.8s | RAM free 4.1 GB | ETA 159 min
+[24/435] cik 1166691 10-Q    2023-04-27   74 chunks   3.6s | RAM free 4.1 GB | ETA 159 min
+[25/435] cik 1166691 10-Q    2023-07-27   76 chunks   3.9s | RAM free 4.1 GB | ETA 155 min
+[26/435] cik 1166691 10-Q    2023-10-26   83 chunks   4.1s | RAM free 4.1 GB | ETA 151 min
+[27/435] cik 1166691 10-K    2024-01-31  129 chunks   6.2s | RAM free 4.0 GB | ETA 147 min
+[28/435] cik 1166691 10-Q    2024-04-25   63 chunks   3.1s | RAM free 4.0 GB | ETA 144 min
+[29/435] cik 1166691 10-Q    2024-07-23   66 chunks   3.7s | RAM free 4.0 GB | ETA 141 min
+[30/435] cik 1170010 10-K    2023-04-13  191 chunks   8.4s | RAM free 4.0 GB | ETA 138 min
+[31/435] cik 1170010 10-Q    2023-06-26  115 chunks   5.3s | RAM free 4.0 GB | ETA 137 min
+[32/435] cik 1170010 10-Q    2023-09-29  106 chunks   5.0s | RAM free 3.9 GB | ETA 134 min
+[33/435] cik 1170010 10-Q    2024-01-05  109 chunks   5.8s | RAM free 3.9 GB | ETA 132 min
+[34/435] cik 1170010 10-K    2024-04-15  192 chunks   8.2s | RAM free 3.9 GB | ETA 131 min
+[35/435] cik 1170010 10-Q    2024-06-27  116 chunks   6.1s | RAM free 3.9 GB | ETA 130 min
+[36/435] cik 1170010 10-Q    2024-09-27  103 chunks   5.7s | RAM free 3.9 GB | ETA 128 min
+[37/435] cik 1177394 10-Q    2023-07-06  115 chunks   5.8s | RAM free 3.8 GB | ETA 126 min
+[38/435] cik 1177394 10-Q    2023-10-03  114 chunks   6.7s | RAM free 4.0 GB | ETA 125 min
+[39/435] cik 1177394 10-K    2024-01-26  226 chunks  10.5s | RAM free 3.9 GB | ETA 124 min
+[40/435] cik 1177394 10-Q    2024-04-04  109 chunks   6.8s | RAM free 3.9 GB | ETA 124 min
+[41/435] cik 1177394 10-Q    2024-07-03  109 chunks   5.3s | RAM free 3.9 GB | ETA 122 min
+[42/435] cik 1177394 10-Q    2024-10-03  112 chunks   7.1s | RAM free 3.9 GB | ETA 121 min
+[43/435] cik 1177394 10-K    2025-01-24  206 chunks   9.8s | RAM free 3.9 GB | ETA 121 min
+[44/435] cik 1177394 10-Q    2025-04-02  100 chunks   5.7s | RAM free 3.8 GB | ETA 120 min
+[45/435] cik 1206264 10-K    2024-02-16  192 chunks   9.5s | RAM free 3.8 GB | ETA 119 min
+[46/435] cik 1206264 10-Q    2024-05-09   61 chunks   3.7s | RAM free 3.8 GB | ETA 118 min
+[47/435] cik 1206264 10-Q    2024-08-08   72 chunks   4.1s | RAM free 3.8 GB | ETA 117 min
+[48/435] cik 1206264 10-Q    2024-11-07   80 chunks   4.4s | RAM free 3.8 GB | ETA 115 min
+[49/435] cik 1206264 10-K    2025-02-28  189 chunks   8.2s | RAM free 3.8 GB | ETA 114 min
+[50/435] cik 1206264 10-Q    2025-05-12   85 chunks   6.0s | RAM free 3.7 GB | ETA 113 min
+[51/435] cik 1219601 10-K    2023-02-27  237 chunks  11.3s | RAM free 3.7 GB | ETA 113 min
+[52/435] cik 1219601 10-Q    2023-04-28   65 chunks   4.1s | RAM free 3.8 GB | ETA 113 min
+[53/435] cik 1219601 10-Q    2023-07-28   67 chunks   3.9s | RAM free 3.7 GB | ETA 111 min
+[54/435] cik 1219601 10-Q    2023-10-30   69 chunks   4.4s | RAM free 3.7 GB | ETA 110 min
+[55/435] cik 1219601 10-K    2024-02-27  240 chunks  11.0s | RAM free 3.9 GB | ETA 110 min
+[56/435] cik 1219601 10-Q    2024-05-06   68 chunks   3.9s | RAM free 3.8 GB | ETA 109 min
+[58/435] cik 1220754 10-Q    2023-08-04  117 chunks   5.8s | RAM free 3.9 GB | ETA 106 min
+[59/435] cik 1220754 10-Q    2023-11-03  117 chunks   6.7s | RAM free 3.9 GB | ETA 105 min
+[60/435] cik 1220754 10-K    2024-02-26  306 chunks  13.7s | RAM free 3.8 GB | ETA 105 min
+[61/435] cik 1220754 10-Q    2024-05-03  106 chunks   6.0s | RAM free 3.7 GB | ETA 105 min
+[62/435] cik 1220754 10-Q    2024-08-08  139 chunks   7.3s | RAM free 3.8 GB | ETA 105 min
+[63/435] cik 1220754 10-Q    2024-11-07  140 chunks   6.4s | RAM free 3.7 GB | ETA 104 min
+[64/435] cik 1220754 10-K    2025-03-06  335 chunks  14.8s | RAM free 3.7 GB | ETA 104 min
+[65/435] cik 1220754 10-Q    2025-05-09  139 chunks   9.8s | RAM free 3.8 GB | ETA 105 min
+[66/435] cik 1223389 10-K    2023-03-29  244 chunks  10.6s | RAM free 3.7 GB | ETA 105 min
+[67/435] cik 1223389 10-Q    2023-06-01  103 chunks   5.8s | RAM free 3.5 GB | ETA 105 min
+  [memguard] 1.89 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.61 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+[68/435] cik 1223389 10-Q    2023-08-30  124 chunks   6.8s | RAM free 2.9 GB | ETA 106 min
+  [memguard] 2.39 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+[69/435] cik 1223389 10-Q    2023-12-18  138 chunks   7.6s | RAM free 2.6 GB | ETA 106 min
+[70/435] cik 1223389 10-K    2024-04-18  304 chunks  13.6s | RAM free 2.9 GB | ETA 106 min
+[71/435] cik 1254699 10-K    2024-02-28  209 chunks   9.3s | RAM free 3.1 GB | ETA 107 min
+[72/435] cik 1254699 10-Q    2024-05-08   80 chunks   3.9s | RAM free 3.4 GB | ETA 106 min
+[73/435] cik 1254699 10-Q    2024-08-08   88 chunks   4.6s | RAM free 3.4 GB | ETA 105 min
+[74/435] cik 1254699 10-Q    2024-11-07   89 chunks   4.5s | RAM free 3.4 GB | ETA 104 min
+[75/435] cik 1254699 10-K    2025-02-27  201 chunks   9.6s | RAM free 3.4 GB | ETA 103 min
+[76/435] cik 1254699 10-Q    2025-05-07   81 chunks   8.4s | RAM free 3.4 GB | ETA 103 min
+[77/435] cik 1324424 10-Q    2023-08-03   94 chunks   5.0s | RAM free 3.4 GB | ETA 103 min
+[78/435] cik 1324424 10-Q    2023-11-03  100 chunks   5.3s | RAM free 3.4 GB | ETA 102 min
+[79/435] cik 1324424 10-K    2024-02-09  157 chunks   8.4s | RAM free 3.3 GB | ETA 101 min
+[80/435] cik 1324424 10-Q    2024-05-03   91 chunks   4.7s | RAM free 3.4 GB | ETA 101 min
+[81/435] cik 1324424 10-Q    2024-08-09   96 chunks   4.5s | RAM free 3.4 GB | ETA 100 min
+[82/435] cik 1324424 10-Q    2024-11-08  100 chunks   5.4s | RAM free 3.4 GB | ETA 99 min
+[83/435] cik 1326160 10-Q    2023-05-09  191 chunks   8.6s | RAM free 3.2 GB | ETA 99 min
+[84/435] cik 1326160 10-Q    2023-08-08  210 chunks  13.9s | RAM free 3.2 GB | ETA 99 min
+[85/435] cik 1326160 10-Q    2023-11-02  225 chunks  11.1s | RAM free 3.3 GB | ETA 99 min
+[86/435] cik 1326160 10-K    2024-02-23  529 chunks  26.7s | RAM free 3.1 GB | ETA 101 min
+[87/435] cik 1326160 10-Q    2024-05-07  209 chunks  10.7s | RAM free 3.3 GB | ETA 102 min
+[88/435] cik 1326160 10-Q    2024-08-06  228 chunks  11.4s | RAM free 3.7 GB | ETA 102 min
+[89/435] cik 1326380 10-Q    2023-12-06   57 chunks   3.6s | RAM free 3.7 GB | ETA 101 min
+[90/435] cik 1326380 10-K    2024-03-26  133 chunks   7.2s | RAM free 3.4 GB | ETA 101 min
+[91/435] cik 1326380 10-K/A  2024-03-27   10 chunks   1.3s | RAM free 3.4 GB | ETA 100 min
+[92/435] cik 1326380 10-Q    2024-06-11   48 chunks   2.8s | RAM free 3.4 GB | ETA 99 min
+[93/435] cik 1326380 10-Q    2024-09-10   54 chunks   3.8s | RAM free 3.4 GB | ETA 98 min
+[94/435] cik 1326380 10-Q/A  2024-10-25   54 chunks   3.6s | RAM free 3.5 GB | ETA 97 min
+[95/435] cik 1326380 10-Q/A  2024-10-25   48 chunks   3.1s | RAM free 3.5 GB | ETA 96 min
+[96/435] cik 1326380 10-Q    2024-12-10   58 chunks   3.9s | RAM free 3.5 GB | ETA 95 min
+[97/435] cik 1326380 10-K    2025-03-25  146 chunks   8.3s | RAM free 3.5 GB | ETA 95 min
+[98/435] cik 1326380 10-Q    2025-06-10   74 chunks   4.5s | RAM free 3.3 GB | ETA 94 min
+[99/435] cik 1333986 10-Q    2023-08-09  294 chunks  16.8s | RAM free 3.1 GB | ETA 94 min
+[100/435] cik 1333986 10-Q    2023-11-03  304 chunks  28.5s | RAM free 3.5 GB | ETA 95 min
+[101/435] cik 1333986 10-K    2024-02-26  494 chunks  24.7s | RAM free 3.4 GB | ETA 97 min
+[102/435] cik 1333986 10-Q    2024-05-02  241 chunks  13.9s | RAM free 3.3 GB | ETA 98 min
+[103/435] cik 1333986 10-Q    2024-08-01  268 chunks  16.1s | RAM free 2.8 GB | ETA 99 min
+[104/435] cik 1333986 10-Q    2024-11-05  280 chunks  16.5s | RAM free 3.1 GB | ETA 99 min
+[105/435] cik 1333986 10-K    2025-02-24  501 chunks  29.2s | RAM free 2.8 GB | ETA 100 min
+[106/435] cik 1341439 10-Q    2023-12-12   58 chunks   4.3s | RAM free 2.9 GB | ETA 101 min
+[107/435] cik 1341439 10-Q    2024-03-12   58 chunks   4.2s | RAM free 2.9 GB | ETA 100 min
+[108/435] cik 1341439 10-K    2024-06-20  325 chunks  21.5s | RAM free 3.1 GB | ETA 100 min
+  [memguard] 2.36 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.47 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.46 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.26 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.01 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.04 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.00 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.18 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.96 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.02 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.01 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.47 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+[109/435] cik 1341439 10-Q    2024-09-10   60 chunks   3.3s | RAM free 2.9 GB | ETA 106 min
+[110/435] cik 1341439 10-Q    2024-12-10   62 chunks   3.8s | RAM free 3.1 GB | ETA 105 min
+[111/435] cik 1341439 10-Q    2025-03-11   66 chunks   3.7s | RAM free 3.3 GB | ETA 104 min
+[112/435] cik 1355096 10-K    2024-02-28  216 chunks  11.6s | RAM free 3.3 GB | ETA 104 min
+[113/435] cik 1355096 10-Q    2024-05-08   91 chunks   5.6s | RAM free 2.9 GB | ETA 104 min
+[114/435] cik 1355096 10-Q    2024-08-08  105 chunks   6.6s | RAM free 2.9 GB | ETA 103 min
+[115/435] cik 1355096 10-Q    2024-11-07  111 chunks   8.6s | RAM free 3.1 GB | ETA 102 min
+[116/435] cik 1355096 10-K    2025-02-27  173 chunks  11.5s | RAM free 3.0 GB | ETA 102 min
+[117/435] cik 1355096 10-Q    2025-05-07  103 chunks   6.6s | RAM free 2.8 GB | ETA 102 min
+[118/435] cik 1357615 10-K    2023-02-17  331 chunks  18.7s | RAM free 2.9 GB | ETA 102 min
+[119/435] cik 1357615 10-Q    2023-05-01   51 chunks   3.1s | RAM free 3.0 GB | ETA 102 min
+[120/435] cik 1357615 10-Q    2023-07-27   58 chunks   3.6s | RAM free 3.0 GB | ETA 101 min
+[121/435] cik 1357615 10-Q    2023-11-02   58 chunks   3.8s | RAM free 3.0 GB | ETA 100 min
+[122/435] cik 1357615 10-K    2024-02-20  308 chunks  17.8s | RAM free 3.2 GB | ETA 100 min
+[123/435] cik 1357615 10-Q    2024-04-30   41 chunks   3.1s | RAM free 3.0 GB | ETA 100 min
+=== full run resumed 12:59 store=cloud cooldown 1.0 ===
+RAM free 5.1 GB; 124 filers; store=cloud
+embedding on gpu
+C:\Users\chara\OneDrive\Desktop\Credit-PulseIQ\rag\store.py:95: UserWarning: Qdrant client version 1.14.0 is incompatible with server version 1.20.1. Major versions should match and minor version difference must not exceed 1. Set check_compatibility=False to skip version check.
+  return QdrantClient(url=url, api_key=key, timeout=60)
+312 filings to ingest (563 already stored)
+[1/312] cik 1220754 10-Q    2023-05-04   95 chunks   4.6s | RAM free 4.9 GB | ETA 603 min
+[2/312] cik 1391127 10-Q    2023-08-15  109 chunks   6.2s | RAM free 4.5 GB | ETA 329 min
+[3/312] cik 1391127 10-Q    2023-09-12  119 chunks   8.4s | RAM free 4.5 GB | ETA 245 min
+[4/312] cik 1391127 10-Q    2023-11-16  172 chunks  15.6s | RAM free 4.2 GB | ETA 215 min
+[5/312] cik 1396033 10-K    2023-03-01  138 chunks   7.1s | RAM free 4.2 GB | ETA 195 min
+[6/312] cik 1396033 10-Q    2023-05-08   60 chunks   3.6s | RAM free 4.2 GB | ETA 171 min
+[8/312] cik 1396033 10-Q    2023-11-08   71 chunks   4.2s | RAM free 4.2 GB | ETA 133 min
+[9/312] cik 1396033 10-K    2024-03-01  149 chunks   7.7s | RAM free 4.2 GB | ETA 125 min
+[10/312] cik 1396033 10-K/A  2024-04-26   92 chunks   5.1s | RAM free 4.2 GB | ETA 118 min
+[11/312] cik 1396033 10-Q    2024-05-08   66 chunks   3.7s | RAM free 4.0 GB | ETA 111 min
+[12/312] cik 1402057 10-Q    2023-08-02   29 chunks   2.3s | RAM free 4.1 GB | ETA 104 min
+[13/312] cik 1402057 10-Q    2023-11-01   30 chunks   1.6s | RAM free 4.1 GB | ETA 97 min
+[14/312] cik 1402057 10-K    2024-02-26   91 chunks   4.7s | RAM free 4.1 GB | ETA 93 min
+[15/312] cik 1402057 10-Q    2024-05-01   26 chunks   2.4s | RAM free 4.1 GB | ETA 89 min
+[16/312] cik 1402057 10-Q    2024-07-31   29 chunks   1.6s | RAM free 4.1 GB | ETA 84 min
+[17/312] cik 1402057 10-Q    2024-10-30   32 chunks   1.6s | RAM free 4.1 GB | ETA 80 min
+[18/312] cik 1411579 10-Q    2023-11-08  232 chunks  12.3s | RAM free 4.2 GB | ETA 79 min
+[19/312] cik 1411579 10-K    2024-02-28  393 chunks  41.7s | RAM free 4.2 GB | ETA 89 min
+[20/312] cik 1411579 10-Q    2024-05-08  152 chunks   8.4s | RAM free 4.1 GB | ETA 97 min
+[21/312] cik 1411579 10-Q    2024-08-02  213 chunks  10.7s | RAM free 4.1 GB | ETA 96 min
+[22/312] cik 1411579 10-Q    2024-11-06  256 chunks  13.2s | RAM free 4.1 GB | ETA 97 min
+[23/312] cik 1411579 10-K    2025-02-26  380 chunks  18.4s | RAM free 4.3 GB | ETA 99 min
+[24/312] cik 1411688 10-Q    2023-02-08  103 chunks   5.9s | RAM free 4.3 GB | ETA 100 min
+[25/312] cik 1411688 10-K    2023-05-26  251 chunks  12.9s | RAM free 4.3 GB | ETA 99 min
+[26/312] cik 1411688 10-Q    2023-08-02   80 chunks   4.9s | RAM free 4.2 GB | ETA 99 min
+[27/312] cik 1411688 10-Q    2023-11-01   96 chunks   5.2s | RAM free 4.2 GB | ETA 96 min
+[28/312] cik 1411688 10-Q    2024-02-07  100 chunks   5.5s | RAM free 4.1 GB | ETA 95 min
+[29/312] cik 1411688 10-K    2024-05-28  237 chunks  13.0s | RAM free 4.1 GB | ETA 94 min
+[30/312] cik 1411688 10-Q    2024-08-07   77 chunks   4.5s | RAM free 4.0 GB | ETA 93 min
+[31/312] cik 1415404 10-Q    2023-08-08  163 chunks   8.7s | RAM free 4.0 GB | ETA 92 min
+[32/312] cik 1415404 10-Q    2023-11-06  175 chunks   9.7s | RAM free 3.9 GB | ETA 92 min
+[33/312] cik 1415404 10-K    2024-02-29  254 chunks  13.7s | RAM free 3.3 GB | ETA 92 min
+[34/312] cik 1415404 10-Q    2024-05-08  256 chunks  13.4s | RAM free 3.6 GB | ETA 93 min
+[35/312] cik 1415404 10-Q    2024-08-09  301 chunks  17.5s | RAM free 3.6 GB | ETA 94 min
+[36/312] cik 1415404 10-Q    2024-11-12  338 chunks  17.6s | RAM free 3.8 GB | ETA 96 min
+[37/312] cik 1423689 10-K    2023-02-27  216 chunks  11.6s | RAM free 3.8 GB | ETA 97 min
+[38/312] cik 1423689 10-Q    2023-05-08  125 chunks   6.8s | RAM free 3.6 GB | ETA 96 min
+[39/312] cik 1423689 10-Q    2023-08-03  128 chunks   6.3s | RAM free 3.6 GB | ETA 95 min
+[40/312] cik 1423689 10-Q    2023-11-06  126 chunks   6.5s | RAM free 3.5 GB | ETA 94 min
+[41/312] cik 1423689 10-K    2024-02-22  223 chunks  10.5s | RAM free 3.7 GB | ETA 93 min
+[42/312] cik 1423689 10-Q    2024-05-07  128 chunks   6.0s | RAM free 4.4 GB | ETA 92 min
+[43/312] cik 1455684 10-Q    2023-05-03   79 chunks   4.4s | RAM free 4.4 GB | ETA 91 min
+[44/312] cik 1455684 10-Q    2023-08-03   78 chunks   3.8s | RAM free 4.5 GB | ETA 89 min
+[45/312] cik 1455684 10-Q    2023-11-02   90 chunks   4.4s | RAM free 4.4 GB | ETA 88 min
+[46/312] cik 1455684 10-K    2024-02-22  304 chunks  13.2s | RAM free 4.4 GB | ETA 87 min
+[47/312] cik 1455684 10-Q    2024-05-02   67 chunks   3.4s | RAM free 4.4 GB | ETA 87 min
+[48/312] cik 1455684 10-Q    2024-08-08   64 chunks   3.2s | RAM free 4.4 GB | ETA 85 min
+[49/312] cik 1455684 10-Q    2024-11-07   73 chunks   3.8s | RAM free 4.4 GB | ETA 84 min
+[50/312] cik 1455684 10-K    2025-02-20  303 chunks  13.4s | RAM free 4.4 GB | ETA 84 min
+[51/312] cik 1455684 10-K/A  2025-04-30  173 chunks   8.0s | RAM free 4.3 GB | ETA 84 min
+[52/312] cik 1455684 10-Q    2025-05-12   77 chunks   4.1s | RAM free 4.3 GB | ETA 83 min
+[53/312] cik 1456772 10-Q    2023-04-26  117 chunks   6.8s | RAM free 4.3 GB | ETA 82 min
+[54/312] cik 1456772 10-Q    2023-07-26  140 chunks   7.5s | RAM free 4.2 GB | ETA 81 min
+[55/312] cik 1456772 10-Q    2023-10-30  101 chunks   5.4s | RAM free 4.2 GB | ETA 80 min
+[56/312] cik 1456772 10-K    2024-02-15  275 chunks  12.5s | RAM free 4.2 GB | ETA 80 min
+[57/312] cik 1456772 10-Q    2024-05-01   90 chunks   5.9s | RAM free 4.3 GB | ETA 80 min
+[58/312] cik 1456772 10-Q    2024-07-31  103 chunks   6.1s | RAM free 4.3 GB | ETA 79 min
+[59/312] cik 1456772 10-Q    2024-10-30  109 chunks   6.0s | RAM free 4.3 GB | ETA 78 min
+[60/312] cik 1456772 10-K    2025-02-13  267 chunks  13.0s | RAM free 4.3 GB | ETA 78 min
+[61/312] cik 1456772 10-Q    2025-04-30   96 chunks   5.3s | RAM free 4.2 GB | ETA 78 min
+[62/312] cik 1459417 10-K    2023-02-21  323 chunks  18.5s | RAM free 4.1 GB | ETA 78 min
+[63/312] cik 1459417 10-Q    2023-04-28  146 chunks   8.2s | RAM free 3.7 GB | ETA 78 min
+[64/312] cik 1459417 10-Q    2023-08-08  159 chunks   8.4s | RAM free 3.6 GB | ETA 78 min
+[65/312] cik 1459417 10-Q    2023-11-09  167 chunks   9.1s | RAM free 3.6 GB | ETA 77 min
+[66/312] cik 1459417 10-K    2024-03-06  351 chunks  18.5s | RAM free 3.7 GB | ETA 78 min
+[67/312] cik 1459417 10-Q    2024-05-02  304 chunks  16.6s | RAM free 3.6 GB | ETA 78 min
+[68/312] cik 1467373 10-Q    2023-03-23   75 chunks   4.3s | RAM free 3.7 GB | ETA 78 min
+[69/312] cik 1467373 10-Q    2023-06-22   77 chunks   5.2s | RAM free 3.6 GB | ETA 77 min
+[70/312] cik 1467373 10-K    2023-10-12  121 chunks   7.0s | RAM free 3.6 GB | ETA 77 min
+[71/312] cik 1467373 10-Q    2023-12-19   64 chunks   4.1s | RAM free 3.6 GB | ETA 76 min
+[72/312] cik 1467373 10-Q    2024-03-21   70 chunks   4.1s | RAM free 3.6 GB | ETA 75 min
+[73/312] cik 1467373 10-Q    2024-06-20   73 chunks   4.3s | RAM free 3.6 GB | ETA 74 min
+[74/312] cik 1467373 10-K    2024-10-10  125 chunks   7.3s | RAM free 3.6 GB | ETA 73 min
+[75/312] cik 1467373 10-Q    2024-12-19   67 chunks   4.2s | RAM free 3.6 GB | ETA 73 min
+[76/312] cik 1484769 10-K    2024-03-05  197 chunks  10.6s | RAM free 3.6 GB | ETA 72 min
+[77/312] cik 1484769 10-Q    2024-05-03  254 chunks  13.6s | RAM free 3.6 GB | ETA 72 min
+[78/312] cik 1484769 10-Q    2024-08-06  268 chunks  14.6s | RAM free 3.6 GB | ETA 73 min
+[79/312] cik 1484769 10-Q    2024-11-01  254 chunks  14.0s | RAM free 3.6 GB | ETA 73 min
+[80/312] cik 1484769 10-K    2025-03-03  222 chunks  18.0s | RAM free 3.6 GB | ETA 73 min
+[81/312] cik 1484769 10-Q    2025-05-05  278 chunks  15.4s | RAM free 3.6 GB | ETA 74 min
+[82/312] cik 1498710 10-K    2023-02-06  315 chunks  15.6s | RAM free 3.6 GB | ETA 74 min
+[83/312] cik 1498710 10-Q    2023-04-26   52 chunks   4.1s | RAM free 3.5 GB | ETA 74 min
+[84/312] cik 1498710 10-Q    2023-08-03   72 chunks   4.6s | RAM free 3.5 GB | ETA 73 min
+[85/312] cik 1498710 10-Q    2023-10-26   69 chunks   4.6s | RAM free 3.5 GB | ETA 72 min
+[86/312] cik 1498710 10-K    2024-02-09  311 chunks  18.2s | RAM free 3.4 GB | ETA 72 min
+[87/312] cik 1498710 10-Q    2024-05-06   51 chunks   3.3s | RAM free 3.5 GB | ETA 72 min
+[88/312] cik 1498710 10-Q    2024-08-01   74 chunks   4.6s | RAM free 3.5 GB | ETA 71 min
+[89/312] cik 1510295 10-Q    2023-08-01  108 chunks   5.9s | RAM free 3.5 GB | ETA 70 min
+[90/312] cik 1510295 10-Q    2023-10-31  115 chunks   6.6s | RAM free 3.5 GB | ETA 70 min
+[91/312] cik 1510295 10-K    2024-02-28  287 chunks  15.3s | RAM free 3.5 GB | ETA 70 min
+[92/312] cik 1510295 10-Q    2024-04-30  100 chunks   5.4s | RAM free 3.5 GB | ETA 69 min
+[93/312] cik 1510295 10-Q    2024-08-06  109 chunks   9.3s | RAM free 3.5 GB | ETA 69 min
+[94/312] cik 1510295 10-Q    2024-11-05  115 chunks   6.7s | RAM free 3.5 GB | ETA 69 min
+[95/312] cik 1510295 10-K    2025-02-27  299 chunks  15.7s | RAM free 3.5 GB | ETA 68 min
+[96/312] cik 1510295 10-Q    2025-05-06  107 chunks   6.4s | RAM free 3.4 GB | ETA 68 min
+[97/312] cik 1519061 10-K    2024-02-23  436 chunks  23.5s | RAM free 3.4 GB | ETA 68 min
+[98/312] cik 1519061 10-Q    2024-05-09   71 chunks   4.5s | RAM free 3.3 GB | ETA 68 min
+[99/312] cik 1519061 10-Q    2024-08-07   77 chunks   4.6s | RAM free 3.3 GB | ETA 68 min
+[100/312] cik 1519061 10-Q    2024-11-07  151 chunks   9.0s | RAM free 3.3 GB | ETA 67 min
+[101/312] cik 1519061 10-K    2025-02-27  442 chunks  23.7s | RAM free 3.1 GB | ETA 68 min
+  [memguard] 1.71 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.06 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.20 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.34 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.41 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+[102/312] cik 1519061 10-Q    2025-05-08   74 chunks   7.9s | RAM free 2.6 GB | ETA 69 min
+[103/312] cik 1532286 10-Q    2023-11-07   93 chunks   6.0s | RAM free 2.5 GB | ETA 69 min
+  [memguard] 2.49 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+[104/312] cik 1532286 10-K    2024-03-08  204 chunks  12.0s | RAM free 2.5 GB | ETA 69 min
+  [memguard] 2.42 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.48 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.48 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+[105/312] cik 1532286 10-Q    2024-05-07   83 chunks   5.3s | RAM free 2.5 GB | ETA 69 min
+[106/312] cik 1532286 10-Q    2024-08-06   93 chunks   5.3s | RAM free 2.6 GB | ETA 69 min
+[107/312] cik 1532286 10-Q    2024-10-31  102 chunks   6.4s | RAM free 2.6 GB | ETA 68 min
+[108/312] cik 1532286 10-K    2025-03-06  206 chunks  12.8s | RAM free 2.6 GB | ETA 68 min
+[109/312] cik 1532286 10-Q    2025-05-07   90 chunks   5.5s | RAM free 2.5 GB | ETA 68 min
+[110/312] cik 1537028 10-K    2023-03-06  222 chunks  12.2s | RAM free 2.5 GB | ETA 67 min
+[111/312] cik 1537028 10-Q    2023-05-09  118 chunks   7.0s | RAM free 2.5 GB | ETA 67 min
+  [memguard] 2.48 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.49 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.49 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+[112/312] cik 1537028 10-Q    2023-08-03  132 chunks   7.8s | RAM free 2.6 GB | ETA 67 min
+[113/312] cik 1537028 10-Q    2023-11-01  134 chunks   8.0s | RAM free 2.6 GB | ETA 67 min
+[114/312] cik 1537028 10-K    2024-02-28  216 chunks  17.7s | RAM free 2.7 GB | ETA 67 min
+[115/312] cik 1537028 10-Q    2024-05-01  103 chunks  11.7s | RAM free 3.4 GB | ETA 67 min
+[116/312] cik 1537028 10-Q    2024-08-07  129 chunks   7.8s | RAM free 3.4 GB | ETA 66 min
+[117/312] cik 1539838 10-Q    2023-05-03   55 chunks   3.6s | RAM free 3.3 GB | ETA 66 min
+[118/312] cik 1539838 10-Q    2023-08-03   57 chunks   3.6s | RAM free 3.3 GB | ETA 65 min
+[119/312] cik 1539838 10-Q    2023-11-08   61 chunks   4.1s | RAM free 3.3 GB | ETA 64 min
+[120/312] cik 1539838 10-K    2024-02-22  303 chunks  16.6s | RAM free 3.3 GB | ETA 64 min
+[121/312] cik 1539838 10-Q    2024-05-02   59 chunks   3.7s | RAM free 3.2 GB | ETA 64 min
+[122/312] cik 1539838 10-Q    2024-08-07   62 chunks   4.1s | RAM free 3.2 GB | ETA 63 min
+[123/312] cik 1580864 10-K    2023-03-02  262 chunks  14.4s | RAM free 3.2 GB | ETA 63 min
+[124/312] cik 1580864 10-Q    2023-05-09  129 chunks   7.4s | RAM free 3.2 GB | ETA 63 min
+[125/312] cik 1580864 10-Q    2023-08-08  146 chunks   8.5s | RAM free 3.2 GB | ETA 62 min
+[126/312] cik 1580864 10-Q    2023-11-07  158 chunks   9.0s | RAM free 3.2 GB | ETA 62 min
+[127/312] cik 1580864 10-K    2024-03-13  209 chunks  11.8s | RAM free 3.1 GB | ETA 62 min
+[128/312] cik 1580864 10-Q    2024-05-10   64 chunks   4.1s | RAM free 3.1 GB | ETA 61 min
+[129/312] cik 1580864 10-Q    2024-08-08   95 chunks   5.6s | RAM free 3.1 GB | ETA 61 min
+[130/312] cik 1584754 10-Q    2023-02-07   75 chunks   6.3s | RAM free 3.2 GB | ETA 60 min
+[131/312] cik 1584754 10-Q    2023-05-08   83 chunks   5.1s | RAM free 3.2 GB | ETA 60 min
+[132/312] cik 1584754 10-K    2023-09-06  211 chunks  11.6s | RAM free 3.2 GB | ETA 59 min
+[133/312] cik 1584754 10-Q    2023-11-13   74 chunks   4.9s | RAM free 3.1 GB | ETA 59 min
+[134/312] cik 1584754 10-Q    2024-02-13   93 chunks   5.6s | RAM free 3.1 GB | ETA 58 min
+[135/312] cik 1584754 10-Q    2024-05-13   98 chunks   5.9s | RAM free 3.1 GB | ETA 58 min
+[136/312] cik 1613103 10-K    2023-06-22  267 chunks  14.7s | RAM free 3.1 GB | ETA 57 min
+[137/312] cik 1613103 10-Q    2023-08-31  121 chunks   6.9s | RAM free 3.1 GB | ETA 57 min
+[138/312] cik 1613103 10-Q    2023-11-30  129 chunks   8.3s | RAM free 3.0 GB | ETA 57 min
+[139/312] cik 1613103 10-Q    2024-02-27  132 chunks   8.1s | RAM free 3.0 GB | ETA 56 min
+[140/312] cik 1613103 10-K    2024-06-20  261 chunks  14.2s | RAM free 3.0 GB | ETA 56 min
+[141/312] cik 1613103 10-Q    2024-08-27  114 chunks   6.9s | RAM free 3.0 GB | ETA 56 min
+[142/312] cik 1633917 10-K    2023-02-10  154 chunks   8.9s | RAM free 3.0 GB | ETA 56 min
+[143/312] cik 1633917 10-Q    2023-05-09  154 chunks   8.8s | RAM free 3.0 GB | ETA 55 min
+[144/312] cik 1633917 10-Q    2023-08-03  196 chunks  11.7s | RAM free 2.9 GB | ETA 55 min
+[145/312] cik 1633917 10-Q    2023-11-02  209 chunks  11.2s | RAM free 2.9 GB | ETA 55 min
+[146/312] cik 1633917 10-K    2024-02-08  147 chunks   8.8s | RAM free 2.9 GB | ETA 54 min
+[147/312] cik 1633917 10-Q    2024-04-30  160 chunks   9.2s | RAM free 3.1 GB | ETA 54 min
+[148/312] cik 1652044 10-Q    2023-07-26  103 chunks   6.7s | RAM free 3.1 GB | ETA 54 min
+[149/312] cik 1652044 10-Q    2023-10-25  105 chunks   5.9s | RAM free 3.1 GB | ETA 53 min
+[150/312] cik 1652044 10-K    2024-01-31  212 chunks  12.2s | RAM free 3.1 GB | ETA 53 min
+[151/312] cik 1652044 10-Q    2024-04-26   98 chunks   6.0s | RAM free 3.0 GB | ETA 52 min
+[152/312] cik 1652044 10-Q    2024-07-24   99 chunks   5.8s | RAM free 3.0 GB | ETA 52 min
+[153/312] cik 1652044 10-Q    2024-10-30  107 chunks   6.6s | RAM free 3.0 GB | ETA 52 min
+[154/312] cik 1656634 10-K    2023-03-09  564 chunks  29.1s | RAM free 3.0 GB | ETA 52 min
+[155/312] cik 1656634 10-Q    2023-05-11  140 chunks   8.2s | RAM free 2.8 GB | ETA 52 min
+[156/312] cik 1656634 10-Q    2023-08-09  148 chunks   8.9s | RAM free 2.8 GB | ETA 51 min
+[157/312] cik 1656634 10-Q    2023-11-08  152 chunks   8.5s | RAM free 2.8 GB | ETA 51 min
+[158/312] cik 1656634 10-K    2024-03-05  602 chunks  32.0s | RAM free 2.8 GB | ETA 51 min
+[159/312] cik 1656634 10-Q    2024-05-09  150 chunks   8.5s | RAM free 2.8 GB | ETA 51 min
+[160/312] cik 1656634 10-Q    2024-08-13  157 chunks   9.5s | RAM free 2.7 GB | ETA 51 min
+[161/312] cik 1687229 10-Q    2023-07-27  179 chunks  11.0s | RAM free 2.7 GB | ETA 50 min
+[162/312] cik 1687229 10-Q    2023-10-26  176 chunks   9.2s | RAM free 2.8 GB | ETA 50 min
+[163/312] cik 1687229 10-K    2024-02-21  209 chunks  11.9s | RAM free 2.8 GB | ETA 50 min
+[164/312] cik 1687229 10-Q    2024-05-01  155 chunks   8.4s | RAM free 2.6 GB | ETA 49 min
+  [memguard] 2.49 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+[165/312] cik 1687229 10-Q    2024-07-25  176 chunks  10.8s | RAM free 2.7 GB | ETA 49 min
+[166/312] cik 1687229 10-Q    2024-10-31  180 chunks  10.2s | RAM free 2.7 GB | ETA 49 min
+[167/312] cik 1705012 10-Q    2023-10-31   74 chunks   4.5s | RAM free 2.7 GB | ETA 48 min
+[168/312] cik 1705012 10-K    2024-03-12  105 chunks   6.6s | RAM free 2.7 GB | ETA 48 min
+[169/312] cik 1705012 10-Q    2024-05-02   72 chunks   4.7s | RAM free 2.7 GB | ETA 48 min
+[170/312] cik 1705012 10-Q    2024-08-01   83 chunks   5.1s | RAM free 2.7 GB | ETA 47 min
+  [memguard] 2.39 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+[171/312] cik 1705012 10-Q    2024-10-31   86 chunks   5.2s | RAM free 2.5 GB | ETA 47 min
+[172/312] cik 1705012 10-K    2025-02-28  111 chunks   6.5s | RAM free 2.6 GB | ETA 46 min
+  [memguard] 2.39 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.24 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.26 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.35 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.39 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.35 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+
+STOPPED: only 0.73 GB RAM free (stop threshold 1.5 GB). Everything stored so far is kept; rerun to continue.
+exit 2
+=== full run resumed 14:39 store=cloud cooldown 1.0 ===
+RAM free 2.0 GB; 124 filers; store=cloud
+embedding on gpu
+C:\Users\chara\OneDrive\Desktop\Credit-PulseIQ\rag\store.py:95: UserWarning: Qdrant client version 1.14.0 is incompatible with server version 1.20.1. Major versions should match and minor version difference must not exceed 1. Set check_compatibility=False to skip version check.
+  return QdrantClient(url=url, api_key=key, timeout=60)
+141 filings to ingest (734 already stored)
+  [memguard] 2.19 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.15 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.11 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.93 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.93 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.87 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.12 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.13 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.09 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.07 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.10 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.08 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.26 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.21 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 2.14 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.87 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.85 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.82 GB free < 2.5 GB; pausing 10s (close browser tabs or editor windows to resume)
+
+STOPPED: RAM stayed below 2.5 GB for 180s. Everything stored so far is kept; rerun to continue.
+exit 2
+=== full run resumed 14:45 store=cloud cooldown 1.0 pause 2.0 stop 1.2 ===
+RAM free 1.9 GB; 124 filers; store=cloud
+embedding on gpu
+C:\Users\chara\OneDrive\Desktop\Credit-PulseIQ\rag\store.py:95: UserWarning: Qdrant client version 1.14.0 is incompatible with server version 1.20.1. Major versions should match and minor version difference must not exceed 1. Set check_compatibility=False to skip version check.
+  return QdrantClient(url=url, api_key=key, timeout=60)
+141 filings to ingest (734 already stored)
+  [memguard] 1.41 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.48 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.55 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.73 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.97 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.63 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.79 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.84 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.89 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+[1/141] cik 1396033 10-Q    2023-08-09   66 chunks   4.0s | RAM free 2.1 GB | ETA 498 min
+  [memguard] 1.69 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.64 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.50 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.37 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.38 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.58 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.68 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.67 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.44 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.42 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.64 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.84 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.85 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.86 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.62 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.65 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.59 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+  [memguard] 1.85 GB free < 2.0 GB; pausing 10s (close browser tabs or editor windows to resume)
+
+STOPPED: RAM stayed below 2.0 GB for 180s. Everything stored so far is kept; rerun to continue.
+exit 2
+=== full run resumed 14:52 store=cloud cooldown 1.0 pause 2.0 stop 1.2 wait-forever ===
+RAM free 1.9 GB; 124 filers; store=cloud
+embedding on gpu
+C:\Users\chara\OneDrive\Desktop\Credit-PulseIQ\rag\store.py:95: UserWarning: Qdrant client version 1.14.0 is incompatible with server version 1.20.1. Major versions should match and minor version difference must not exceed 1. Set check_compatibility=False to skip version check.
+  return QdrantClient(url=url, api_key=key, timeout=60)
+140 filings to ingest (735 already stored)
+  [memguard] 1.96 GB free < 2.0 GB; waiting (close browser tabs, pause OneDrive, or close editor windows to resume)
+  [memguard] 2.00 GB free < 2.0 GB; waiting (close browser tabs, pause OneDrive, or close editor windows to resume)
+[1/140] cik 1705012 10-Q    2025-05-09   93 chunks   6.5s | RAM free 2.0 GB | ETA 463 min
+  [memguard] 1.55 GB free < 2.0 GB; waiting (close browser tabs, pause OneDrive, or close editor windows to resume)
+  [memguard] 1.40 GB free < 2.0 GB; waiting (close browser tabs, pause OneDrive, or close editor windows to resume)
+  [memguard] 1.73 GB free < 2.0 GB; waiting (close browser tabs, pause OneDrive, or close editor windows to resume)
+[2/140] cik 1705012 10-Q/A  2025-05-12    6 chunks   1.0s | RAM free 2.0 GB | ETA 422 min
+  [memguard] 1.88 GB free < 2.0 GB; waiting (close browser tabs, pause OneDrive, or close editor windows to resume)
+  [memguard] 1.92 GB free < 2.0 GB; waiting (close browser tabs, pause OneDrive, or close editor windows to resume)
+[3/140] cik 1723580 10-K    2023-04-03  236 chunks  12.0s | RAM free 2.1 GB | ETA 381 min
+  [memguard] 1.73 GB free < 2.0 GB; waiting (close browser tabs, pause OneDrive, or close editor windows to resume)
+  [memguard] 1.72 GB free < 2.0 GB; waiting (close browser tabs, pause OneDrive, or close editor windows to resume)
+[4/140] cik 1723580 10-Q    2023-05-17   74 chunks   4.6s | RAM free 2.0 GB | ETA 350 min
+[5/140] cik 1723580 10-Q    2023-08-17   90 chunks   5.5s | RAM free 2.0 GB | ETA 283 min
+  [memguard] 1.75 GB free < 2.0 GB; waiting (close browser tabs, pause OneDrive, or close editor windows to resume)
+[6/140] cik 1723580 10-Q    2023-11-15   90 chunks   5.2s | RAM free 2.1 GB | ETA 249 min
+[7/140] cik 1723580 10-K    2024-04-10  240 chunks  33.4s | RAM free 2.1 GB | ETA 224 min
+  [memguard] 1.92 GB free < 2.0 GB; waiting (close browser tabs, pause OneDrive, or close editor windows to resume)
+[8/140] cik 1723580 10-Q    2024-05-16   75 chunks   4.4s | RAM free 3.8 GB | ETA 211 min
+[9/140] cik 1731289 10-K    2023-02-23  338 chunks  16.0s | RAM free 3.9 GB | ETA 191 min
+[10/140] cik 1731289 10-Q    2023-05-09  268 chunks  18.6s | RAM free 5.7 GB | ETA 179 min
+[11/140] cik 1731289 10-K/A  2023-05-12  174 chunks   8.7s | RAM free 5.7 GB | ETA 167 min
+[12/140] cik 1731289 10-Q    2023-08-04  280 chunks  14.1s | RAM free 5.5 GB | ETA 156 min
+[13/140] cik 1731289 10-Q    2023-11-02  290 chunks  14.0s | RAM free 5.6 GB | ETA 147 min
+[14/140] cik 1731289 10-K    2024-02-28  339 chunks  15.7s | RAM free 5.7 GB | ETA 140 min
+[15/140] cik 1731289 10-K/A  2024-03-01   24 chunks   1.8s | RAM free 5.8 GB | ETA 132 min
+[16/140] cik 1731289 10-Q/A  2024-03-01   11 chunks   0.6s | RAM free 5.9 GB | ETA 123 min
+[17/140] cik 1731289 10-Q    2024-05-07  248 chunks   9.6s | RAM free 5.8 GB | ETA 117 min
+[18/140] cik 1731289 10-Q    2024-08-09  274 chunks  23.6s | RAM free 5.9 GB | ETA 113 min
+[19/140] cik 1731289 10-Q    2024-10-31  298 chunks  12.9s | RAM free 5.8 GB | ETA 110 min
+[20/140] cik 1744489 10-Q    2023-05-10  138 chunks   6.8s | RAM free 5.8 GB | ETA 106 min
+[21/140] cik 1744489 10-Q    2023-08-09  147 chunks   9.0s | RAM free 5.8 GB | ETA 101 min
+[22/140] cik 1744489 10-K    2023-11-21  144 chunks   6.4s | RAM free 5.7 GB | ETA 97 min
+[23/140] cik 1744489 10-K/A  2024-01-24  191 chunks   8.4s | RAM free 5.8 GB | ETA 94 min
+[24/140] cik 1744489 10-Q    2024-02-07  114 chunks   6.2s | RAM free 5.3 GB | ETA 90 min
+[25/140] cik 1744489 10-Q    2024-05-07  145 chunks   7.1s | RAM free 5.3 GB | ETA 87 min
+[26/140] cik 1744489 10-Q    2024-08-07  147 chunks   9.3s | RAM free 5.8 GB | ETA 84 min
+[27/140] cik 1744489 10-K    2024-11-14  117 chunks   7.3s | RAM free 5.8 GB | ETA 82 min
+[28/140] cik 1744489 10-Q    2025-02-05  118 chunks   7.3s | RAM free 5.4 GB | ETA 79 min
+[29/140] cik 1744489 10-Q    2025-05-07  157 chunks   9.4s | RAM free 5.4 GB | ETA 77 min
+[30/140] cik 1758057 10-Q    2023-08-08   99 chunks  39.5s | RAM free 5.4 GB | ETA 76 min
+Traceback (most recent call last):
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\httpx\_transports\default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\httpcore\_sync\connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\httpcore\_sync\connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\httpcore\_sync\connection.py", line 101, in handle_request
+    raise exc
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\httpcore\_sync\connection.py", line 78, in handle_request
+    stream = self._connect(request)
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\httpcore\_sync\connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\httpcore\_backends\sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\qdrant_client\http\api_client.py", line 129, in send_inner
+    response = self._client.send(request)
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\httpx\_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\httpx\_transports\default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\contextlib.py", line 153, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 11001] getaddrinfo failed
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "C:\Users\chara\OneDrive\Desktop\Credit-PulseIQ\rag\ingest.py", line 200, in <module>
+    sys.exit(main())
+  File "C:\Users\chara\OneDrive\Desktop\Credit-PulseIQ\rag\ingest.py", line 185, in main
+    stats = ingest(ciks, cases, store, EdgarClient(offline=args.offline), cooldown=args.cooldown)
+  File "C:\Users\chara\OneDrive\Desktop\Credit-PulseIQ\rag\ingest.py", line 133, in ingest
+    store.add(chunks)
+  File "C:\Users\chara\OneDrive\Desktop\Credit-PulseIQ\rag\store.py", line 137, in add
+    self.client.upsert(
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\qdrant_client\qdrant_client.py", line 1631, in upsert
+    return self._client.upsert(
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\qdrant_client\qdrant_remote.py", line 1911, in upsert
+    http_result = self.openapi_client.points_api.upsert_points(
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\qdrant_client\http\api\points_api.py", line 987, in upsert_points
+    return self._build_for_upsert_points(
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\qdrant_client\http\api\points_api.py", line 512, in _build_for_upsert_points
+    return self.api_client.request(
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\qdrant_client\http\api_client.py", line 90, in request
+    return self.send(request, type_)
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\qdrant_client\http\api_client.py", line 107, in send
+    response = self.middleware(request, self.send_inner)
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\qdrant_client\http\api_client.py", line 240, in __call__
+    return call_next(request)
+  File "C:\Users\chara\AppData\Local\Programs\Python\Python310\lib\site-packages\qdrant_client\http\api_client.py", line 131, in send_inner
+    raise ResponseHandlingException(e)
+qdrant_client.http.exceptions.ResponseHandlingException: [Errno 11001] getaddrinfo failed
+exit 1
+RAM free 6.5 GB; 124 filers; store=cloud
+embedding on gpu
+C:\Users\chara\OneDrive\Desktop\Credit-PulseIQ\rag\store.py:95: UserWarning: Qdrant client version 1.14.0 is incompatible with server version 1.20.1. Major versions should match and minor version difference must not exceed 1. Set check_compatibility=False to skip version check.
+  return QdrantClient(url=url, api_key=key, timeout=60)
+110 filings to ingest (765 already stored)
+[1/110] cik 1758057 10-Q    2023-11-09   99 chunks   4.1s | RAM free 5.2 GB | ETA 205 min
+[2/110] cik 1758057 10-K    2024-02-28  302 chunks  12.2s | RAM free 4.8 GB | ETA 113 min
+[3/110] cik 1758057 10-Q    2024-05-10   98 chunks   4.7s | RAM free 4.7 GB | ETA 78 min
+[4/110] cik 1758057 10-Q    2024-08-08  121 chunks   5.8s | RAM free 4.9 GB | ETA 61 min
+[5/110] cik 1758057 10-Q    2024-11-18  129 chunks   5.8s | RAM free 4.9 GB | ETA 50 min
+[6/110] cik 1758057 10-K    2025-03-28  332 chunks  16.1s | RAM free 5.0 GB | ETA 47 min
+[7/110] cik 1758057 10-K/A  2025-04-30   83 chunks   4.0s | RAM free 4.8 GB | ETA 41 min
+[8/110] cik 1758057 10-Q    2025-05-20  129 chunks   6.9s | RAM free 4.8 GB | ETA 37 min
+[9/110] cik 1772695 10-K    2023-02-23  500 chunks  24.3s | RAM free 4.8 GB | ETA 37 min
+[10/110] cik 1772695 10-Q    2023-04-27  170 chunks   7.9s | RAM free 4.8 GB | ETA 35 min
+[11/110] cik 1772695 10-Q    2023-07-27  179 chunks   8.9s | RAM free 4.8 GB | ETA 33 min
+[12/110] cik 1772695 10-Q    2023-10-26  199 chunks   8.9s | RAM free 4.8 GB | ETA 31 min
+[13/110] cik 1772695 10-K    2024-02-22  528 chunks  25.8s | RAM free 3.8 GB | ETA 32 min
+[14/110] cik 1772695 10-Q    2024-05-02  209 chunks  10.4s | RAM free 4.8 GB | ETA 31 min
+[15/110] cik 1772695 10-Q    2024-08-01  226 chunks  11.1s | RAM free 4.8 GB | ETA 30 min
+[16/110] cik 1772695 10-Q    2024-10-31  255 chunks  11.8s | RAM free 4.9 GB | ETA 29 min
+[17/110] cik 1772695 10-K    2025-03-03  560 chunks  27.6s | RAM free 4.8 GB | ETA 29 min
+[18/110] cik 1779020 10-K    2023-03-28  260 chunks  12.1s | RAM free 4.9 GB | ETA 29 min
+[19/110] cik 1779020 10-Q    2023-05-10   80 chunks   3.7s | RAM free 4.9 GB | ETA 27 min
+[20/110] cik 1779020 10-Q    2023-08-08   80 chunks   4.1s | RAM free 4.9 GB | ETA 26 min
+[21/110] cik 1779020 10-Q    2023-11-14   80 chunks   3.9s | RAM free 4.9 GB | ETA 25 min
+[22/110] cik 1779020 10-K    2024-03-29  262 chunks  11.9s | RAM free 4.9 GB | ETA 24 min
+[23/110] cik 1779020 10-Q    2024-05-07   75 chunks   3.2s | RAM free 4.9 GB | ETA 23 min
+[24/110] cik 1779020 10-Q    2024-08-08   86 chunks   3.9s | RAM free 4.9 GB | ETA 22 min
+[25/110] cik 1779020 10-Q    2024-11-19  112 chunks   5.0s | RAM free 4.9 GB | ETA 21 min
+[26/110] cik 1804591 10-Q    2023-02-08  144 chunks   6.8s | RAM free 4.8 GB | ETA 21 min
+[27/110] cik 1804591 10-K    2023-05-25  171 chunks   8.4s | RAM free 4.8 GB | ETA 20 min
+[28/110] cik 1804591 10-Q    2023-08-08  130 chunks   5.7s | RAM free 4.8 GB | ETA 19 min
+[29/110] cik 1804591 10-Q    2023-11-08  157 chunks   7.3s | RAM free 4.8 GB | ETA 19 min
+[30/110] cik 1804591 10-Q    2024-02-07  164 chunks   8.3s | RAM free 4.8 GB | ETA 18 min
+[31/110] cik 1804591 10-K    2024-05-30  409 chunks  19.9s | RAM free 4.8 GB | ETA 19 min
+[32/110] cik 1804591 10-Q    2024-08-08   80 chunks   4.1s | RAM free 4.8 GB | ETA 18 min
+[33/110] cik 1804591 10-Q    2024-11-12  101 chunks   5.1s | RAM free 4.8 GB | ETA 17 min
+[34/110] cik 1808220 10-K    2024-03-14  305 chunks  15.9s | RAM free 4.8 GB | ETA 17 min
+[35/110] cik 1808220 10-Q    2024-05-09  114 chunks   6.0s | RAM free 4.7 GB | ETA 17 min
+[36/110] cik 1808220 10-Q    2024-08-08  114 chunks   5.9s | RAM free 4.3 GB | ETA 16 min
+[37/110] cik 1808220 10-Q    2024-11-07  131 chunks   6.4s | RAM free 4.4 GB | ETA 16 min
+[38/110] cik 1808220 10-K    2025-02-27  307 chunks  14.5s | RAM free 4.4 GB | ETA 16 min
+[39/110] cik 1808220 10-Q    2025-05-16  112 chunks   5.3s | RAM free 4.4 GB | ETA 15 min
+[40/110] cik 1813914 10-Q/A  2023-03-29   54 chunks   2.6s | RAM free 4.4 GB | ETA 15 min
+[41/110] cik 1813914 10-Q/A  2023-03-29   53 chunks   2.1s | RAM free 4.5 GB | ETA 14 min
+[42/110] cik 1813914 10-Q/A  2023-03-29   47 chunks   2.5s | RAM free 4.5 GB | ETA 14 min
+[43/110] cik 1813914 10-K/A  2023-03-29  158 chunks   7.0s | RAM free 4.5 GB | ETA 14 min
+[44/110] cik 1813914 10-Q/A  2023-03-29   79 chunks   4.3s | RAM free 4.5 GB | ETA 13 min
+[45/110] cik 1813914 10-K    2023-03-30  354 chunks  17.2s | RAM free 4.5 GB | ETA 13 min
+[46/110] cik 1813914 10-Q    2023-05-10  137 chunks   6.7s | RAM free 4.5 GB | ETA 13 min
+[47/110] cik 1813914 10-Q    2023-08-09  146 chunks   6.4s | RAM free 4.9 GB | ETA 13 min
+[48/110] cik 1813914 10-Q    2023-11-09  148 chunks   7.7s | RAM free 4.9 GB | ETA 12 min
+[49/110] cik 1813914 10-K    2024-03-18  359 chunks  18.4s | RAM free 4.7 GB | ETA 12 min
+[50/110] cik 1813914 10-K/A  2024-04-29   84 chunks   3.8s | RAM free 4.9 GB | ETA 12 min
+[51/110] cik 1813914 10-Q    2024-05-09  121 chunks   7.0s | RAM free 4.9 GB | ETA 12 min
+[52/110] cik 1813914 10-Q/A  2024-05-13    7 chunks   0.5s | RAM free 4.7 GB | ETA 11 min
+[53/110] cik 1813914 10-Q    2024-08-09  149 chunks   6.8s | RAM free 4.7 GB | ETA 11 min
+[54/110] cik 1830210 10-K    2023-03-16  261 chunks  12.9s | RAM free 4.7 GB | ETA 11 min
+[55/110] cik 1830210 10-K/A  2023-05-01  124 chunks   5.5s | RAM free 6.4 GB | ETA 10 min
+[56/110] cik 1830210 10-Q    2023-05-10   98 chunks   4.1s | RAM free 6.3 GB | ETA 10 min
+[57/110] cik 1830210 10-Q    2023-08-09  104 chunks   4.3s | RAM free 5.5 GB | ETA 10 min
+[58/110] cik 1830210 10-Q    2023-11-09  226 chunks  10.5s | RAM free 5.2 GB | ETA 10 min
+[59/110] cik 1830210 10-K    2024-03-15  303 chunks  19.1s | RAM free 4.5 GB | ETA 10 min
+[60/110] cik 1830210 10-K/A  2024-04-26  130 chunks   6.8s | RAM free 4.7 GB | ETA 9 min
+[61/110] cik 1830210 10-Q    2024-05-09  102 chunks   5.2s | RAM free 4.9 GB | ETA 9 min
+[62/110] cik 1830210 10-Q    2024-08-08  116 chunks   6.0s | RAM free 4.8 GB | ETA 9 min
+[63/110] cik 1830210 10-Q    2024-11-12  122 chunks   6.3s | RAM free 4.9 GB | ETA 9 min
+[64/110] cik 1834045 10-Q    2023-05-10   90 chunks   4.2s | RAM free 4.8 GB | ETA 8 min
+[65/110] cik 1834045 10-Q    2023-05-10   85 chunks   3.3s | RAM free 4.8 GB | ETA 8 min
+[66/110] cik 1834045 10-Q/A  2023-05-10   72 chunks   3.0s | RAM free 4.8 GB | ETA 8 min
+[67/110] cik 1834045 10-K    2023-10-13  119 chunks   4.7s | RAM free 4.8 GB | ETA 8 min
+[68/110] cik 1834045 10-Q/A  2023-10-13  109 chunks   4.2s | RAM free 4.8 GB | ETA 7 min
+[69/110] cik 1834045 10-Q/A  2023-10-13  107 chunks   3.9s | RAM free 5.0 GB | ETA 7 min
+[70/110] cik 1834045 10-Q/A  2023-10-13   95 chunks   3.7s | RAM free 5.1 GB | ETA 7 min
+[71/110] cik 1834045 10-Q    2023-11-14   49 chunks   2.5s | RAM free 5.0 GB | ETA 7 min
+[72/110] cik 1834045 10-Q    2024-03-12   81 chunks   5.1s | RAM free 5.0 GB | ETA 6 min
+[73/110] cik 1834045 10-Q    2024-05-15   82 chunks   6.5s | RAM free 5.1 GB | ETA 6 min
+[74/110] cik 1835972 10-K    2023-03-31  162 chunks   6.6s | RAM free 5.1 GB | ETA 6 min
+[75/110] cik 1835972 10-Q    2023-05-15  128 chunks   5.2s | RAM free 5.1 GB | ETA 6 min
+[76/110] cik 1835972 10-Q    2023-08-18  135 chunks   5.7s | RAM free 5.1 GB | ETA 6 min
+[77/110] cik 1835972 10-Q    2023-11-14  137 chunks   5.9s | RAM free 5.1 GB | ETA 5 min
+[78/110] cik 1835972 10-K    2024-04-01  178 chunks   7.6s | RAM free 5.0 GB | ETA 5 min
+[79/110] cik 1835972 10-Q    2024-05-16  161 chunks   6.6s | RAM free 5.0 GB | ETA 5 min
+[80/110] cik 1835972 10-Q    2024-08-13  369 chunks  14.9s | RAM free 5.1 GB | ETA 5 min
+[81/110] cik 1850838 10-K    2023-03-01  535 chunks  21.6s | RAM free 5.1 GB | ETA 5 min
+[82/110] cik 1850838 10-K/A  2023-03-24    7 chunks   0.5s | RAM free 5.1 GB | ETA 5 min
+[83/110] cik 1850838 10-Q    2023-05-04  336 chunks  13.3s | RAM free 5.1 GB | ETA 5 min
+[84/110] cik 1850838 10-Q    2023-08-03  349 chunks  14.1s | RAM free 5.1 GB | ETA 4 min
+[85/110] cik 1850838 10-Q    2023-11-09  356 chunks  14.1s | RAM free 5.2 GB | ETA 4 min
+[86/110] cik 1850838 10-K    2024-03-28  548 chunks  21.0s | RAM free 5.1 GB | ETA 4 min
+[87/110] cik 1850838 10-Q    2024-05-06  363 chunks  13.6s | RAM free 5.1 GB | ETA 4 min
+[88/110] cik 1850838 10-Q    2024-08-06  370 chunks  15.4s | RAM free 5.0 GB | ETA 4 min
+[89/110] cik 1850838 10-Q    2024-11-14  374 chunks  16.1s | RAM free 5.0 GB | ETA 4 min
+[90/110] cik 1856437 10-Q    2023-12-01   98 chunks   4.2s | RAM free 5.0 GB | ETA 4 min
+[91/110] cik 1856437 10-K    2024-03-22  275 chunks  11.2s | RAM free 5.0 GB | ETA 3 min
+[92/110] cik 1856437 10-Q    2024-06-07   75 chunks   3.1s | RAM free 5.0 GB | ETA 3 min
+[93/110] cik 1856437 10-Q    2024-09-06   83 chunks   3.1s | RAM free 5.0 GB | ETA 3 min
+[94/110] cik 1856437 10-Q    2024-12-09   89 chunks   3.5s | RAM free 5.0 GB | ETA 3 min
+[95/110] cik 1856437 10-K    2025-03-21  230 chunks   9.0s | RAM free 5.0 GB | ETA 3 min
+[96/110] cik 1893311 10-Q    2023-05-09   86 chunks   3.1s | RAM free 5.0 GB | ETA 2 min
+[97/110] cik 1893311 10-Q    2023-08-08   58 chunks   2.7s | RAM free 5.0 GB | ETA 2 min
+[98/110] cik 1893311 10-Q    2023-11-08  105 chunks   3.8s | RAM free 5.0 GB | ETA 2 min
+[99/110] cik 1893311 10-K    2024-04-15  229 chunks  10.1s | RAM free 5.0 GB | ETA 2 min
+[100/110] cik 1893311 10-Q    2024-05-13  132 chunks   5.4s | RAM free 5.0 GB | ETA 2 min
+[101/110] cik 1893311 10-Q/A  2024-08-20  143 chunks   5.4s | RAM free 5.0 GB | ETA 2 min
+[102/110] cik 1893311 10-Q    2024-09-25  157 chunks   6.0s | RAM free 5.0 GB | ETA 1 min
+[103/110] cik 1893311 10-Q    2024-11-19  162 chunks   6.0s | RAM free 5.0 GB | ETA 1 min
+[104/110] cik 1901799 10-K    2024-04-15  415 chunks  15.7s | RAM free 5.0 GB | ETA 1 min
+[105/110] cik 1901799 10-Q    2024-05-15   59 chunks   2.1s | RAM free 5.0 GB | ETA 1 min
+[106/110] cik 1901799 10-Q    2024-08-15   65 chunks   2.9s | RAM free 5.0 GB | ETA 1 min
+[107/110] cik 1901799 10-Q    2024-11-14   64 chunks   2.2s | RAM free 5.0 GB | ETA 0 min
+[108/110] cik 1901799 10-K    2025-03-24  399 chunks  15.6s | RAM free 5.0 GB | ETA 0 min
+[109/110] cik 1901799 10-K/A  2025-04-10    5 chunks   0.4s | RAM free 5.0 GB | ETA 0 min
+[110/110] cik 1901799 10-Q    2025-05-15  151 chunks   6.1s | RAM free 5.0 GB | ETA 0 min
+
+done: 124 filers, 110 new filings (765 already stored), 19552 chunks, 18.0 min, 0 errors
