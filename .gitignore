@@ -17,3 +17,26 @@ data/cache/
 
 # The trained ranker ships with the app; it is an input, not a cache.
 !models/artifacts/
+
+# Editor and build artefacts
+.vscode/
+.idea/
+*.egg-info/
+build/
+dist/
+
+# Working logs from long runs. Final results are committed by name;
+# progress, error and per-item dumps stay local.
+results/*_run.log
+results/*_err.log
+results/*.items.jsonl
+results/*_partial.log
+results/overnight.log
+results/faithfulness*
+results/langfuse_upload*.log
+results/rag_ingest_*.log
+results/rag_recall.log
+results/react_parallel*
+results/backtest3_react_full.log
+results/backtest3_react_replay.log
+results/backtest3_single_run.log

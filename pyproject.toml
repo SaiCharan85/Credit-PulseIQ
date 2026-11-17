@@ -32,6 +32,15 @@ tracing = ["langfuse>=3"]
 rag = ["qdrant-client>=1.14", "fastembed>=0.9", "tokenizers", "psutil"]
 local-model = ["torch", "transformers"]
 
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+# Name the packages. With a flat layout and no list, setuptools finds results/
+# and web/ as well and refuses to build -- which failed `pip install -e .` in CI.
+[tool.setuptools.packages.find]
+include = ["agents*", "compute*", "data*", "evals*", "models*", "rag*", "verify*"]
+
 [tool.pytest.ini_options]
 testpaths = ["evals"]
 addopts = "-m 'not network'"

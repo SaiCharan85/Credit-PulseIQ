@@ -1,2 +1,0 @@
-23:06:17 parallel tool-loop arm start
-23:06:17 START tool-loop arm (parallel), live: evals.run_l3 --agent react --max-negatives 100 --tpm 8000 --results data/cache/l3_react_full.csv  -> results/backtest3_react_full.log

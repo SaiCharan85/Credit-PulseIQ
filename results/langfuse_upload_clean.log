@@ -1,3 +1,0 @@
-﻿dataset creditpulse-distress-ab: 199 items
-run single-pass-rag-clean: 199 cases  {'auc': 0.9642, 'abstention_rate': 0.0352, 'mean_brier': 0.08}
-open Langfuse > Datasets > creditpulse-distress-ab to compare runs
