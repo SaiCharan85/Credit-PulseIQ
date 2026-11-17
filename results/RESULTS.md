@@ -362,3 +362,51 @@ to find.
 | `eq_engineered.log` | the paired engineered-feature comparison |
 | `eq_oversight.log` | the oversight-signal comparison and signal prevalence |
 | `eq_gbm_groupaware.log` | estimator and split-strategy comparison, attempt eight |
+
+# Phase 5 — filing-text RAG and a single-pass investigator
+
+Stratified 199 cases (99 bankruptcies), gemma-4-31b-it, same split, critic and as-of rule.
+
+| | Tool loop | Single-pass + RAG |
+|---|---|---|
+| AUC (abstentions scored 0.5) | 0.974 | 0.964 |
+| Paired-bootstrap difference (single − loop) | | −0.009, 95% CI [−0.029, +0.009] |
+| Bankruptcies called healthy | 8 / 99 | 0 / 99 |
+| Base-rate-corrected precision | 0.46 | 0.32 |
+| Median lead time | 148 days | 165 days |
+| Model calls per case | ~10 | ~1 |
+
+The arms are not distinguishable on ranking; single-pass trades some precision for
+recall at a tenth of the calls. Hazard baseline on the same cases: 0.969.
+
+Retrieval (deterministic ground truth, hybrid search):
+
+| Warning | Recall@5 | nDCG@10 |
+|---|---|---|
+| Going concern | 0.93 | 0.75 |
+| Material weakness (tuned queries + section filter) | 0.88 | 0.67 |
+| Covenant trouble | ~0.4 | ~0.25 |
+
+## Extension: covenant breach needs improving
+
+Covenant retrieval is the open item. Two query rewrites and a section filter did
+not lift it, and a graded key (stated breach = 2, covenant stress = 1) shows the
+same picture. Reading the misses shows why: embeddings rank "we were in
+compliance with our covenants" next to "we were not in compliance", so the
+breach is often outranked by its own negation.
+
+It does not limit the headline — single-pass missed no bankruptcy without it —
+but a credit report that names covenant breaches should not rely on it yet.
+Suggested next steps, in order:
+
+1. A deterministic covenant scan in the evidence pack, as the going-concern
+   scan already is: the graded patterns in `evals/run_rag_recall.py`, with the
+   matched sentence and filing cited. Exact, no model call.
+2. A cross-encoder re-ranker on covenant queries only (variant
+   `terms+sections+rerank`), which reads negation that embeddings miss.
+3. Hand-check the 24 covenant cases to tighten the ground truth before tuning further.
+
+NLI faithfulness is disabled for the same kind of reason: the small NLI model
+mislabelled correct, figure-heavy claims. Figures are verified by the critic and
+quotes by exact match; prose faithfulness needs a validated checker (e.g. MiniCheck)
+before it is reported.
