@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import threading
 from datetime import date
 from pathlib import Path
 
@@ -40,7 +41,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--panel", type=Path, default=Path("data/cache/panel.csv"))
     parser.add_argument("--results", type=Path, default=Path("data/cache/l3_results.csv"))
     parser.add_argument("--cutoff", type=date.fromisoformat, default=date(2024, 6, 1))
-    parser.add_argument("--agent", choices=("rules", "react"), default="rules")
+    parser.add_argument(
+        "--agent", choices=("rules", "react", "single"), default="rules",
+        help="rules: control; react: tool loop; single: evidence pack + retrieved passages, one call",
+    )
+    parser.add_argument(
+        "--store", choices=("local", "cloud"), default="local",
+        help="filing-text store for --agent single (see rag/ingest.py)",
+    )
     parser.add_argument("--limit", type=int, default=0, help="cap test cases (0 = all)")
     parser.add_argument(
         "--max-negatives",
@@ -74,6 +82,13 @@ def main(argv: list[str] | None = None) -> int:
         default=0,
         help="self-imposed API call ceiling; stops cleanly, cached work is kept (0 = no cap)",
     )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="cases investigated concurrently. The model's reply time, not the "
+        "token ceiling, was the bottleneck; threads share one paced client",
+    )
     args = parser.parse_args(argv)
 
     loaded = load_env_file()
@@ -97,7 +112,7 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
 
-    if args.agent == "react":
+    if args.agent in ("react", "single"):
         from agents.distress import DistressInvestigator
         from agents.llm import default_client, preflight
 
@@ -126,14 +141,25 @@ def main(argv: list[str] | None = None) -> int:
             if not args.no_cache:
                 # Cache outside the limiter: a cache hit costs no quota.
                 client = CachingClient(inner=client)
-        investigator = DistressInvestigator(client, with_baseline=args.with_baseline)
-        label = f"ReAct investigator ({client.name})"
+        if args.agent == "single":
+            from agents.single_pass import SinglePassInvestigator
+            from rag.embed import FastEmbedder
+            from rag.store import FilingStore, open_client
+
+            store = FilingStore(open_client(args.store), FastEmbedder())
+            investigator = SinglePassInvestigator(client, store, with_baseline=args.with_baseline)
+            label = f"single-pass investigator ({client.name})"
+        else:
+            investigator = DistressInvestigator(client, with_baseline=args.with_baseline)
+            label = f"ReAct investigator ({client.name})"
     else:
         investigator = RuleBasedInvestigator()
         label = "rule-based control"
 
     edgar = EdgarClient()
     cache: dict[int, list] = {}
+    # EdgarClient's SEC throttle is not thread-safe; workers take turns on it.
+    sec_lock = threading.RLock()
 
     def facts_for(cik: int):
         """Facts for one filer, or a hard failure.
@@ -145,29 +171,33 @@ def main(argv: list[str] | None = None) -> int:
         irreproducible, because the same case replayed differently depending on
         whether the fetch happened to succeed.
         """
-        if cik not in cache:
-            cache[cik] = edgar.facts(cik)
-        return cache[cik]
+        with sec_lock:
+            if cik not in cache:
+                cache[cik] = edgar.facts(cik)
+            return cache[cik]
 
     index_cache: dict[int, list] = {}
 
     def filings_for(cik: int) -> list:
-        if cik not in index_cache:
-            try:
-                index_cache[cik] = edgar.filing_index(cik)
-            except Exception:  # noqa: BLE001
-                # Unlike facts, an absent index is survivable: the tools report
-                # it as unavailable and the agent can say so, rather than being
-                # handed a fabricated "no adverse events found".
-                index_cache[cik] = []
-        return index_cache[cik]
+        with sec_lock:
+            if cik not in index_cache:
+                try:
+                    index_cache[cik] = edgar.filing_index(cik)
+                except Exception:  # noqa: BLE001
+                    # Unlike facts, an absent index is survivable: the tools report
+                    # it as unavailable and the agent can say so, rather than being
+                    # handed a fabricated "no adverse events found".
+                    index_cache[cik] = []
+            return index_cache[cik]
+
+    def fetch_document(cik: int, acc: str, doc: str) -> str:
+        with sec_lock:
+            return edgar.fetch_filing_document(cik, acc, doc)
 
     def make_kwargs(row):
         extra = {
             "filing_index": filings_for(row.cik),
-            "fetch_document": lambda acc, doc, _c=row.cik: edgar.fetch_filing_document(
-                _c, acc, doc
-            ),
+            "fetch_document": lambda acc, doc, _c=row.cik: fetch_document(_c, acc, doc),
         }
         if base_scores is not None:
             extra["model_score"] = base_scores[id(row)]
@@ -175,9 +205,15 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"L3 backtest: {label} over {len(test)} test cases (cutoff {args.cutoff})", file=sys.stderr)
 
-    def progress(n: int, _result) -> None:
-        if n % 25 == 0:
-            print(f"  {n}/{len(test)}", file=sys.stderr)
+    done = [0]
+    progress_lock = threading.Lock()
+
+    def progress(_n: int, _result) -> None:
+        with progress_lock:
+            done[0] += 1
+            n = done[0]
+        if n % (5 if args.workers > 1 else 25) == 0:
+            print(f"  {n}/{len(test)}", file=sys.stderr, flush=True)
 
     # The agent may consult the baseline as one piece of evidence. It is fitted
     # only on the training window, so exposing it introduces no lookahead.
@@ -189,9 +225,26 @@ def main(argv: list[str] | None = None) -> int:
     case_kwargs = make_kwargs if args.agent == "react" else None
 
     try:
-        results = run_backtest(
-            investigator, test, facts_for, on_case=progress, case_kwargs=case_kwargs
-        )
+        if args.workers > 1:
+            # Interleaved shards, one per thread, each through the unchanged
+            # sequential runner (so its outage handling applies per shard).
+            # Results are put back in case order so the CSV is stable.
+            from concurrent.futures import ThreadPoolExecutor
+
+            shards = [test[i :: args.workers] for i in range(args.workers)]
+            with ThreadPoolExecutor(args.workers) as pool:
+                futures = [
+                    pool.submit(run_backtest, investigator, shard, facts_for,
+                                on_case=progress, case_kwargs=case_kwargs)
+                    for shard in shards if shard
+                ]
+                parts = [f.result() for f in futures]
+            order = {(r.cik, r.observation_date): i for i, r in enumerate(test)}
+            results = sorted((c for part in parts for c in part), key=lambda c: order[(c.cik, c.as_of)])
+        else:
+            results = run_backtest(
+                investigator, test, facts_for, on_case=progress, case_kwargs=case_kwargs
+            )
     except InfrastructureError as exc:
         print(f"\nABORTED -- endpoint unusable, no metrics are valid:\n  {exc}", file=sys.stderr)
         return 4

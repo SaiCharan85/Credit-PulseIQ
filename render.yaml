@@ -21,3 +21,9 @@ services:
         sync: false
       - key: CREDITPULSE_LLM_API_KEY
         sync: false
+      # Optional. Qdrant Cloud holds the embedded filing text for retrieval.
+      # Without it, retrieval falls back to the local index (or is skipped).
+      - key: CREDITPULSE_QDRANT_URL
+        sync: false
+      - key: CREDITPULSE_QDRANT_API_KEY
+        sync: false

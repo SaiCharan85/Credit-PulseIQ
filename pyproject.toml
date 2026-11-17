@@ -27,6 +27,8 @@ dev = ["pytest", "ruff"]
 # Optional at runtime. Tracing is a no-op without keys; a local model is only
 # needed if you self-host one instead of calling an endpoint.
 tracing = ["langfuse>=3"]
+# Retrieval over filing text (rag/). Embeds locally through ONNX -- no torch.
+rag = ["qdrant-client>=1.14", "fastembed>=0.9", "tokenizers", "psutil"]
 local-model = ["torch", "transformers"]
 
 [tool.pytest.ini_options]

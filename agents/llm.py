@@ -23,8 +23,10 @@ import hashlib
 import json
 import os
 import re
+import threading
 import time
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
@@ -71,6 +73,12 @@ def _dispatch_complete_call(
     if hasattr(client, "complete_call"):
         return client.complete_call(messages, tools=tools, **kwargs)
     return Completion(content=client.complete(messages, **kwargs))
+
+
+#: Hard ceiling on one model call, in seconds. Without it a stalled connection
+#: hung a backtest for five hours with no error and no progress; with it, the
+#: stall becomes a timeout, which the rate limiter retries as transient.
+LLM_TIMEOUT_S = float(os.environ.get("CREDITPULSE_LLM_TIMEOUT", "300"))
 
 
 class LLMClient(Protocol):
@@ -132,7 +140,7 @@ class OpenAICompatibleClient:
         from openai import OpenAI
 
         client = OpenAI(
-            api_key=self.api_key or "not-needed", base_url=self.base_url or None
+            api_key=self.api_key or "not-needed", base_url=self.base_url or None, timeout=LLM_TIMEOUT_S
         )
         response = client.chat.completions.create(
             model=self.model,
@@ -168,7 +176,9 @@ class OpenAICompatibleClient:
             raise RuntimeError(f"no model configured; set {DEFAULT_MODEL_ENV}")
         from openai import OpenAI
 
-        client = OpenAI(api_key=self.api_key or "not-needed", base_url=self.base_url or None)
+        client = OpenAI(
+            api_key=self.api_key or "not-needed", base_url=self.base_url or None, timeout=LLM_TIMEOUT_S
+        )
         extra: dict[str, Any] = {}
         if tools:
             extra["tools"] = tools
@@ -445,6 +455,40 @@ class InfrastructureError(RuntimeError):
     """
 
 
+#: Path of a per-minute token ledger shared across processes (see ``_pace``).
+TPM_LEDGER_ENV = "CREDITPULSE_TPM_LEDGER"
+
+
+@contextmanager
+def _file_lock(path: Path) -> Iterator[None]:
+    """Exclusive lock across processes, held only for a read-modify-write."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "a+b") as f:
+        if os.name == "nt":
+            import msvcrt
+
+            f.seek(0)
+            while True:
+                try:
+                    msvcrt.locking(f.fileno(), msvcrt.LK_NBLCK, 1)
+                    break
+                except OSError:
+                    time.sleep(0.05)
+            try:
+                yield
+            finally:
+                f.seek(0)
+                msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
+        else:
+            import fcntl
+
+            fcntl.flock(f, fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                fcntl.flock(f, fcntl.LOCK_UN)
+
+
 @dataclass
 class RateLimitedClient:
     """Retries on rate limits and stops before a budget is exhausted.
@@ -465,6 +509,8 @@ class RateLimitedClient:
     inner: Any
     max_calls: int = 0
     max_retries: int = 5
+    #: Attempts for rate limits and 503s (~10 min at the 60 s cap).
+    rate_limit_retries: int = 14
     base_delay: float = 2.0
     #: Proactive tokens-per-minute ceiling. 0 disables pacing.
     #:
@@ -479,6 +525,7 @@ class RateLimitedClient:
     waited_seconds: float = 0.0
     paced_seconds: float = 0.0
     _window: list = field(default_factory=list)
+    _lock: Any = field(default_factory=threading.Lock, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         self.name = f"ratelimited:{getattr(self.inner, 'name', 'unknown')}"
@@ -567,9 +614,46 @@ class RateLimitedClient:
         return int(size / 4) + 200  # + headroom for the reply
 
     def _pace(self, estimated: int) -> None:
-        """Sleep just long enough to stay under the per-minute ceiling."""
+        """Sleep just long enough to stay under the per-minute ceiling.
+
+        Thread-safe, so one client can serve several worker threads. With
+        ``CREDITPULSE_TPM_LEDGER`` set, the minute window lives in that file and
+        is shared by every process pointing at it: the provider counts one
+        quota per project, so two backtests pacing separately at 16K each
+        jointly overshoot it and spend the difference on 429 backoff.
+        """
         if not self.tokens_per_minute:
             return
+        with self._lock:
+            ledger = os.environ.get(TPM_LEDGER_ENV)
+            if ledger:
+                self._pace_shared(Path(ledger), estimated)
+            else:
+                self._pace_local(estimated)
+
+    def _pace_shared(self, ledger: Path, estimated: int) -> None:
+        while True:
+            with _file_lock(ledger.with_suffix(".lock")):
+                now = time.time()
+                entries: list[tuple[float, int]] = []
+                if ledger.exists():
+                    for line in ledger.read_text(encoding="utf8").splitlines():
+                        try:
+                            t, n = line.split()
+                            if now - float(t) < 60.0:
+                                entries.append((float(t), int(n)))
+                        except ValueError:
+                            continue
+                used = sum(n for _, n in entries)
+                if not entries or used + estimated <= self.tokens_per_minute:
+                    entries.append((now, estimated))
+                    ledger.write_text("".join(f"{t:.3f} {n}\n" for t, n in entries), encoding="utf8")
+                    return
+                wait = max(60.0 - (now - min(t for t, _ in entries)) + 0.25, 0.5)
+            time.sleep(wait)
+            self.paced_seconds += wait
+
+    def _pace_local(self, estimated: int) -> None:
         now = time.monotonic()
         self._window = [(t, n) for t, n in self._window if now - t < 60.0]
         used = sum(n for _, n in self._window)
@@ -593,7 +677,7 @@ class RateLimitedClient:
                 "completed work is cached, so a re-run resumes rather than repeats"
             )
         delay = self.base_delay
-        for attempt in range(self.max_retries + 1):
+        for attempt in range(max(self.max_retries, self.rate_limit_retries) + 1):
             try:
                 result = action()
                 self.calls += 1
@@ -614,7 +698,22 @@ class RateLimitedClient:
                         f"provider daily/credit limit reached: {str(exc)[:160]}. "
                         "Completed work is cached; re-run when the quota resets."
                     ) from exc
-                if attempt >= self.max_retries:
+                if self._is_transient(exc) and not self._is_rate_limit(exc):
+                    from agents import netwait
+
+                    if netwait.enabled() and not netwait.online():
+                        # An outage is not the provider failing: wait it out and
+                        # start the retries afresh rather than spend them on it.
+                        netwait.wait_until_online()
+                        return self._with_retries(action)
+                # A 429 or 503 means "not now", not "no". Five quick retries
+                # (~1 min) gave up on 55 of 199 single-pass cases overnight while
+                # parallel workers shared one quota; those were scored as
+                # abstentions though the agent never ran. Be patient with them.
+                limit = self.max_retries
+                if self._is_rate_limit(exc) or "503" in str(exc):
+                    limit = max(limit, self.rate_limit_retries)
+                if attempt >= limit:
                     raise
                 wait = self._retry_after(exc) or delay
                 wait = min(wait, 60.0)

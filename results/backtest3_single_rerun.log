@@ -1,0 +1,77 @@
+loaded from .env: CREDITPULSE_SEC_UA, CREDITPULSE_LLM_BASE_URL, CREDITPULSE_LLM_MODEL, CREDITPULSE_LLM_API_KEY, CREDITPULSE_JUDGE_MODEL, CREDITPULSE_JUDGE_BASE_URL, CREDITPULSE_JUDGE_API_KEY, CREDITPULSE_QDRANT_URL, CREDITPULSE_QDRANT_API_KEY, LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY, LANGFUSE_HOST
+stratified: 99 positives + 100/1113 negatives (fraction 0.090); precision is base-rate corrected
+endpoint ok: <thought>The user wants a specific JSON response: `{"ok": true}`.
+The instructio
+C:\Users\chara\OneDrive\Desktop\Credit-PulseIQ\rag\store.py:122: UserWarning: Qdrant client version 1.14.0 is incompatible with server version 1.20.1. Major versions should match and minor version difference must not exceed 1. Set check_compatibility=False to skip version check.
+  return QdrantClient(url=url, api_key=key, timeout=60)
+L3 backtest: single-pass investigator (cached:ratelimited:openai-compatible:gemma-4-31b-it) over 199 test cases (cutoff 2024-06-01)
+  5/199
+  10/199
+  15/199
+  20/199
+  25/199
+  30/199
+  35/199
+  40/199
+  45/199
+  50/199
+  55/199
+  60/199
+  65/199
+  70/199
+  75/199
+  80/199
+  85/199
+  90/199
+  95/199
+  100/199
+  105/199
+  110/199
+  115/199
+  120/199
+  125/199
+  130/199
+  135/199
+  140/199
+  145/199
+  150/199
+  155/199
+  160/199
+  165/199
+  170/199
+  175/199
+  180/199
+  185/199
+  190/199
+  195/199
+per-case results -> data\cache\l3_single.csv
+
+=== L3: single-pass investigator (cached:ratelimited:openai-compatible:gemma-4-31b-it) ===
+cases                 199  (positives 99)
+abstained             7  (3.5%)  honest 0 / protocol-failure 7
+precision / recall    0.836 / 0.989   F1 0.906  [base-rate corrected 0.315]
+median lead time      165 days
+FALSE-CONFIDENCE RATE 0.000  (0/99)
+calibration (ECE)     0.101    AUC 0.974
+mean steps / calls    1.1 / 40.9
+verification failures 0
+signals               {'elevated_risk': 24, 'healthy': 68, 'insufficient_evidence': 7, 'severe_risk': 86, 'watch': 14}
+
+  reliability curve (confidence -> observed failure rate):
+    [0.0-0.2)  n=   68  stated=0.11  observed=0.00
+    [0.2-0.4)  n=   14  stated=0.27  observed=0.07
+    [0.4-0.6)  n=    6  stated=0.54  observed=0.33
+    [0.6-0.8)  n=   28  stated=0.70  observed=0.61
+    [0.8-1.0)  n=   76  stated=0.90  observed=0.96
+
+=== baselines on the IDENTICAL 192 graded cases ===
+  agent single     : auc=0.9738
+  Tier 0 Altman Z'' : n=192  positives=93  base_rate=0.4844  AUC=0.886  Brier=0.1418  ECE=0.1527  P@10=1.000  P@25=1.000  P@50=0.980  P@100=0.760
+  Tier 1 hazard     : n=192  positives=93  base_rate=0.4844  AUC=0.968  Brier=0.0842  ECE=0.1116  P@10=1.000  P@25=1.000  P@50=1.000  P@100=0.880
+
+=== all 199 completed cases (abstentions scored 0.5, not dropped) ===
+  agent single     : auc=0.9642
+  Tier 0 Altman Z'' : n=199  positives=99  base_rate=0.4975  AUC=0.887  Brier=0.1427  ECE=0.1421  P@10=1.000  P@25=1.000  P@50=0.980  P@100=0.820
+  Tier 1 hazard     : n=199  positives=99  base_rate=0.4975  AUC=0.969  Brier=0.0836  ECE=0.1100  P@10=1.000  P@25=1.000  P@50=1.000  P@100=0.880
+
+AUC is comparable across rows; precision/recall are not directly comparable, because the agent may abstain and the baselines never do.
