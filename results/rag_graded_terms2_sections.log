@@ -1,0 +1,43 @@
+variant: terms2+sections
+Recall@5 (share of cases with a relevant chunk in the top 5); MRR@10 in brackets
+
+family             cases              hybrid             dense            sparse
+going_concern          0       0.00 [0.00]       0.00 [0.00]       0.00 [0.00]  
+material_weakness      0       0.00 [0.00]       0.00 [0.00]       0.00 [0.00]  
+covenant              24       0.33 [0.18]       0.29 [0.23]       0.33 [0.21]  
+all                   24       0.33              0.29              0.33         
+
+Context precision@5 (share of the top 5 that are relevant):
+going_concern          0       0.00              0.00              0.00         
+material_weakness      0       0.00              0.00              0.00         
+covenant              24       0.12              0.14              0.14         
+
+nDCG@10 (binary relevance; credits every relevant chunk by rank):
+going_concern          0       0.00              0.00              0.00         
+material_weakness      0       0.00              0.00              0.00         
+covenant              24       0.17              0.18              0.19         
+
+Covenant, GRADED key (2 = stated breach/waiver/forbearance, 1 = covenant stress), 24 cases:
+any_recall@5          24       0.54              0.46              0.54         
+any_precision@5       24       0.28              0.25              0.28         
+graded_ndcg@10        24       0.21              0.22              0.24         
+
+Coverage (probe found the warning in the latest report -> store has a matching chunk):
+
+Hybrid misses (16):
+  covenant          cik 748790 as of 2024-07-01: 5 relevant chunks, none in top 5
+  covenant          cik 1723580 as of 2024-07-01: 2 relevant chunks, none in top 5
+  covenant          cik 1834045 as of 2024-07-01: 25 relevant chunks, none in top 5
+  covenant          cik 1835972 as of 2024-07-01: 5 relevant chunks, none in top 5
+  covenant          cik 92122 as of 2024-10-01: 3 relevant chunks, none in top 5
+  covenant          cik 748790 as of 2024-10-01: 5 relevant chunks, none in top 5
+  covenant          cik 1539838 as of 2024-10-01: 1 relevant chunks, none in top 5
+  covenant          cik 1835972 as of 2024-10-01: 4 relevant chunks, none in top 5
+  covenant          cik 1893311 as of 2024-10-01: 1 relevant chunks, none in top 5
+  covenant          cik 720154 as of 2025-01-01: 4 relevant chunks, none in top 5
+  covenant          cik 1415404 as of 2025-01-01: 1 relevant chunks, none in top 5
+  covenant          cik 1893311 as of 2025-01-01: 1 relevant chunks, none in top 5
+  covenant          cik 1893311 as of 2025-04-01: 1 relevant chunks, none in top 5
+  covenant          cik 92122 as of 2025-07-01: 2 relevant chunks, none in top 5
+  covenant          cik 720154 as of 2025-07-01: 8 relevant chunks, none in top 5
+  covenant          cik 1893311 as of 2025-07-01: 1 relevant chunks, none in top 5
