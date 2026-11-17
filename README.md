@@ -120,6 +120,42 @@ The control matters as much as the effect: where no signal was found the verdict
 
 Reproduce with `python -m evals.run_l3 --agent react --max-negatives 100`. Full numbers and limits in [`results/RESULTS.md`](results/RESULTS.md); methodology in [`SPEC.md`](SPEC.md) §7.
 
+### One model call instead of ten: single-pass investigation with filing-text RAG
+
+The ReAct loop spends ~10 model calls deciding which deterministic tool to run next. Every one of those tools is deterministic, so the single-pass investigator runs them all in code, adds passages **retrieved from the filings themselves**, and asks the model once. Figures, the critic and the as-of rule are unchanged; any quoted passage must appear verbatim in the passage it cites.
+
+A/B on a stratified 199 cases (99 bankruptcies), `gemma-4-31b-it`, identical cases and grading:
+
+| Metric | ReAct tool loop | **Single-pass + RAG** | Hazard |
+|---|---|---|---|
+| AUC (abstentions scored 0.5) | 0.974 | **0.964** | 0.969 |
+| Bankruptcies called healthy | 8 / 99 | **0 / 99** | — |
+| Recall | 0.896 | **0.989** | — |
+| Base-rate-corrected precision | **0.462** | 0.315 | — |
+| Median lead time | 148 days | **165 days** | — |
+| Model calls per case | ~10 | **~1** | — |
+| Verification failures | 0 | **0** | — |
+
+```
+single - loop : -0.0093   paired-bootstrap 95% CI [-0.0287, +0.0092]   -> tie
+```
+
+**Same ranking quality at a tenth of the model calls**, with a different error profile: single-pass missed no bankruptcy and warns earlier, at the cost of more false alarms.
+
+Retrieval is a hybrid of `bge-small` embeddings and BM25 fused by reciprocal rank, on Qdrant, over 875 10-K/10-Q filings (~139k section-aware chunks, 320 tokens with 64 overlap). **The prediction date is enforced by the store, not the caller**, and re-checked on every result: a chunk filed after the as-of date raises an error rather than leaking the outcome in words.
+
+Retrieval is evaluated against deterministic ground truth (no judge), 158 cases:
+
+| Warning | Recall@5 | MRR@10 | nDCG@10 |
+|---|---|---|---|
+| Going concern | 0.93 | 0.94 | 0.75 |
+| Material weakness (filing-vocabulary queries + section filter) | 0.88 | 0.76 | 0.67 |
+| Covenant trouble | ~0.4 | ~0.37 | ~0.25 |
+
+Store coverage is 100%: every warning the filing contains is indexed, so every miss is a ranking miss. Covenant retrieval is the open extension -- embeddings rank "in compliance with our covenants" beside "not in compliance". It does not affect the headline; the fix is a deterministic covenant scan like the going-concern one (see [`results/RESULTS.md`](results/RESULTS.md), Phase 5).
+
+Reproduce with `python -m evals.run_l3 --agent single --store cloud --max-negatives 100`, then `python -m evals.compare_arms` and `python -m evals.run_rag_recall --store cloud`.
+
 ### The second leg does not work, and that is reported
 
 The earnings-quality leg was built to the same standard and **failed**. Four independent approaches against 891 test positives with a clean leak canary:
@@ -491,6 +527,8 @@ The eval harness is the point. Tooling is matched to what each layer actually is
 | **L3** | Investigator diagnosis vs real labels | **Outcome-based backtest** | **custom harness** (pytest-driven) | built, running |
 | **L4** | End-to-end (name → memo), cost/latency | Outcome + behavioral | custom harness + DeepEval | |
 | **L5** | Guardrails / adversarial; retrieval groundedness | LLM-as-judge / behavioral | DeepEval; RAGAS (context leg) | |
+| **RAG** | Retrieval: Recall@5, MRR@10, precision@5, nDCG@10, coverage; verbatim-quote check; answer relevance | Deterministic ground truth, no judge | custom (`evals/run_rag_recall.py`) | ✅ |
+| Tracking | A/B arms and retrieval variants as experiments on shared datasets | Experiment tracking | Langfuse | ✅ |
 | Online | Live drift, groundedness, calibration | LLM-as-judge + tracing | Langfuse / Opik | |
 
 The headline is the **custom outcome-based backtest** (L3) with lookahead controls — that is the differentiator. RAGAS/DeepEval/Langfuse are the supporting cast for the groundedness, guardrail, and monitoring layers.
@@ -525,7 +563,8 @@ The headline is the **custom outcome-based backtest** (L3) with lookahead contro
 | [`verify/`](verify/) | Numeric recomputation, lookahead + staleness guards | built |
 | [`models/`](models/) | Firm-period panel, hazard + Altman baselines, evaluation metrics | built |
 | [`evals/`](evals/) | L0–L2 suite, real-filing fixtures | built |
-| [`agents/`](agents/) | Distress investigator (ReAct loop), typed tools, deterministic critic, model clients | built |
+| [`agents/`](agents/) | Distress investigator (ReAct loop), single-pass investigator, typed tools, deterministic critic, model clients with shared rate pacing | built |
+| [`rag/`](rag/) | Filing-text chunking, embeddings, Qdrant store with enforced as-of filter, resumable ingestion | built |
 | `agents/` (rest) | Orchestrator + earnings-quality / covenant / context workers | Phase 4–5 |
 | `serving/` | vLLM config + judge model | Phase 3 |
 | `feedback/` | Input-quality gate + online judge + flywheel | Phase 5 |
@@ -569,6 +608,13 @@ python -m evals.run_l3 --agent react --max-negatives 300
 
 # The judge must be a different model (hard rule 7); cross-provider is safest.
 export CREDITPULSE_JUDGE_MODEL="gemini-2.5-flash"
+
+# Filing-text RAG. Credentials go in .env (CREDITPULSE_QDRANT_URL / _API_KEY), never in code.
+pip install -e ".[rag]"
+python -m rag.ingest --all --store cloud                    # resumable; skips filings already stored
+python -m evals.run_rag_recall --store cloud                # Recall@5, MRR, precision@5, nDCG@10
+python -m evals.run_l3 --agent single --store cloud --max-negatives 100 --workers 4 --tpm 15000
+python -m evals.compare_arms data/cache/l3_react_full.csv data/cache/l3_single.csv
 ```
 
 Responses are cached by model and conversation, so re-running a backtest after
@@ -595,10 +641,11 @@ Other sources evaluated and their trade-offs are recorded in [`data/labels/READM
 3. ✅ **Distress investigator as a real ReAct loop + its L3 backtest.** Produced a real calibration curve; filing-text tools measured at +0.084 AUC.
 4. ✅ Earnings-quality leg vs restatement labels, reusing the harness — **measured, failed, reported**. Demo-grade, excluded from the graded signal.
 5. ✅ Assemble: orchestrator, guardrails, memo, L4 and L5. Scoped to one green leg rather than faking a fusion. Feedback layer not built.
+6. ✅ **Filing-text RAG + single-pass investigator, A/B'd against the tool loop.** Tie on AUC at a tenth of the model calls; retrieval measured per warning type.
 
 ## Status
 
-**Complete as an eval-first study.** One backtested leg at parity with a strong statistical baseline, one leg measured and honestly declared unusable, the full L0–L5 ladder, and every number reproducible from the committed harness.
+**Complete as an eval-first study.** One backtested leg at parity with a strong statistical baseline -- in two designs, a tool loop and a single-pass RAG investigator, tied with each other -- one leg measured and honestly declared unusable, the full L0–L5 ladder, and every number reproducible from the committed harness.
 
 Known gaps, stated rather than hidden:
 
@@ -606,6 +653,8 @@ Known gaps, stated rather than hidden:
 - **The covenant leg does not exist.** It was demo-grade by design and nothing was built.
 - **Absolute probabilities do not transfer.** The universe is enriched with distressed filers far above the population base rate (Zmijewski 1984); ranking transfers, calibrated probabilities do not.
 - **The agent has never chosen to abstain.** All abstentions across 200 cases were protocol failures. "It will tell you when it does not know" is an unexercised claim.
+- **Covenant-trouble retrieval is weak** (Recall@5 ~0.4). An open extension: a deterministic covenant scan is the planned fix.
+- **Prose faithfulness is not reported.** A small NLI checker mislabelled correct, figure-heavy claims, so it was disabled. Figures are verified by the critic and quotes by exact match; free-text claims need a validated checker first.
 - **One model, one window.** Validated on `gemma-4-31b-it` over 2024–2025. Any swap needs re-measuring — which the harness makes cheap, and which is the point of having built it first.
 
 ## License
