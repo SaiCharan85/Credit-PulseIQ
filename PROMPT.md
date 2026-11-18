@@ -45,7 +45,8 @@ Paste this as the opening message in the repo root. It is written to enforce the
 
 - L0–L2 (deterministic): **pytest**. These are unit tests, not "LLM evals." ✅ built
 - L3–L4 (reasoning vs real labels): a **custom backtest harness** — this is the core; no library does it.
-- L5 + online (groundedness, guardrails, drift): **DeepEval**; **RAGAS** only for the context/retrieval leg's groundedness; **Langfuse/Opik** for tracing and online monitoring.
+- L5 (guardrails, groundedness) and retrieval: **custom deterministic harnesses** — exact ground truth, no judge model.
+- Tracking and online monitoring: **Langfuse**.
 
 ## Stack
 

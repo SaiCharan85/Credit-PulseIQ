@@ -115,7 +115,10 @@ The retrieval design is under [Architecture](#filing-text-retrieval-rag). It is 
 |---|---|---|---|
 | Going concern | 0.93 | 0.94 | 0.75 |
 | Material weakness (filing-vocabulary queries + section filter) | 0.88 | 0.76 | 0.67 |
+| Material weakness, + cross-encoder rerank (offline only) | 0.96 | 0.81 | — |
 | Covenant trouble | ~0.4 | ~0.37 | ~0.25 |
+
+The cross-encoder (`bge-reranker-v2-m3`) reads query and passage together, which lifts material weakness to 0.96. It is measured, not served: on CPU it costs minutes per case against milliseconds for hybrid search. On covenant trouble it reaches 0.58 only when it rescores the whole candidate pool (~4.5 min per case); small rerankers (MiniLM-L-6/L-12) do not separate "in compliance" from "not in compliance" (0.33-0.38).
 
 Store coverage is 100%: every warning the filing contains is indexed, so every miss is a ranking miss. Covenant retrieval is the open extension -- embeddings rank "in compliance with our covenants" beside "not in compliance". It does not affect the headline; the fix is a deterministic covenant scan like the going-concern one (see [`results/RESULTS.md`](results/RESULTS.md), Phase 5).
 
@@ -490,13 +493,15 @@ The eval harness is the point. Tooling is matched to what each layer actually is
 | **L1** | XBRL extraction accuracy | Unit test | pytest | ✅ |
 | **L2** | Peer-group + trend correctness | Unit test | pytest | ✅ |
 | **L3** | Investigator diagnosis vs real labels; tool loop vs single-pass A/B | **Outcome-based backtest** | **custom harness** (pytest-driven) | ✅ |
-| **L4** | End-to-end (name → memo), cost/latency | Outcome + behavioral | custom harness + DeepEval | |
-| **L5** | Guardrails / adversarial; retrieval groundedness | LLM-as-judge / behavioral | DeepEval; RAGAS (context leg) | |
+| **L4** | End-to-end (facts in → cited memo out), answer shape | Outcome + behavioral | custom harness (`test_l4_*`, `run_answer_quality`) | ✅ |
+| **L5** | Guardrails / adversarial: decision framing, baited figures, citation provenance, context poisoning | Deterministic + behavioral | custom harness (13 test files, `run_hallucination_probe`, `run_figure_audit`) | ✅ |
 | **RAG** | Retrieval: Recall@5, MRR@10, precision@5, nDCG@10, coverage; verbatim-quote check; answer relevance | Deterministic ground truth, no judge | custom (`evals/run_rag_recall.py`) | ✅ |
 | Tracking | A/B arms and retrieval variants as experiments on shared datasets | Experiment tracking | Langfuse | ✅ |
-| Online | Live drift, groundedness, calibration | LLM-as-judge + tracing | Langfuse / Opik | |
+| Online | Live drift, groundedness, calibration | LLM-as-judge + tracing | Langfuse | not built |
 
-The headline is the **custom outcome-based backtest** (L3) with lookahead controls — that is the differentiator. RAGAS/DeepEval/Langfuse are the supporting cast for the groundedness, guardrail, and monitoring layers.
+The headline is the **custom outcome-based backtest** (L3) with lookahead controls — that is the differentiator.
+
+**Deterministic wherever possible.** Every check here has an exact answer — a figure either recomputes from XBRL or it does not, a quote either appears in its passage or it does not, a retrieved chunk either matches the warning's ground truth or it does not. A judge is reserved for what nothing exact can grade, and is never the generating model. The one open gap, prose faithfulness, needs a validated fact-checker rather than a generic judge.
 
 ---
 
@@ -615,7 +620,7 @@ Other sources evaluated and their trade-offs are recorded in [`data/labels/READM
 Known gaps, stated rather than hidden:
 
 - **The feedback layer is not built** (SPEC §9) — no online judge, no drift monitoring. It was always the last item and it needs production traffic to mean anything.
-- **The covenant leg does not exist.** It was demo-grade by design and nothing was built.
+- **The covenant-analysis leg was not built.** It would read credit-agreement exhibits and was scoped demo-grade, never gating the assessment. (Separate from covenant-trouble *retrieval*, below.)
 - **Absolute probabilities do not transfer.** The universe is enriched with distressed filers far above the population base rate (Zmijewski 1984); ranking transfers, calibrated probabilities do not.
 - **The agent has never chosen to abstain.** All abstentions across 200 cases were protocol failures. "It will tell you when it does not know" is an unexercised claim.
 - **Covenant-trouble retrieval is weak** (Recall@5 ~0.4). An open extension: a deterministic covenant scan is the planned fix.

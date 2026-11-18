@@ -142,7 +142,7 @@ QUESTION = ("How likely is this company to file for bankruptcy protection within
 def answer_relevance(embedder, rationales: list[str]) -> list[float]:
     """Cosine between the question and each answer, with the retrieval embedder (bge).
 
-    No LLM: RAGAS-style answer relevance uses a model to invent questions from
+    No LLM: judge-style answer relevance uses a model to invent questions from
     the answer; a fixed task makes that unnecessary. Absolute values depend on
     the embedder, so read this comparatively -- arm against arm.
     """

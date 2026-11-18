@@ -402,8 +402,16 @@ Suggested next steps, in order:
 1. A deterministic covenant scan in the evidence pack, as the going-concern
    scan already is: the graded patterns in `evals/run_rag_recall.py`, with the
    matched sentence and filing cited. Exact, no model call.
-2. A cross-encoder re-ranker on covenant queries only (variant
-   `terms+sections+rerank`), which reads negation that embeddings miss.
+2. A cross-encoder re-ranker, which reads negation that embeddings miss --
+   measured, with mixed results. Re-ranking the top 40 of one query
+   (`terms+sections+rerank`) left covenant at 0.33 but lifted material weakness
+   from 0.88 to **0.96** Recall@5 (MRR 0.76 -> 0.81). Re-scoring the whole fused
+   candidate pool with `bge-reranker-v2-m3` against three breach questions lifts
+   covenant to **0.58**, at ~4.5 min per case on CPU -- too slow to serve. Small
+   re-rankers (MiniLM-L-6, L-12) on the top 60 reach only 0.33-0.38, and a
+   recency boost lowered material weakness (0.88 -> 0.82). In 4 of 24 cases no
+   matching chunk reaches the candidate pool at all, so re-ranking alone tops
+   out near 0.83.
 3. Hand-check the 24 covenant cases to tighten the ground truth before tuning further.
 
 NLI faithfulness is disabled for the same kind of reason: the small NLI model
