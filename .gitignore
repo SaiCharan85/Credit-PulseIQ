@@ -40,3 +40,13 @@ results/react_parallel*
 results/backtest3_react_full.log
 results/backtest3_react_replay.log
 results/backtest3_single_run.log
+results/rag_langfuse_upload.log
+results/rag_tune_terms.log
+results/rag_tune_terms_sections_rerank.log
+
+# Local working files: build brief, machine-specific job runners, superseded run
+PROMPT.md
+rag/overnight.py
+evals/ab_finish.py
+evals/ab_complete.py
+results/eq_baselines_scoped.log

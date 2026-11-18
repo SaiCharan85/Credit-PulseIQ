@@ -541,7 +541,7 @@ The headline is the **custom outcome-based backtest** (L3) with lookahead contro
 | `serving/` | vLLM config + judge model | Phase 3 |
 | `feedback/` | Input-quality gate + online judge + flywheel | Phase 5 |
 
-See [`SPEC.md`](SPEC.md) for the full design and [`PROMPT.md`](PROMPT.md) for the build brief.
+See [`SPEC.md`](SPEC.md) for the full design.
 
 ---
 

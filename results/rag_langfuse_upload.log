@@ -1,6 +1,0 @@
-﻿dataset creditpulse-rag-retrieval: 158 items
-run baseline: 158 items  {'all/recall@5': 0.7342, 'all/rr': 0.5832, 'all/precision@5': 0.4101, 'all/ndcg@10': 0.4938}
-run terms: 97 items  {'all/recall@5': 0.732, 'all/rr': 0.6269, 'all/precision@5': 0.3773, 'all/ndcg@10': 0.5542}
-run terms+sections: 97 items  {'all/recall@5': 0.7423, 'all/rr': 0.6233, 'all/precision@5': 0.3773, 'all/ndcg@10': 0.5498}
-run terms+sections+rerank: 97 items  {'all/recall@5': 0.8041, 'all/rr': 0.6628, 'all/precision@5': 0.4082, 'all/ndcg@10': 0.6124}
-open Langfuse > Datasets > creditpulse-rag-retrieval to compare variants
