@@ -118,6 +118,8 @@ The retrieval design is under [Architecture](#filing-text-retrieval-rag). It is 
 | Material weakness, + cross-encoder rerank (offline only) | 0.96 | 0.81 | — |
 | Covenant trouble | ~0.4 | ~0.37 | ~0.25 |
 
+**Which setting the A/B used.** The single-pass arm retrieves with the plain-language baseline: five standard questions, hybrid search, three passages each (`agents/single_pass.py`). The tuned material-weakness setting (0.88, up from 0.67 for the baseline) and the rerank are retrieval results, not part of the A/B; adopting them in the investigator would need the A/B re-run.
+
 The cross-encoder (`bge-reranker-v2-m3`) reads query and passage together, which lifts material weakness to 0.96. It is measured, not served: on CPU it costs minutes per case against milliseconds for hybrid search. On covenant trouble it reaches 0.58 only when it rescores the whole candidate pool (~4.5 min per case); small rerankers (MiniLM-L-6/L-12) do not separate "in compliance" from "not in compliance" (0.33-0.38).
 
 Store coverage is 100%: every warning the filing contains is indexed, so every miss is a ranking miss. Covenant retrieval is the open extension -- embeddings rank "in compliance with our covenants" beside "not in compliance". It does not affect the headline; the fix is a deterministic covenant scan like the going-concern one (see [`results/RESULTS.md`](results/RESULTS.md), Phase 5).
